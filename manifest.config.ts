@@ -14,6 +14,18 @@ export default defineManifest({
     },
     default_popup: "src/popup/index.html",
   },
+  commands: {
+    "toggle-spotlight": {
+      suggested_key: {
+        default: "Alt+M",
+      },
+      description: "Toggle Spotlight",
+    },
+  },
+  background: {
+    service_worker: "src/background.ts",
+    type: "module",
+  },
   permissions: ["contentSettings"],
   content_scripts: [
     {

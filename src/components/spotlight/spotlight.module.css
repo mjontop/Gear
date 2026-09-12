@@ -17,8 +17,9 @@
   width: 100%;
   max-width: 650px;
   background-color: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(2px) saturate(180%);
   border-radius: 12px;
+  border: #dedede 1.2px solid;
   box-shadow:
     0 16px 40px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(0, 0, 0, 0.1);
@@ -32,6 +33,7 @@
   align-items: center;
   padding: 0 20px;
   height: 64px;
+  background: #000;
 }
 
 .search_icon {
@@ -45,24 +47,19 @@
   border: none;
   outline: none;
   font-size: 22px;
-  color: #333;
+  color: #444;
   font-weight: 300;
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+.search_input:focus {
+  outline: none !important;
+  outline-offset: 0 !important;
 }
 
 .search_input::placeholder {
   color: #999;
-}
-
-.shortcut_hint {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.05);
-  padding: 4px 8px;
-  border-radius: 6px;
-  color: #666;
-  font-size: 12px;
-  font-weight: 600;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -83,10 +80,5 @@
 
   .search_input::placeholder {
     color: #666;
-  }
-
-  .shortcut_hint {
-    background: rgba(255, 255, 255, 0.1);
-    color: #aaa;
   }
 }

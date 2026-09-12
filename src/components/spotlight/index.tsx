@@ -6,18 +6,46 @@ export const Spotlight = () => {
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // useEffect(() => {
+  //   const handleKeydown = (e: KeyboardEvent) => {
+  //     if (e.ctrlKey && e.key.toLowerCase() === "t") {
+  //       e.preventDefault();
+  //       setIsOpen((prev) => !prev);
+  //     } else if (e.key === "Escape") {
+  //       setIsOpen(false);
+  //     }
+  //   };
+
+  //   document.addEventListener("keydown", handleKeydown);
+  //   return () => document.removeEventListener("keydown", handleKeydown);
+  // }, []);
+
+  useEffect(() => {
+    const handleMessage = (message: { type?: string }) => {
+      if (message.type === "TOGGLE_SPOTLIGHT") {
+        setIsOpen((prev) => !prev);
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(handleMessage);
+
+    return () => {
+      chrome.runtime.onMessage.removeListener(handleMessage);
+    };
+  }, []);
+
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
-      if (e.altKey && e.key.toLowerCase() === "m") {
-        e.preventDefault();
-        setIsOpen((prev) => !prev);
-      } else if (e.key === "Escape") {
+      if (e.key === "Escape") {
         setIsOpen(false);
       }
     };
 
     document.addEventListener("keydown", handleKeydown);
-    return () => document.removeEventListener("keydown", handleKeydown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeydown);
+    };
   }, []);
 
   useEffect(() => {
@@ -39,15 +67,11 @@ export const Spotlight = () => {
           <Search size={24} className={styles.search_icon} />
           <input
             ref={inputRef}
+            name="search"
             type="text"
             className={styles.search_input}
             placeholder="Search or Enter URL...."
           />
-          <div className={styles.shortcut_hint}>
-            <span>Alt</span>
-            <span>+</span>
-            <span>M</span>
-          </div>
         </div>
       </div>
     </div>
