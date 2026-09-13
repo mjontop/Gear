@@ -16,10 +16,10 @@
 
 .spotlight_container {
   width: 100%;
-  max-width: 650px;
-  background-color: rgba(255, 255, 255, 0.85);
-  border-radius: 12px;
-  border: #dedede 1.2px solid;
+  width: 650px !important;
+  background-color: rgba(8, 9, 10, 0.82);
+  border-radius: 10px;
+  border: rgba(255, 255, 255, 0.14) 1px solid;
   box-shadow:
     0 16px 40px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(0, 0, 0, 0.1);
@@ -33,11 +33,11 @@
   align-items: center;
   padding: 0 20px;
   height: 64px;
-  background: #000;
+  background: transparent;
 }
 
 .search_icon {
-  color: #555;
+  color: rgba(255, 255, 255, 0.58);
   margin-right: 12px;
 }
 
@@ -47,7 +47,7 @@
   border: none;
   outline: none;
   font-size: 22px;
-  color: #444;
+  color: #fff;
   font-weight: 300;
   outline: none !important;
   outline-offset: 0 !important;
@@ -61,12 +61,12 @@
 }
 
 .search_input::placeholder {
-  color: #999;
+  color: rgba(255, 255, 255, 0.42);
 }
 
 @media (prefers-color-scheme: dark) {
   .spotlight_container {
-    background-color: rgba(30, 30, 30, 0.85);
+    background-color: rgba(8, 9, 10, 0.82);
     box-shadow:
       0 16px 40px rgba(0, 0, 0, 0.5),
       0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -81,6 +81,6 @@
   }
 
   .search_input::placeholder {
-    color: #666;
+    color: rgba(255, 255, 255, 0.42);
   }
 }

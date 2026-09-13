@@ -26,7 +26,7 @@ export default defineManifest({
     service_worker: "src/background.ts",
     type: "module",
   },
-  permissions: ["contentSettings"],
+  permissions: ["contentSettings", "tabs"],
   content_scripts: [
     {
       js: ["src/content/main.tsx"],
