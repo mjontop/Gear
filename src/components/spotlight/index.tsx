@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
-import { Search } from "lucide-react";
+import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import { SearchIcon } from "lucide-react";
 import styles from "./spotlight.module.css";
+import { getRedirectUrl } from "@/lib/redirect";
 
 export const Spotlight = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,26 +21,20 @@ export const Spotlight = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const handleKeydown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setIsOpen(false);
+  const handleKeydown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape") {
+      setIsOpen(false);
+      if (inputRef.current) {
+        inputRef.current.value = "";
       }
-    };
-
-    document.addEventListener("keydown", handleKeydown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeydown);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    }
+    if (e.key === "Enter" && inputRef.current) {
+      const redirectUrl = getRedirectUrl(inputRef.current.value);
+      window.open(redirectUrl, "_blank");
+      setIsOpen(false);
       inputRef.current.value = "";
     }
-  }, [isOpen]);
+  };
 
   if (!isOpen) return null;
 
@@ -50,14 +45,16 @@ export const Spotlight = () => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className={styles.search_header}>
-          <Search size={24} className={styles.search_icon} />
+          <SearchIcon size={24} className={styles.search_icon} />
           <input
             ref={inputRef}
             autoFocus={true}
             name="search"
             type="text"
+            // on tab change it should close the spotlight
             className={styles.search_input}
             placeholder="Search or Enter URL...."
+            onKeyDown={handleKeydown}
           />
         </div>
       </div>
