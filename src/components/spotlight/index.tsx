@@ -6,20 +6,6 @@ export const Spotlight = () => {
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // useEffect(() => {
-  //   const handleKeydown = (e: KeyboardEvent) => {
-  //     if (e.ctrlKey && e.key.toLowerCase() === "t") {
-  //       e.preventDefault();
-  //       setIsOpen((prev) => !prev);
-  //     } else if (e.key === "Escape") {
-  //       setIsOpen(false);
-  //     }
-  //   };
-
-  //   document.addEventListener("keydown", handleKeydown);
-  //   return () => document.removeEventListener("keydown", handleKeydown);
-  // }, []);
-
   useEffect(() => {
     const handleMessage = (message: { type?: string }) => {
       if (message.type === "TOGGLE_SPOTLIGHT") {
@@ -67,6 +53,7 @@ export const Spotlight = () => {
           <Search size={24} className={styles.search_icon} />
           <input
             ref={inputRef}
+            autoFocus={true}
             name="search"
             type="text"
             className={styles.search_input}
