@@ -4,7 +4,7 @@ import App from "./views/App.tsx";
 import appStyles from "./views/App.css?raw";
 import spotlightStyles from "@/components/spotlight/spotlight.module.css?raw";
 import activeTabsStyles from "@/components/spotlight/components/active-tabs.module.css?raw";
-import tabItemStyles from "@/components/spotlight/components/tab-item.module.css?raw";
+import suggestionItemStyles from "@/components/spotlight/components/suggestion-item.module.css?raw";
 
 const host = document.createElement("div");
 host.id = "crxjs-app";
@@ -16,7 +16,7 @@ style.textContent = [
   appStyles,
   spotlightStyles,
   activeTabsStyles,
-  tabItemStyles,
+  suggestionItemStyles,
 ].join("\n");
 shadowRoot.appendChild(style);
 

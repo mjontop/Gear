@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { getRedirectUrl, isValidUrl } from "@/lib/redirect";
-import type { TabItemData } from "./components/tab-item";
+import type { ActiveTabData } from "./components/active-tabs";
 import { SpotlightView } from "./components/spotlight-view";
 
 type TabsResponse = {
-  tabs?: TabItemData[];
+  tabs?: ActiveTabData[];
 };
 
 type SwitchTabResponse = {
@@ -19,7 +19,7 @@ const getClampedTabIndex = (index: number, tabCount: number) => {
 
 export const Spotlight = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [tabs, setTabs] = useState<TabItemData[]>([]);
+  const [tabs, setTabs] = useState<ActiveTabData[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -218,7 +218,7 @@ export const Spotlight = () => {
     filteredTabs.length,
   );
 
-  const handleSelectTab = (tab: TabItemData) => {
+  const handleSelectTab = (tab: ActiveTabData) => {
     chrome.runtime.sendMessage(
       { type: "SWITCH_TO_TAB", tabId: tab.id, windowId: tab.windowId },
       (response?: SwitchTabResponse) => {

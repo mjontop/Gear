@@ -2,19 +2,19 @@ import { GlobeIcon, SearchIcon } from "lucide-react";
 import { useEffect } from "react";
 import type { KeyboardEvent, RefObject } from "react";
 import { ActiveTabs } from "./active-tabs";
-import type { TabItemData } from "./tab-item";
+import type { ActiveTabData } from "./active-tabs";
 
 type SpotlightViewProps = {
   inputRef: RefObject<HTMLInputElement | null>;
   overlayRef: RefObject<HTMLDialogElement | null>;
   searchValue: string;
   validUrl: string | null;
-  filteredTabs: TabItemData[];
+  filteredTabs: ActiveTabData[];
   selectedTabIndex: number;
   onClose: () => void;
   onSearchChange: (value: string) => void;
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
-  onSelectTab: (tab: TabItemData) => void;
+  onSelectTab: (tab: ActiveTabData) => void;
 };
 
 export const SpotlightView = ({

@@ -1,10 +1,15 @@
-import { TabItem } from "./tab-item";
-import type { TabItemData } from "./tab-item";
+import { SuggestionItem } from "./suggestion-item";
+import type { SuggestionItemData } from "./suggestion-item";
+
+export type ActiveTabData = SuggestionItemData & {
+  windowId: number;
+  active: boolean;
+};
 
 type ActiveTabsProps = {
-  tabs: TabItemData[];
+  tabs: ActiveTabData[];
   selectedIndex: number;
-  onSelectTab: (tab: TabItemData) => void;
+  onSelectTab: (tab: ActiveTabData) => void;
 };
 
 export const ActiveTabs = ({
@@ -19,10 +24,12 @@ export const ActiveTabs = ({
   return (
     <div className="active_tabs">
       {tabs.map((tab, index) => (
-        <TabItem
+        <SuggestionItem
           key={tab.id}
-          tab={tab}
+          item={tab}
           isSelected={index === selectedIndex}
+          isActive={tab.active}
+          actionLabel="Switch to Tab"
           onSelect={onSelectTab}
         />
       ))}
