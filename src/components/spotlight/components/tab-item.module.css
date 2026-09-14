@@ -1,13 +1,12 @@
 .tab_item {
   width: 100%;
-  height: 58px;
+  height: 3.08125rem;
   border: 0;
-  border-radius: 8px;
-  padding: 0 14px;
-  display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) max-content;
+  border-radius: 0.425rem;
+  padding: 0 0.74375rem;
+  display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.6375rem;
   background: transparent;
   color: rgba(255, 255, 255, 0.92);
   cursor: pointer;
@@ -21,46 +20,47 @@
 }
 
 .favicon_wrap {
-  width: 28px;
-  height: 28px;
+  width: 1.4875rem;
+  height: 1.4875rem;
   display: grid;
   place-items: center;
   overflow: hidden;
 }
 
 .favicon {
-  width: 24px;
-  height: 24px;
+  width: 1.275rem;
+  height: 1.275rem;
   object-fit: contain;
 }
 
 .favicon_fallback {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 1.4875rem;
+  height: 1.4875rem;
+  border-radius: 0.425rem;
   display: grid;
   place-items: center;
   background: rgba(255, 255, 255, 0.95);
   color: #202425;
-  font-size: 14px;
+  font-size: 0.74375rem;
   font-weight: 700;
 }
 
 .tab_title {
   min-width: 0;
+  flex: 1 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 18px;
+  font-size: 0.9rem;
   line-height: 1.2;
 }
 
 .switch_label {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.425rem;
   color: rgba(255, 255, 255, 0.82);
-  font-size: 17px;
+  font-size: 0.6rem;
   line-height: 1;
   white-space: nowrap;
 }
@@ -71,9 +71,8 @@
 
 @media (max-width: 640px) {
   .tab_item {
-    grid-template-columns: 32px minmax(0, 1fr);
-    height: 54px;
-    padding: 0 12px;
+    height: 2.86875rem;
+    padding: 0 0.6375rem;
   }
 
   .switch_label {
@@ -81,6 +80,6 @@
   }
 
   .tab_title {
-    font-size: 16px;
+    font-size: 0.85rem;
   }
 }
