@@ -18,6 +18,7 @@ export const Spotlight = () => {
   const [searchValue, setSearchValue] = useState("");
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleMessage = (message: { type?: string }) => {
@@ -47,6 +48,145 @@ export const Spotlight = () => {
         setTabs(response?.tabs ?? []);
       },
     );
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const scrollY = window.scrollY;
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+    const bodyPaddingRight =
+      Number.parseFloat(getComputedStyle(document.body).paddingRight) || 0;
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousBodyPaddingRight = document.body.style.paddingRight;
+    const previousBodyPosition = document.body.style.position;
+    const previousBodyTop = document.body.style.top;
+    const previousBodyLeft = document.body.style.left;
+    const previousBodyRight = document.body.style.right;
+    const previousBodyWidth = document.body.style.width;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    const previousHtmlScrollbarGutter =
+      document.documentElement.style.scrollbarGutter;
+    const previousBodyOverscroll = document.body.style.overscrollBehavior;
+    const previousHtmlOverscroll =
+      document.documentElement.style.overscrollBehavior;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${bodyPaddingRight + scrollbarWidth}px`;
+    }
+    document.documentElement.style.overflow = "hidden";
+    document.documentElement.style.scrollbarGutter = "stable";
+    document.body.style.overscrollBehavior = "none";
+    document.documentElement.style.overscrollBehavior = "none";
+
+    const blockedEvents = [
+      "click",
+      "contextmenu",
+      "dblclick",
+      "mousedown",
+      "mouseup",
+      "mousemove",
+      "pointerdown",
+      "pointerup",
+      "pointermove",
+      "pointercancel",
+      "touchstart",
+      "touchend",
+      "touchmove",
+      "wheel",
+      "drag",
+      "dragstart",
+      "dragover",
+      "drop",
+    ];
+
+    const isSpotlightEvent = (event: Event) => {
+      const overlay = overlayRef.current;
+      return overlay ? event.composedPath().includes(overlay) : false;
+    };
+
+    const stopBackgroundInput = (event: Event) => {
+      if (isSpotlightEvent(event)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    };
+
+    const stopBackgroundKeyboardInput = (event: globalThis.KeyboardEvent) => {
+      if (isSpotlightEvent(event)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    const listenerOptions = { capture: true, passive: false };
+
+    blockedEvents.forEach((eventName) => {
+      document.addEventListener(eventName, stopBackgroundInput, listenerOptions);
+      window.addEventListener(eventName, stopBackgroundInput, listenerOptions);
+    });
+    document.addEventListener(
+      "keydown",
+      stopBackgroundKeyboardInput,
+      listenerOptions,
+    );
+    window.addEventListener(
+      "keydown",
+      stopBackgroundKeyboardInput,
+      listenerOptions,
+    );
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.body.style.paddingRight = previousBodyPaddingRight;
+      document.body.style.position = previousBodyPosition;
+      document.body.style.top = previousBodyTop;
+      document.body.style.left = previousBodyLeft;
+      document.body.style.right = previousBodyRight;
+      document.body.style.width = previousBodyWidth;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.documentElement.style.scrollbarGutter =
+        previousHtmlScrollbarGutter;
+      document.body.style.overscrollBehavior = previousBodyOverscroll;
+      document.documentElement.style.overscrollBehavior = previousHtmlOverscroll;
+      window.scrollTo(0, scrollY);
+
+      blockedEvents.forEach((eventName) => {
+        document.removeEventListener(
+          eventName,
+          stopBackgroundInput,
+          listenerOptions,
+        );
+        window.removeEventListener(
+          eventName,
+          stopBackgroundInput,
+          listenerOptions,
+        );
+      });
+      document.removeEventListener(
+        "keydown",
+        stopBackgroundKeyboardInput,
+        listenerOptions,
+      );
+      window.removeEventListener(
+        "keydown",
+        stopBackgroundKeyboardInput,
+        listenerOptions,
+      );
+    };
   }, [isOpen]);
 
   const normalizedSearchValue = searchValue.trim().toLowerCase();
@@ -135,7 +275,11 @@ export const Spotlight = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="spotlight_overlay" onClick={() => setIsOpen(false)}>
+    <div
+      ref={overlayRef}
+      className="spotlight_overlay"
+      onClick={() => setIsOpen(false)}
+    >
       <div className="spotlight_container" onClick={(e) => e.stopPropagation()}>
         <div className="search_header">
           <SearchIcon size={24} className="search_icon" />

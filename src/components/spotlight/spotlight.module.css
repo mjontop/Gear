@@ -1,9 +1,6 @@
 .spotlight_overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   overflow: hidden;
   background-color: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(1rem) saturate(180%);
@@ -12,12 +9,16 @@
   align-items: flex-start;
   padding-top: 15vh;
   z-index: 9999999999999999999999999999999999;
+  pointer-events: auto;
+  touch-action: none;
 }
 
 .spotlight_container {
   width: 100%;
+  max-width: calc(100% - 2rem);
   width: 45rem !important;
-  height: 21.2rem !important;
+  max-height: 21.2rem !important;
+  height: fit-content !important;
   background-color: #000;
   border-radius: 10px;
   display: flex;
