@@ -1,4 +1,4 @@
-import { SearchIcon } from "lucide-react";
+import { GlobeIcon, SearchIcon } from "lucide-react";
 import { useEffect } from "react";
 import type { KeyboardEvent, RefObject } from "react";
 import { ActiveTabs } from "./active-tabs";
@@ -8,6 +8,7 @@ type SpotlightViewProps = {
   inputRef: RefObject<HTMLInputElement | null>;
   overlayRef: RefObject<HTMLDialogElement | null>;
   searchValue: string;
+  validUrl: string | null;
   filteredTabs: TabItemData[];
   selectedTabIndex: number;
   onClose: () => void;
@@ -20,6 +21,7 @@ export const SpotlightView = ({
   inputRef,
   overlayRef,
   searchValue,
+  validUrl,
   filteredTabs,
   selectedTabIndex,
   onClose,
@@ -55,7 +57,11 @@ export const SpotlightView = ({
       />
       <div className="spotlight_container">
         <div className="search_header">
-          <SearchIcon size={24} className="search_icon" />
+          {validUrl ? (
+            <GlobeIcon size={24} className="search_icon" />
+          ) : (
+            <SearchIcon size={24} className="search_icon" />
+          )}
           <label htmlFor="spotlight-search" className="search_label">
             Search
           </label>

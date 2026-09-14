@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
-import { getRedirectUrl } from "@/lib/redirect";
+import { getRedirectUrl, isValidUrl } from "@/lib/redirect";
 import type { TabItemData } from "./components/tab-item";
 import { SpotlightView } from "./components/spotlight-view";
 
@@ -200,6 +200,7 @@ export const Spotlight = () => {
   }, [isOpen]);
 
   const normalizedSearchValue = searchValue.trim().toLowerCase();
+  const validUrl = isValidUrl(searchValue.trim());
   const filteredTabs = tabs
     .filter((tab) => {
       if (!normalizedSearchValue) {
@@ -291,6 +292,7 @@ export const Spotlight = () => {
       inputRef={inputRef}
       overlayRef={overlayRef}
       searchValue={searchValue}
+      validUrl={validUrl}
       filteredTabs={filteredTabs}
       selectedTabIndex={visibleSelectedTabIndex}
       onClose={() => setIsOpen(false)}

@@ -1,21 +1,37 @@
 import { getBangs } from "./bangs";
 
-function isValidUrl(s: string): string | null {
+export function isValidUrl(s: string): string | null {
+  const trimmedValue = s.trim();
+
+  if (!trimmedValue) {
+    return null;
+  }
+
   // handling ip addresses and localhost
   const ipAddressRegex = /^(?:\d{1,3}\.){3}\d{1,3}$/;
   const localhostRegex = /^localhost$/;
+  const hostnameRegex =
+    /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?))*\.(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9]))$/i;
 
-  if (ipAddressRegex.test(s) || localhostRegex.test(s)) {
-    return s;
+  if (ipAddressRegex.test(trimmedValue) || localhostRegex.test(trimmedValue)) {
+    return trimmedValue;
   }
 
   try {
-    if (!s.startsWith("http://") && !s.startsWith("https://")) {
-      s = "https://" + s;
+    const hasProtocol = /^https?:\/\//i.test(trimmedValue);
+    const urlValue = hasProtocol ? trimmedValue : "https://" + trimmedValue;
+    const url = new URL(urlValue);
+
+    const isValidHostname =
+      url.hostname === "localhost" ||
+      ipAddressRegex.test(url.hostname) ||
+      hostnameRegex.test(url.hostname);
+
+    if (!isValidHostname) {
+      return null;
     }
 
-    new URL(s);
-    return s;
+    return url.toString();
   } catch {
     return null;
   }
