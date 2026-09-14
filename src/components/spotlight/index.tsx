@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { SearchIcon } from "lucide-react";
-import styles from "./spotlight.module.css";
 import { getRedirectUrl } from "@/lib/redirect";
 import { ActiveTabs } from "./components/active-tabs";
 import type { TabItemData } from "./components/tab-item";
@@ -42,9 +41,12 @@ export const Spotlight = () => {
       return;
     }
 
-    chrome.runtime.sendMessage({ type: "GET_OPEN_TABS" }, (response?: TabsResponse) => {
-      setTabs(response?.tabs ?? []);
-    });
+    chrome.runtime.sendMessage(
+      { type: "GET_OPEN_TABS" },
+      (response?: TabsResponse) => {
+        setTabs(response?.tabs ?? []);
+      },
+    );
   }, [isOpen]);
 
   const normalizedSearchValue = searchValue.trim().toLowerCase();
@@ -109,9 +111,7 @@ export const Spotlight = () => {
           return 0;
         }
 
-        return (
-          (currentIndex - 1 + filteredTabs.length) % filteredTabs.length
-        );
+        return (currentIndex - 1 + filteredTabs.length) % filteredTabs.length;
       });
       return;
     }
@@ -135,13 +135,10 @@ export const Spotlight = () => {
   if (!isOpen) return null;
 
   return (
-    <div className={styles.spotlight_overlay} onClick={() => setIsOpen(false)}>
-      <div
-        className={styles.spotlight_container}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className={styles.search_header}>
-          <SearchIcon size={24} className={styles.search_icon} />
+    <div className="spotlight_overlay" onClick={() => setIsOpen(false)}>
+      <div className="spotlight_container" onClick={(e) => e.stopPropagation()}>
+        <div className="search_header">
+          <SearchIcon size={24} className="search_icon" />
           <input
             ref={inputRef}
             autoFocus={true}
@@ -152,7 +149,7 @@ export const Spotlight = () => {
             name="search"
             type="text"
             value={searchValue}
-            className={styles.search_input}
+            className="search_input"
             placeholder="Search or Enter URL...."
             onChange={(event) => setSearchValue(event.target.value)}
             onKeyDown={handleKeydown}

@@ -1,6 +1,5 @@
 import { TabItem } from "./tab-item";
 import type { TabItemData } from "./tab-item";
-import styles from "./active-tabs.module.css";
 
 type ActiveTabsProps = {
   tabs: TabItemData[];
@@ -18,7 +17,7 @@ export const ActiveTabs = ({
   }
 
   return (
-    <div className={styles.active_tabs}>
+    <div className="active_tabs">
       {tabs.map((tab, index) => (
         <TabItem
           key={tab.id}

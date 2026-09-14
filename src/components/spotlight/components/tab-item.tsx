@@ -1,5 +1,4 @@
 import { ArrowRightIcon } from "lucide-react";
-import styles from "./tab-item.module.css";
 
 export type TabItemData = {
   id: number;
@@ -30,25 +29,25 @@ export const TabItem = ({ tab, isSelected, onSelect }: TabItemProps) => {
   return (
     <button
       type="button"
-      className={`${styles.tab_item} ${
-        isSelected || tab.active ? styles.tab_item_active : ""
+      className={`tab_item ${
+        isSelected || tab.active ? "tab_item_active" : ""
       }`}
       onClick={handleSelect}
       aria-selected={isSelected}
     >
-      <span className={styles.favicon_wrap} aria-hidden="true">
+      <span className="favicon_wrap" aria-hidden="true">
         {tab.favIconUrl ? (
-          <img className={styles.favicon} src={tab.favIconUrl} alt="" />
+          <img className="favicon" src={tab.favIconUrl} alt="" />
         ) : (
-          <span className={styles.favicon_fallback}>
+          <span className="favicon_fallback">
             {getFallbackLabel(tab.title)}
           </span>
         )}
       </span>
-      <span className={styles.tab_title}>{tab.title}</span>
-      <span className={styles.switch_label}>
+      <span className="tab_title">{tab.title}</span>
+      <span className="switch_label">
         Switch to Tab
-        <ArrowRightIcon size={18} className={styles.switch_icon} />
+        <ArrowRightIcon size={18} className="switch_icon" />
       </span>
     </button>
   );
