@@ -32,6 +32,11 @@ export const getSearchSuggestions = async (
       trimmedQuery,
     )}`,
   );
+
+  if (!response.ok) {
+    return [createSearchSuggestion(trimmedQuery)];
+  }
+
   const payload: unknown = await response.json();
   const [, suggestionValues] = Array.isArray(payload) ? payload : [];
 
