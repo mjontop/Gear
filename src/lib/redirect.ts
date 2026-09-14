@@ -1,12 +1,31 @@
 import { getBangs } from "./bangs";
 
+function isValidUrl(s: string): string | null {
+  // handling ip addresses and localhost
+  const ipAddressRegex = /^(?:\d{1,3}\.){3}\d{1,3}$/;
+  const localhostRegex = /^localhost$/;
+
+  if (ipAddressRegex.test(s) || localhostRegex.test(s)) {
+    return s;
+  }
+
+  try {
+    if (!s.startsWith("http://") && !s.startsWith("https://")) {
+      s = "https://" + s;
+    }
+
+    new URL(s);
+    return s;
+  } catch {
+    return null;
+  }
+}
+
 export function getRedirectUrl(s: string): string {
   // Check if input string is a valid URL
-  try {
-    const url = new URL(s);
-    return url.toString();
-  } catch {
-    // Not a valid URL, continue with bang processing
+  const validUrl = isValidUrl(s);
+  if (validUrl) {
+    return validUrl;
   }
 
   const bangs = getBangs();
