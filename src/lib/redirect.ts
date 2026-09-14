@@ -1,3 +1,4 @@
+import { DEFAULT_SEARCH_URL, DEFAULT_URL_PROTOCOL } from "@/constants";
 import { getBangs } from "./bangs";
 
 export function isValidUrl(s: string): string | null {
@@ -19,7 +20,9 @@ export function isValidUrl(s: string): string | null {
 
   try {
     const hasProtocol = /^https?:\/\//i.test(trimmedValue);
-    const urlValue = hasProtocol ? trimmedValue : "https://" + trimmedValue;
+    const urlValue = hasProtocol
+      ? trimmedValue
+      : DEFAULT_URL_PROTOCOL + trimmedValue;
     const url = new URL(urlValue);
 
     const isValidHostname =
@@ -63,5 +66,5 @@ export function getRedirectUrl(s: string): string {
     return redirectUrl.replace("%s", encodeURIComponent(s));
   }
 
-  return `https://www.google.com/search?q=${encodeURIComponent(s)}`;
+  return `${DEFAULT_SEARCH_URL}?q=${encodeURIComponent(s)}`;
 }

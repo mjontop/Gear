@@ -45,6 +45,13 @@
   font-weight: 700;
 }
 
+.search_suggestion_icon {
+  width: 1.4875rem;
+  height: 1.4875rem;
+  color: rgba(255, 255, 255, 0.72);
+  background: transparent;
+}
+
 .suggestion_title {
   min-width: 0;
   flex: 1 1 auto;

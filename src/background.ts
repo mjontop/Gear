@@ -1,15 +1,7 @@
-type OpenTab = {
-  id: number;
-  windowId: number;
-  title: string;
-  url: string;
-  favIconUrl?: string;
-  active: boolean;
-};
-
-type RuntimeMessage =
-  | { type: "GET_OPEN_TABS" }
-  | { type: "SWITCH_TO_TAB"; tabId: number; windowId: number };
+import { getOpenTabs } from "./background-tasks/open-tabs";
+import { getSearchSuggestions } from "./background-tasks/search-suggestions";
+import { switchToTab } from "./background-tasks/switch-tab";
+import type { RuntimeMessage } from "./background-tasks/types";
 
 chrome.commands.onCommand.addListener(async (command) => {
   if (command !== "toggle-spotlight") return;
@@ -31,37 +23,9 @@ chrome.runtime.onMessage.addListener(
     if (message.type === "GET_OPEN_TABS") {
       const currentTabId = sender.tab?.id;
 
-      chrome.tabs
-        .query({})
+      getOpenTabs(currentTabId)
         .then((tabs) => {
-          const openTabs: OpenTab[] = tabs
-            .filter((tab): tab is chrome.tabs.Tab & { id: number } => {
-              return (
-                typeof tab.id === "number" &&
-                tab.id !== currentTabId
-              );
-            })
-            .sort((firstTab, secondTab) => {
-              if (firstTab.active !== secondTab.active) {
-                return firstTab.active ? -1 : 1;
-              }
-
-              if (firstTab.windowId !== secondTab.windowId) {
-                return firstTab.windowId - secondTab.windowId;
-              }
-
-              return firstTab.index - secondTab.index;
-            })
-            .map((tab) => ({
-              id: tab.id,
-              windowId: tab.windowId,
-              title: tab.title || tab.url || "Untitled",
-              url: tab.url || "",
-              favIconUrl: tab.favIconUrl,
-              active: Boolean(tab.active),
-            }));
-
-          sendResponse({ tabs: openTabs });
+          sendResponse({ tabs });
         })
         .catch(() => {
           sendResponse({ tabs: [] });
@@ -71,14 +35,24 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (message.type === "SWITCH_TO_TAB") {
-      chrome.windows
-        .update(message.windowId, { focused: true })
-        .then(() => chrome.tabs.update(message.tabId, { active: true }))
+      switchToTab(message.tabId, message.windowId)
         .then(() => {
           sendResponse({ success: true });
         })
         .catch(() => {
           sendResponse({ success: false });
+        });
+
+      return true;
+    }
+
+    if (message.type === "GET_SEARCH_SUGGESTIONS") {
+      getSearchSuggestions(message.query)
+        .then((suggestions) => {
+          sendResponse({ suggestions });
+        })
+        .catch(() => {
+          sendResponse({ suggestions: [] });
         });
 
       return true;

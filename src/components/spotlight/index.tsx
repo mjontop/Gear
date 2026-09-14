@@ -1,10 +1,30 @@
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import {
+  MAX_SPOTLIGHT_RESULTS,
+  SEARCH_RESULT_PRIORITY,
+  SEARCH_SUGGESTION_DEBOUNCE_MS,
+} from "@/constants";
 import { getRedirectUrl, isValidUrl } from "@/lib/redirect";
 import type { ActiveTabData } from "./components/active-tabs";
+import type {
+  SearchSuggestionData,
+  SpotlightResultData,
+} from "./components/active-tabs";
 import { SpotlightView } from "./components/spotlight-view";
 
+type OpenTabData = Omit<ActiveTabData, "kind" | "priority">;
+
+type SearchSuggestionResponseData = Omit<
+  SearchSuggestionData,
+  "kind" | "priority"
+>;
+
 type TabsResponse = {
-  tabs?: ActiveTabData[];
+  tabs?: OpenTabData[];
+};
+
+type SearchSuggestionsResponse = {
+  suggestions?: SearchSuggestionResponseData[];
 };
 
 type SwitchTabResponse = {
@@ -19,11 +39,16 @@ const getClampedTabIndex = (index: number, tabCount: number) => {
 
 export const Spotlight = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [tabs, setTabs] = useState<ActiveTabData[]>([]);
+  const [tabs, setTabs] = useState<OpenTabData[]>([]);
+  const [searchSuggestions, setSearchSuggestions] = useState<
+    SearchSuggestionResponseData[]
+  >([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const overlayRef = useRef<HTMLDialogElement>(null);
+  const normalizedSearchValue = searchValue.trim().toLowerCase();
+  const validUrl = isValidUrl(searchValue.trim());
 
   useEffect(() => {
     const handleMessage = (message: { type?: string }) => {
@@ -42,6 +67,7 @@ export const Spotlight = () => {
   useEffect(() => {
     if (!isOpen) {
       setTabs([]);
+      setSearchSuggestions([]);
       setSearchValue("");
       setSelectedTabIndex(0);
       return;
@@ -54,6 +80,30 @@ export const Spotlight = () => {
       },
     );
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !normalizedSearchValue || validUrl) {
+      setSearchSuggestions([]);
+      return;
+    }
+
+    let isCurrentSearch = true;
+    const timeoutId = window.setTimeout(() => {
+      chrome.runtime.sendMessage(
+        { type: "GET_SEARCH_SUGGESTIONS", query: searchValue.trim() },
+        (response?: SearchSuggestionsResponse) => {
+          if (!isCurrentSearch) return;
+
+          setSearchSuggestions(response?.suggestions ?? []);
+        },
+      );
+    }, SEARCH_SUGGESTION_DEBOUNCE_MS);
+
+    return () => {
+      isCurrentSearch = false;
+      window.clearTimeout(timeoutId);
+    };
+  }, [isOpen, normalizedSearchValue, searchValue, validUrl]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -199,9 +249,7 @@ export const Spotlight = () => {
     };
   }, [isOpen]);
 
-  const normalizedSearchValue = searchValue.trim().toLowerCase();
-  const validUrl = isValidUrl(searchValue.trim());
-  const filteredTabs = tabs
+  const openTabResults: ActiveTabData[] = tabs
     .filter((tab) => {
       if (!normalizedSearchValue) {
         return true;
@@ -212,10 +260,29 @@ export const Spotlight = () => {
         tab.url.toLowerCase().includes(normalizedSearchValue)
       );
     })
-    .slice(0, 5);
+    .map((tab) => ({
+      ...tab,
+      kind: "open-tab" as const,
+      priority: SEARCH_RESULT_PRIORITY.OPEN_TAB,
+    }));
+  const searchSuggestionResults: SearchSuggestionData[] = searchSuggestions.map(
+    (suggestion) => ({
+      ...suggestion,
+      kind: "search-suggestion" as const,
+      priority: SEARCH_RESULT_PRIORITY.SEARCH_SUGGESTION,
+    }),
+  );
+  const spotlightResults: SpotlightResultData[] = [
+    ...openTabResults,
+    ...searchSuggestionResults,
+  ]
+    .sort((firstResult, secondResult) => {
+      return firstResult.priority - secondResult.priority;
+    })
+    .slice(0, MAX_SPOTLIGHT_RESULTS);
   const visibleSelectedTabIndex = getClampedTabIndex(
     selectedTabIndex,
-    filteredTabs.length,
+    spotlightResults.length,
   );
 
   const handleSelectTab = (tab: ActiveTabData) => {
@@ -229,6 +296,23 @@ export const Spotlight = () => {
     );
   };
 
+  const handleSearchSuggestion = (suggestion: SearchSuggestionData) => {
+    const redirectUrl = getRedirectUrl(suggestion.query);
+    window.open(redirectUrl, "_blank", "noopener");
+    setIsOpen(false);
+    setSearchValue("");
+    setSelectedTabIndex(0);
+  };
+
+  const handleSelectResult = (result: SpotlightResultData) => {
+    if (result.kind === "open-tab") {
+      handleSelectTab(result);
+      return;
+    }
+
+    handleSearchSuggestion(result);
+  };
+
   const handleKeydown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
       setIsOpen(false);
@@ -240,13 +324,13 @@ export const Spotlight = () => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setSelectedTabIndex((currentIndex) => {
-        if (filteredTabs.length === 0) {
+        if (spotlightResults.length === 0) {
           return 0;
         }
 
         return (
-          (getClampedTabIndex(currentIndex, filteredTabs.length) + 1) %
-          filteredTabs.length
+          (getClampedTabIndex(currentIndex, spotlightResults.length) + 1) %
+          spotlightResults.length
         );
       });
       return;
@@ -255,25 +339,25 @@ export const Spotlight = () => {
     if (e.key === "ArrowUp") {
       e.preventDefault();
       setSelectedTabIndex((currentIndex) => {
-        if (filteredTabs.length === 0) {
+        if (spotlightResults.length === 0) {
           return 0;
         }
 
         return (
-          (getClampedTabIndex(currentIndex, filteredTabs.length) -
+          (getClampedTabIndex(currentIndex, spotlightResults.length) -
             1 +
-            filteredTabs.length) %
-          filteredTabs.length
+            spotlightResults.length) %
+          spotlightResults.length
         );
       });
       return;
     }
 
     if (e.key === "Enter" && inputRef.current) {
-      const selectedTab = filteredTabs[visibleSelectedTabIndex];
+      const selectedResult = spotlightResults[visibleSelectedTabIndex];
 
-      if (selectedTab) {
-        handleSelectTab(selectedTab);
+      if (selectedResult) {
+        handleSelectResult(selectedResult);
         return;
       }
 
@@ -293,7 +377,7 @@ export const Spotlight = () => {
       overlayRef={overlayRef}
       searchValue={searchValue}
       validUrl={validUrl}
-      filteredTabs={filteredTabs}
+      results={spotlightResults}
       selectedTabIndex={visibleSelectedTabIndex}
       onClose={() => setIsOpen(false)}
       onSearchChange={(value) => {
@@ -301,7 +385,7 @@ export const Spotlight = () => {
         setSelectedTabIndex(0);
       }}
       onKeyDown={handleKeydown}
-      onSelectTab={handleSelectTab}
+      onSelectResult={handleSelectResult}
     />
   );
 };

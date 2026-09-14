@@ -2,19 +2,19 @@ import { GlobeIcon, SearchIcon } from "lucide-react";
 import { useEffect } from "react";
 import type { KeyboardEvent, RefObject } from "react";
 import { ActiveTabs } from "./active-tabs";
-import type { ActiveTabData } from "./active-tabs";
+import type { SpotlightResultData } from "./active-tabs";
 
 type SpotlightViewProps = {
   inputRef: RefObject<HTMLInputElement | null>;
   overlayRef: RefObject<HTMLDialogElement | null>;
   searchValue: string;
   validUrl: string | null;
-  filteredTabs: ActiveTabData[];
+  results: SpotlightResultData[];
   selectedTabIndex: number;
   onClose: () => void;
   onSearchChange: (value: string) => void;
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
-  onSelectTab: (tab: ActiveTabData) => void;
+  onSelectResult: (result: SpotlightResultData) => void;
 };
 
 export const SpotlightView = ({
@@ -22,12 +22,12 @@ export const SpotlightView = ({
   overlayRef,
   searchValue,
   validUrl,
-  filteredTabs,
+  results,
   selectedTabIndex,
   onClose,
   onSearchChange,
   onKeyDown,
-  onSelectTab,
+  onSelectResult,
 }: SpotlightViewProps) => {
   useEffect(() => {
     const dialog = overlayRef.current;
@@ -83,9 +83,9 @@ export const SpotlightView = ({
           />
         </div>
         <ActiveTabs
-          tabs={filteredTabs}
+          results={results}
           selectedIndex={selectedTabIndex}
-          onSelectTab={onSelectTab}
+          onSelectResult={onSelectResult}
         />
       </div>
     </dialog>

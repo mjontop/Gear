@@ -1,4 +1,5 @@
 import { ArrowRightIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 export type SuggestionItemData = {
   id: number | string;
@@ -12,6 +13,7 @@ type SuggestionItemProps<T extends SuggestionItemData> = {
   isSelected: boolean;
   isActive?: boolean;
   actionLabel?: string;
+  fallbackIcon?: ReactNode;
   onSelect: (item: T) => void;
 };
 
@@ -26,6 +28,7 @@ export const SuggestionItem = <T extends SuggestionItemData>({
   isSelected,
   isActive = false,
   actionLabel,
+  fallbackIcon,
   onSelect,
 }: SuggestionItemProps<T>) => {
   return (
@@ -39,6 +42,8 @@ export const SuggestionItem = <T extends SuggestionItemData>({
       <span className="favicon_wrap" aria-hidden="true">
         {item.favIconUrl ? (
           <img className="favicon" src={item.favIconUrl} alt="" />
+        ) : fallbackIcon ? (
+          fallbackIcon
         ) : (
           <span className="favicon_fallback">
             {getFallbackLabel(item.title)}

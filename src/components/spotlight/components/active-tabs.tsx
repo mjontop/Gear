@@ -1,36 +1,52 @@
+import { SearchIcon } from "lucide-react";
 import { SuggestionItem } from "./suggestion-item";
 import type { SuggestionItemData } from "./suggestion-item";
 
 export type ActiveTabData = SuggestionItemData & {
+  kind: "open-tab";
   windowId: number;
   active: boolean;
+  priority: number;
 };
 
+export type SearchSuggestionData = SuggestionItemData & {
+  kind: "search-suggestion";
+  query: string;
+  priority: number;
+};
+
+export type SpotlightResultData = ActiveTabData | SearchSuggestionData;
+
 type ActiveTabsProps = {
-  tabs: ActiveTabData[];
+  results: SpotlightResultData[];
   selectedIndex: number;
-  onSelectTab: (tab: ActiveTabData) => void;
+  onSelectResult: (result: SpotlightResultData) => void;
 };
 
 export const ActiveTabs = ({
-  tabs,
+  results,
   selectedIndex,
-  onSelectTab,
+  onSelectResult,
 }: ActiveTabsProps) => {
-  if (tabs.length === 0) {
+  if (results.length === 0) {
     return null;
   }
 
   return (
     <div className="active_tabs">
-      {tabs.map((tab, index) => (
+      {results.map((result, index) => (
         <SuggestionItem
-          key={tab.id}
-          item={tab}
+          key={`${result.kind}-${result.id}`}
+          item={result}
           isSelected={index === selectedIndex}
-          isActive={tab.active}
-          actionLabel="Switch to Tab"
-          onSelect={onSelectTab}
+          isActive={result.kind === "open-tab" ? result.active : false}
+          actionLabel={result.kind === "open-tab" ? "Switch to Tab" : undefined}
+          fallbackIcon={
+            result.kind === "search-suggestion" ? (
+              <SearchIcon size={23} className="search_suggestion_icon" />
+            ) : undefined
+          }
+          onSelect={onSelectResult}
         />
       ))}
     </div>
