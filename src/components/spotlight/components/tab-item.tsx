@@ -33,7 +33,6 @@ export const TabItem = ({ tab, isSelected, onSelect }: TabItemProps) => {
         isSelected || tab.active ? "tab_item_active" : ""
       }`}
       onClick={handleSelect}
-      aria-selected={isSelected}
     >
       <span className="favicon_wrap" aria-hidden="true">
         {tab.favIconUrl ? (

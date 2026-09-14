@@ -1,16 +1,36 @@
 .spotlight_overlay {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  box-sizing: border-box;
+  margin: 0;
+  border: none;
+  padding: 15vh 0 0;
   overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(1rem) saturate(180%);
+  background: transparent;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 15vh;
   z-index: 9999999999999999999999999999999999;
   pointer-events: auto;
   touch-action: none;
+}
+
+.spotlight_backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.spotlight_overlay::backdrop {
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(1rem) saturate(180%);
 }
 
 .spotlight_container {
@@ -24,6 +44,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .search_header {
@@ -37,6 +59,14 @@
 .search_icon {
   color: rgba(255, 255, 255, 0.58);
   margin-right: 12px;
+}
+
+.search_label {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-right: 12px;
+  display: none;
 }
 
 .search_input {

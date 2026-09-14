@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
-import { SearchIcon } from "lucide-react";
 import { getRedirectUrl } from "@/lib/redirect";
-import { ActiveTabs } from "./components/active-tabs";
 import type { TabItemData } from "./components/tab-item";
+import { SpotlightView } from "./components/spotlight-view";
 
 type TabsResponse = {
   tabs?: TabItemData[];
@@ -12,13 +11,19 @@ type SwitchTabResponse = {
   success?: boolean;
 };
 
+const getClampedTabIndex = (index: number, tabCount: number) => {
+  if (tabCount === 0) return 0;
+
+  return Math.min(index, tabCount - 1);
+};
+
 export const Spotlight = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [tabs, setTabs] = useState<TabItemData[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const handleMessage = (message: { type?: string }) => {
@@ -135,7 +140,11 @@ export const Spotlight = () => {
     const listenerOptions = { capture: true, passive: false };
 
     blockedEvents.forEach((eventName) => {
-      document.addEventListener(eventName, stopBackgroundInput, listenerOptions);
+      document.addEventListener(
+        eventName,
+        stopBackgroundInput,
+        listenerOptions,
+      );
       window.addEventListener(eventName, stopBackgroundInput, listenerOptions);
     });
     document.addEventListener(
@@ -161,7 +170,8 @@ export const Spotlight = () => {
       document.documentElement.style.scrollbarGutter =
         previousHtmlScrollbarGutter;
       document.body.style.overscrollBehavior = previousBodyOverscroll;
-      document.documentElement.style.overscrollBehavior = previousHtmlOverscroll;
+      document.documentElement.style.overscrollBehavior =
+        previousHtmlOverscroll;
       window.scrollTo(0, scrollY);
 
       blockedEvents.forEach((eventName) => {
@@ -202,16 +212,10 @@ export const Spotlight = () => {
       );
     })
     .slice(0, 5);
-
-  useEffect(() => {
-    setSelectedTabIndex(0);
-  }, [searchValue]);
-
-  useEffect(() => {
-    if (selectedTabIndex >= filteredTabs.length) {
-      setSelectedTabIndex(Math.max(filteredTabs.length - 1, 0));
-    }
-  }, [filteredTabs.length, selectedTabIndex]);
+  const visibleSelectedTabIndex = getClampedTabIndex(
+    selectedTabIndex,
+    filteredTabs.length,
+  );
 
   const handleSelectTab = (tab: TabItemData) => {
     chrome.runtime.sendMessage(
@@ -239,7 +243,10 @@ export const Spotlight = () => {
           return 0;
         }
 
-        return (currentIndex + 1) % filteredTabs.length;
+        return (
+          (getClampedTabIndex(currentIndex, filteredTabs.length) + 1) %
+          filteredTabs.length
+        );
       });
       return;
     }
@@ -251,13 +258,18 @@ export const Spotlight = () => {
           return 0;
         }
 
-        return (currentIndex - 1 + filteredTabs.length) % filteredTabs.length;
+        return (
+          (getClampedTabIndex(currentIndex, filteredTabs.length) -
+            1 +
+            filteredTabs.length) %
+          filteredTabs.length
+        );
       });
       return;
     }
 
     if (e.key === "Enter" && inputRef.current) {
-      const selectedTab = filteredTabs[selectedTabIndex];
+      const selectedTab = filteredTabs[visibleSelectedTabIndex];
 
       if (selectedTab) {
         handleSelectTab(selectedTab);
@@ -265,7 +277,7 @@ export const Spotlight = () => {
       }
 
       const redirectUrl = getRedirectUrl(searchValue);
-      window.open(redirectUrl, "_blank");
+      window.open(redirectUrl, "_blank", "noopener");
       setIsOpen(false);
       setSearchValue("");
       setSelectedTabIndex(0);
@@ -275,36 +287,19 @@ export const Spotlight = () => {
   if (!isOpen) return null;
 
   return (
-    <div
-      ref={overlayRef}
-      className="spotlight_overlay"
-      onClick={() => setIsOpen(false)}
-    >
-      <div className="spotlight_container" onClick={(e) => e.stopPropagation()}>
-        <div className="search_header">
-          <SearchIcon size={24} className="search_icon" />
-          <input
-            ref={inputRef}
-            autoFocus={true}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="none"
-            spellCheck={false}
-            name="search"
-            type="text"
-            value={searchValue}
-            className="search_input"
-            placeholder="Search or Enter URL...."
-            onChange={(event) => setSearchValue(event.target.value)}
-            onKeyDown={handleKeydown}
-          />
-        </div>
-        <ActiveTabs
-          tabs={filteredTabs}
-          selectedIndex={selectedTabIndex}
-          onSelectTab={handleSelectTab}
-        />
-      </div>
-    </div>
+    <SpotlightView
+      inputRef={inputRef}
+      overlayRef={overlayRef}
+      searchValue={searchValue}
+      filteredTabs={filteredTabs}
+      selectedTabIndex={visibleSelectedTabIndex}
+      onClose={() => setIsOpen(false)}
+      onSearchChange={(value) => {
+        setSearchValue(value);
+        setSelectedTabIndex(0);
+      }}
+      onKeyDown={handleKeydown}
+      onSelectTab={handleSelectTab}
+    />
   );
 };
