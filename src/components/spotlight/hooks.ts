@@ -30,10 +30,6 @@ type UseSpotlightShortcutParams = {
   onToggle: () => void;
 };
 
-type UseOpenTabsParams = {
-  isOpen: boolean;
-};
-
 type UseSearchSuggestionsParams = {
   isOpen: boolean;
   normalizedSearchValue: string;
@@ -67,21 +63,19 @@ export const useSpotlightShortcut = ({
   }, [onToggle, setIsOpen]);
 };
 
-export const useOpenTabs = ({ isOpen }: UseOpenTabsParams) => {
+export const useOpenTabs = () => {
   const [tabs, setTabs] = useState<OpenTabData[]>([]);
 
   useEffect(() => {
-    if (!isOpen) return;
-
     chrome.runtime.sendMessage(
       { type: "GET_OPEN_TABS" },
       (response?: TabsResponse) => {
         setTabs(response?.tabs ?? []);
       },
     );
-  }, [isOpen]);
+  }, []);
 
-  return { tabs, clearTabs: () => setTabs([]) };
+  return { tabs };
 };
 
 export const useSearchSuggestions = ({

@@ -1,12 +1,14 @@
 .suggestion_item {
   width: 100%;
-  height: 3.08125rem;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 3.08125em;
   border: 0;
-  border-radius: 0.425rem;
-  padding: 0 0.74375rem;
+  border-radius: 0.425em;
+  padding: 0 0.74375em;
   display: flex;
   align-items: center;
-  gap: 0.6375rem;
+  gap: 0.6375em;
   background: transparent;
   color: rgba(255, 255, 255, 0.92);
   cursor: pointer;
@@ -20,34 +22,34 @@
 }
 
 .favicon_wrap {
-  width: 1.4875rem;
-  height: 1.4875rem;
+  width: 1.4875em;
+  height: 1.4875em;
   display: grid;
   place-items: center;
   overflow: hidden;
 }
 
 .favicon {
-  width: 1.275rem;
-  height: 1.275rem;
+  width: 1.275em;
+  height: 1.275em;
   object-fit: contain;
 }
 
 .favicon_fallback {
-  width: 1.4875rem;
-  height: 1.4875rem;
-  border-radius: 0.425rem;
+  width: 1.4875em;
+  height: 1.4875em;
+  border-radius: 0.425em;
   display: grid;
   place-items: center;
   background: rgba(255, 255, 255, 0.95);
   color: #202425;
-  font-size: 0.74375rem;
+  font-size: 0.74375em;
   font-weight: 700;
 }
 
 .search_suggestion_icon {
-  width: 1.4875rem;
-  height: 1.4875rem;
+  width: 1.4875em;
+  height: 1.4875em;
   color: rgba(255, 255, 255, 0.72);
   background: transparent;
 }
@@ -58,16 +60,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   line-height: 1.2;
 }
 
 .suggestion_action {
   display: inline-flex;
   align-items: center;
-  gap: 0.425rem;
+  gap: 0.425em;
   color: rgba(255, 255, 255, 0.82);
-  font-size: 0.6rem;
+  font-size: 0.6em;
   line-height: 1;
   white-space: nowrap;
 }
@@ -78,8 +80,8 @@
 
 @media (max-width: 640px) {
   .suggestion_item {
-    height: 2.86875rem;
-    padding: 0 0.6375rem;
+    height: 2.86875em;
+    padding: 0 0.6375em;
   }
 
   .suggestion_action {
@@ -87,6 +89,6 @@
   }
 
   .suggestion_title {
-    font-size: 0.85rem;
+    font-size: 0.85em;
   }
 }

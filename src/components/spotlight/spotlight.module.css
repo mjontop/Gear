@@ -6,6 +6,7 @@
   max-width: none;
   max-height: none;
   box-sizing: border-box;
+  font-size: 16px;
   margin: 0;
   border: none;
   padding: 15vh 0 0;
@@ -30,14 +31,14 @@
 
 .spotlight_overlay::backdrop {
   background-color: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(1rem) saturate(180%);
+  backdrop-filter: blur(1em) saturate(180%);
 }
 
 .spotlight_container {
-  width: 100%;
-  max-width: calc(100% - 2rem);
-  width: 45rem !important;
-  max-height: 21.2rem !important;
+  width: min(45em, calc(100% - 2em));
+  min-width: 0;
+  box-sizing: border-box;
+  max-height: 21.2em !important;
   height: fit-content !important;
   background-color: #000;
   border-radius: 10px;
@@ -52,7 +53,7 @@
   display: flex;
   align-items: center;
   padding: 0 20px;
-  height: 4rem;
+  height: 4em;
   border-bottom: 2px rgba(255, 255, 255, 0.14) solid;
 }
 
@@ -63,7 +64,7 @@
 
 .search_label {
   color: rgba(255, 255, 255, 0.58);
-  font-size: 0.9rem;
+  font-size: 0.9em;
   font-weight: 500;
   margin-right: 12px;
   display: none;
@@ -73,7 +74,7 @@
   flex: 1;
   border: none;
   outline: none;
-  font-size: 1.2rem;
+  font-size: 1.2em;
   color: #fff;
   font-weight: 300;
   outline: none !important;
@@ -91,7 +92,7 @@
 .search_input::placeholder {
   color: rgba(255, 255, 255, 0.42);
   font-weight: 500;
-  letter-spacing: 0.02rem;
+  letter-spacing: 0.02em;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -34,7 +34,7 @@ export const Spotlight = () => {
   const normalizedSearchValue = searchValue.trim().toLowerCase();
   const validUrl = isValidUrl(searchValue.trim());
 
-  const { tabs, clearTabs } = useOpenTabs({ isOpen });
+  const { tabs } = useOpenTabs();
   const searchSuggestions = useSearchSuggestions({
     isOpen,
     normalizedSearchValue,
@@ -43,7 +43,6 @@ export const Spotlight = () => {
   });
 
   const resetSpotlight = () => {
-    clearTabs();
     setSearchValue("");
     setSelectedTabIndex(0);
   };
