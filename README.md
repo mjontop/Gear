@@ -20,14 +20,17 @@
 
 ## ⌨️ Keyboard Shortcuts
 
-| Shortcut                      | Action                                             |
-| :---------------------------- | :------------------------------------------------- |
-| <kbd>Alt</kbd> + <kbd>M</kbd> | Toggle Spotlight overlay on/off                    |
-| <kbd>↑</kbd> / <kbd>↓</kbd>   | Navigate search results and tabs                   |
-| <kbd>Enter</kbd>              | Select tab / open search suggestion / navigate URL |
-| <kbd>Esc</kbd>                | Close Spotlight overlay                            |
+| Shortcut                                | Action                                             |
+| :-------------------------------------- | :------------------------------------------------- |
+| <kbd>Alt</kbd> + <kbd>M</kbd> *(default)* | Toggle Spotlight overlay on/off                    |
+| <kbd>↑</kbd> / <kbd>↓</kbd>             | Navigate search results and tabs                   |
+| <kbd>Enter</kbd>                        | Select tab / open search suggestion / navigate URL |
+| <kbd>Esc</kbd>                          | Close Spotlight overlay                            |
 
-> **Tip**: You can customize the shortcut anytime by visiting `chrome://extensions/shortcuts` in your browser.
+> [!TIP]
+> **Make it your New Tab experience**: You can customize this shortcut anytime in your browser's shortcut manager by visiting `chrome://extensions/shortcuts` (or `brave://extensions/shortcuts`).
+>
+> We can replace the default shortcut with <kbd>Ctrl</kbd> + <kbd>T</kbd> (Windows/Linux) or <kbd>Cmd</kbd> + <kbd>T</kbd> (macOS) to get an instant Spotlight launcher experience instead of having to open a blank new tab every time!
 
 ---
 
