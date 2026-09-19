@@ -1,5 +1,5 @@
 import { DEFAULT_SEARCH_URL, DEFAULT_URL_PROTOCOL } from "@/constants";
-import { getBangs } from "./bangs";
+import { parseQueryWithBangs } from "./bangs";
 
 export function isValidUrl(s: string): string | null {
   const trimmedValue = s.trim();
@@ -47,24 +47,11 @@ export function getRedirectUrl(s: string): string {
     return validUrl;
   }
 
-  const bangs = getBangs();
-  const bangList = Object.keys(bangs);
+  const { cleanQuery, bangUrl } = parseQueryWithBangs(s);
 
-  const searchTerms = s.trim().split(" ");
-
-  let redirectUrl = "";
-
-  searchTerms.forEach((term) => {
-    const bang = bangList.find((key) => term === key);
-    if (bang) {
-      s = s.replace(bang, "").trim();
-      redirectUrl = bangs[bang];
-    }
-  });
-
-  if (redirectUrl) {
-    return redirectUrl.replace("%s", encodeURIComponent(s));
+  if (bangUrl) {
+    return bangUrl.replace("%s", encodeURIComponent(cleanQuery));
   }
 
-  return `${DEFAULT_SEARCH_URL}?q=${encodeURIComponent(s)}`;
+  return `${DEFAULT_SEARCH_URL}?q=${encodeURIComponent(cleanQuery || s.trim())}`;
 }

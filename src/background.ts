@@ -1,3 +1,5 @@
+import { getBookmarks } from "./background-tasks/bookmarks";
+import { getHistory } from "./background-tasks/history";
 import { getOpenTabs } from "./background-tasks/open-tabs";
 import { getSearchSuggestions } from "./background-tasks/search-suggestions";
 import { switchToTab } from "./background-tasks/switch-tab";
@@ -53,6 +55,30 @@ chrome.runtime.onMessage.addListener(
         })
         .catch(() => {
           sendResponse({ suggestions: [] });
+        });
+
+      return true;
+    }
+
+    if (message.type === "GET_BOOKMARKS") {
+      getBookmarks(message.query)
+        .then((bookmarks) => {
+          sendResponse({ bookmarks });
+        })
+        .catch(() => {
+          sendResponse({ bookmarks: [] });
+        });
+
+      return true;
+    }
+
+    if (message.type === "GET_HISTORY") {
+      getHistory(message.query)
+        .then((history) => {
+          sendResponse({ history });
+        })
+        .catch(() => {
+          sendResponse({ history: [] });
         });
 
       return true;

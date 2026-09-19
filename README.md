@@ -7,9 +7,11 @@
 ## ✨ Features
 
 - **⚡ Instant Spotlight Palette**: Summoned with a single hotkey (`Alt+M`) over any webpage.
-- **🔍 Google Search Suggestions**: Live, debounced query auto-suggestions powered by Google Complete.
 - **📑 Tab Search & Switcher**: Search through all open tabs across windows and jump to them instantly.
-- **💥 Search Bangs**: DuckDuckGo-style search shortcuts to query specific services directly (e.g., `!yt`, `!g`, `!wi`).
+- **⭐ Bookmarks Search**: Instantly find and open saved bookmarks with support for custom shortcut titles (e.g. `!f`).
+- **🕒 Browsing History**: Search through previously visited pages, ranked by recency.
+- **🔍 Google Search Suggestions**: Live, debounced query auto-suggestions powered by Google Complete.
+- **💥 Bang-Aware Search**: DuckDuckGo-style shortcuts (e.g., `!yt`, `!g`, `!wi`). Automatically stripped when searching tabs, history, and suggestions, while preserving bang prefixes for bookmarks and destination redirects.
 - **🌐 Smart URL & Localhost Detection**: Intelligently identifies domains, localhost, and IP addresses for direct navigation without performing a web search.
 - **🛡️ Shadow DOM Isolation**: Injected via an open Shadow DOM root to completely isolate styles from the host page without CSS conflicts.
 - **🔒 Interaction Lock**: Locks page scrolling and prevents host page event leaks while the spotlight overlay is active.

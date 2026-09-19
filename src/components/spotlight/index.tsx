@@ -1,5 +1,6 @@
 import { useState, useRef, KeyboardEvent } from "react";
 import { MAX_SPOTLIGHT_RESULTS } from "@/constants";
+import { parseQueryWithBangs } from "@/lib/bangs";
 import { getRedirectUrl, isValidUrl } from "@/lib/redirect";
 import type { ActiveTabData } from "./components/active-tabs";
 import type {
@@ -9,6 +10,8 @@ import type {
 import { SpotlightView } from "./components/spotlight-view";
 import {
   getSpotlightResults,
+  useBookmarks,
+  useHistory,
   useOpenTabs,
   useSearchSuggestions,
   useSpotlightScrollLock,
@@ -31,14 +34,16 @@ export const Spotlight = () => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const overlayRef = useRef<HTMLDialogElement>(null);
-  const normalizedSearchValue = searchValue.trim().toLowerCase();
   const validUrl = isValidUrl(searchValue.trim());
 
+  const { rawQuery, cleanQuery, bang } = parseQueryWithBangs(searchValue);
+
   const { tabs } = useOpenTabs();
+  const bookmarks = useBookmarks({ isOpen, rawQuery, cleanQuery });
+  const history = useHistory({ isOpen, cleanQuery });
   const searchSuggestions = useSearchSuggestions({
     isOpen,
-    normalizedSearchValue,
-    searchValue,
+    cleanQuery,
     validUrl,
   });
 
@@ -53,12 +58,16 @@ export const Spotlight = () => {
   });
   useSpotlightScrollLock({ isOpen, overlayRef, setIsOpen });
 
-  const spotlightResults: SpotlightResultData[] = getSpotlightResults(
+  const spotlightResults: SpotlightResultData[] = getSpotlightResults({
     tabs,
+    bookmarks,
+    history,
     searchSuggestions,
-    normalizedSearchValue,
-    MAX_SPOTLIGHT_RESULTS,
-  );
+    rawQuery,
+    cleanQuery,
+    maxResults: MAX_SPOTLIGHT_RESULTS,
+  });
+
   const visibleSelectedTabIndex = getClampedTabIndex(
     selectedTabIndex,
     spotlightResults.length,
@@ -77,16 +86,23 @@ export const Spotlight = () => {
   };
 
   const handleSearchSuggestion = (suggestion: SearchSuggestionData) => {
-    const redirectUrl = getRedirectUrl(suggestion.query);
+    const targetQuery = bang ? `${bang} ${suggestion.query}` : suggestion.query;
+    const redirectUrl = getRedirectUrl(targetQuery);
     window.open(redirectUrl, "_blank", "noopener");
     setIsOpen(false);
-    setSearchValue("");
-    setSelectedTabIndex(0);
+    resetSpotlight();
   };
 
   const handleSelectResult = (result: SpotlightResultData) => {
     if (result.kind === "open-tab") {
       handleSelectTab(result);
+      return;
+    }
+
+    if (result.kind === "bookmark" || result.kind === "history") {
+      window.open(result.url, "_blank", "noopener");
+      setIsOpen(false);
+      resetSpotlight();
       return;
     }
 

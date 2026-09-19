@@ -1,4 +1,5 @@
 import { ArrowRightIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 export type SuggestionItemData = {
@@ -31,6 +32,14 @@ export const SuggestionItem = <T extends SuggestionItemData>({
   fallbackIcon,
   onSelect,
 }: SuggestionItemProps<T>) => {
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [item.favIconUrl]);
+
+  const showFavicon = Boolean(item.favIconUrl) && !imageError;
+
   return (
     <button
       type="button"
@@ -40,8 +49,13 @@ export const SuggestionItem = <T extends SuggestionItemData>({
       onClick={() => onSelect(item)}
     >
       <span className="favicon_wrap" aria-hidden="true">
-        {item.favIconUrl ? (
-          <img className="favicon" src={item.favIconUrl} alt="" />
+        {showFavicon ? (
+          <img
+            className="favicon"
+            src={item.favIconUrl}
+            alt=""
+            onError={() => setImageError(true)}
+          />
         ) : fallbackIcon ? (
           fallbackIcon
         ) : (

@@ -1,4 +1,4 @@
-import { SearchIcon } from "lucide-react";
+import { BookmarkIcon, HistoryIcon, SearchIcon } from "lucide-react";
 import { SuggestionItem } from "./suggestion-item";
 import type { SuggestionItemData } from "./suggestion-item";
 
@@ -9,13 +9,28 @@ export type ActiveTabData = SuggestionItemData & {
   priority: number;
 };
 
+export type BookmarkData = SuggestionItemData & {
+  kind: "bookmark";
+  priority: number;
+};
+
+export type HistoryData = SuggestionItemData & {
+  kind: "history";
+  lastVisitTime?: number;
+  priority: number;
+};
+
 export type SearchSuggestionData = SuggestionItemData & {
   kind: "search-suggestion";
   query: string;
   priority: number;
 };
 
-export type SpotlightResultData = ActiveTabData | SearchSuggestionData;
+export type SpotlightResultData =
+  | ActiveTabData
+  | BookmarkData
+  | HistoryData
+  | SearchSuggestionData;
 
 type ActiveTabsProps = {
   results: SpotlightResultData[];
@@ -32,6 +47,32 @@ export const ActiveTabs = ({
     return null;
   }
 
+  const getActionLabel = (result: SpotlightResultData) => {
+    switch (result.kind) {
+      case "open-tab":
+        return "Switch to Tab";
+      case "bookmark":
+        return "Open Bookmark";
+      case "history":
+        return "Open History";
+      default:
+        return undefined;
+    }
+  };
+
+  const getFallbackIcon = (result: SpotlightResultData) => {
+    switch (result.kind) {
+      case "bookmark":
+        return <BookmarkIcon size={20} className="search_suggestion_icon" />;
+      case "history":
+        return <HistoryIcon size={20} className="search_suggestion_icon" />;
+      case "search-suggestion":
+        return <SearchIcon size={23} className="search_suggestion_icon" />;
+      default:
+        return undefined;
+    }
+  };
+
   return (
     <div className="active_tabs">
       {results.map((result, index) => (
@@ -40,12 +81,8 @@ export const ActiveTabs = ({
           item={result}
           isSelected={index === selectedIndex}
           isActive={result.kind === "open-tab" ? result.active : false}
-          actionLabel={result.kind === "open-tab" ? "Switch to Tab" : undefined}
-          fallbackIcon={
-            result.kind === "search-suggestion" ? (
-              <SearchIcon size={23} className="search_suggestion_icon" />
-            ) : undefined
-          }
+          actionLabel={getActionLabel(result)}
+          fallbackIcon={getFallbackIcon(result)}
           onSelect={onSelectResult}
         />
       ))}

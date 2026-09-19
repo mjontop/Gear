@@ -14,7 +14,24 @@ export type SearchSuggestion = {
   query: string;
 };
 
+export type BookmarkItem = {
+  id: string;
+  title: string;
+  url: string;
+  favIconUrl?: string;
+};
+
+export type HistoryItem = {
+  id: string;
+  title: string;
+  url: string;
+  lastVisitTime?: number;
+  favIconUrl?: string;
+};
+
 export type RuntimeMessage =
   | { type: "GET_OPEN_TABS" }
   | { type: "SWITCH_TO_TAB"; tabId: number; windowId: number }
-  | { type: "GET_SEARCH_SUGGESTIONS"; query: string };
+  | { type: "GET_SEARCH_SUGGESTIONS"; query: string }
+  | { type: "GET_BOOKMARKS"; query: string }
+  | { type: "GET_HISTORY"; query: string };
