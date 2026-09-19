@@ -1,9 +1,34 @@
 import { BANG_SEARCH_URLS } from "@/constants";
+import {
+  CUSTOM_BANGS_STORAGE_KEY,
+  getCustomBangs,
+} from "./bangs-storage";
 
 export const defaultBangs: Record<string, string> = BANG_SEARCH_URLS;
 
+let activeBangs: Record<string, string> = { ...defaultBangs };
+
+getCustomBangs().then((custom) => {
+  activeBangs = { ...defaultBangs, ...custom };
+});
+
+if (typeof chrome !== "undefined" && chrome.storage?.onChanged) {
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === "sync" || areaName === "local") {
+      if (changes[CUSTOM_BANGS_STORAGE_KEY]) {
+        const newCustom =
+          (changes[CUSTOM_BANGS_STORAGE_KEY].newValue as Record<
+            string,
+            string
+          >) || {};
+        activeBangs = { ...defaultBangs, ...newCustom };
+      }
+    }
+  });
+}
+
 export function getBangs(): Record<string, string> {
-  return defaultBangs;
+  return activeBangs;
 }
 
 export type ParsedQuery = {

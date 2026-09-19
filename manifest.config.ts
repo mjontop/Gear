@@ -30,7 +30,14 @@ export default defineManifest({
     service_worker: "src/background.ts",
     type: "module",
   },
-  permissions: ["contentSettings", "tabs", "bookmarks", "history", "favicon"],
+  permissions: [
+    "contentSettings",
+    "tabs",
+    "bookmarks",
+    "history",
+    "favicon",
+    "storage",
+  ],
   web_accessible_resources: [
     {
       resources: ["_favicon/*"],
