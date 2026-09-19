@@ -10,7 +10,7 @@ export const SEARCH_SUGGESTIONS_CLIENT = "firefox";
 export const SEARCH_SUGGESTIONS_HOST_PERMISSION =
   "https://suggestqueries.google.com/*";
 
-export const CONTENT_SCRIPT_MATCHES = ["https://*/*"];
+export const CONTENT_SCRIPT_MATCHES = ["http://*/*", "https://*/*"];
 
 export const BANG_SEARCH_URLS: Record<string, string> = {
   "!g": `${DEFAULT_SEARCH_URL}?q=%s`,

@@ -1,7 +1,9 @@
 {
   "name": "gear",
+  "displayName": "Gear - Spotlight & Command Palette",
+  "description": "Fast, keyboard-first Spotlight search and command palette for Google Chrome.",
+  "version": "0.1.0",
   "type": "module",
-  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "vite",

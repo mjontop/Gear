@@ -15,9 +15,11 @@ chrome.commands.onCommand.addListener(async (command) => {
 
   if (!tab.id) return;
 
-  chrome.tabs.sendMessage(tab.id, {
-    type: "TOGGLE_SPOTLIGHT",
-  });
+  chrome.tabs
+    .sendMessage(tab.id, {
+      type: "TOGGLE_SPOTLIGHT",
+    })
+    .catch(() => {});
 });
 
 chrome.runtime.onMessage.addListener(

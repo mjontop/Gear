@@ -7,14 +7,22 @@ import pkg from "./package.json";
 
 export default defineManifest({
   manifest_version: 3,
-  name: pkg.name,
+  name: "Gear - Spotlight & Command Palette",
+  description:
+    "Fast, keyboard-first Spotlight search and command palette. Search open tabs, bookmarks, history, and the web with custom bangs.",
   version: pkg.version,
   icons: {
-    48: "public/logo.png",
+    16: "public/icon-16.png",
+    32: "public/icon-32.png",
+    48: "public/icon-48.png",
+    128: "public/icon-128.png",
   },
   action: {
     default_icon: {
-      48: "public/logo.png",
+      16: "public/icon-16.png",
+      32: "public/icon-32.png",
+      48: "public/icon-48.png",
+      128: "public/icon-128.png",
     },
     default_popup: "src/popup/index.html",
   },
@@ -23,7 +31,7 @@ export default defineManifest({
       suggested_key: {
         default: "Alt+M",
       },
-      description: "Toggle Spotlight",
+      description: "Toggle Spotlight search overlay",
     },
   },
   background: {
