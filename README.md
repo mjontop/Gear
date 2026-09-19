@@ -8,11 +8,10 @@
 
 - **⚡ Instant Spotlight Palette**: Summoned with a single hotkey (`Alt+M`) over any webpage.
 - **📑 Tab Search & Switcher**: Search through all open tabs across windows and jump to them instantly.
-- **⭐ Bookmarks Search**: Instantly find and open saved bookmarks with support for custom shortcut titles (e.g. `!f`).
+- **⭐ Bookmarks Search**: Instantly find and open saved bookmarks.
 - **🕒 Browsing History**: Search through previously visited pages, ranked by recency.
 - **🔍 Google Search Suggestions**: Live, debounced query auto-suggestions powered by Google Complete.
-- **💥 Bang-Aware Search & Custom Bangs**: DuckDuckGo-style shortcuts (e.g., `!yt`, `!g`, `!wi`). Users can create, edit, and store custom bangs with input validation in `chrome.storage.sync`.
-- **🎛️ Extension Popup Bangs Manager**: Full-featured management UI accessible from the extension icon to manage search shortcuts.
+- **💥 Search Bangs**: DuckDuckGo-style shortcuts (e.g., `!yt`, `!g`, `!wi`) with custom bang support.
 - **🌐 Smart URL & Localhost Detection**: Intelligently identifies domains, localhost, and IP addresses for direct navigation without performing a web search.
 - **🛡️ Shadow DOM Isolation**: Injected via an open Shadow DOM root to completely isolate styles from the host page without CSS conflicts.
 - **🔒 Interaction Lock**: Locks page scrolling and prevents host page event leaks while the spotlight overlay is active.
@@ -34,7 +33,7 @@
 
 ## 💥 Search Bangs
 
-Type the bang prefix anywhere in your search query to search targeted destinations. You can also add your own custom bangs (e.g., `!gh` for GitHub, `!ddg` for DuckDuckGo) via the extension toolbar popup!
+Type the bang prefix anywhere in your search query to search targeted destinations:
 
 | Bang  | Destination            | Example                    |
 | :---- | :--------------------- | :------------------------- |

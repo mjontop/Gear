@@ -1,4 +1,5 @@
 import {
+  FilterIcon,
   PencilIcon,
   RotateCcwIcon,
   SearchIcon,
@@ -34,8 +35,14 @@ export const BangsList = ({
     <>
       <div className="list_toolbar">
         <div className="search_box">
-          <label htmlFor="search-bangs-filter" className="search_box_label">
-            Filter
+          <label
+            htmlFor="search-bangs-filter"
+            className="search_box_label"
+            title="Filter bangs"
+            aria-label="Filter bangs"
+          >
+            <FilterIcon size={16} aria-hidden="true" />
+            <span className="sr_only">Filter bangs</span>
           </label>
           <div className="search_input_wrap">
             <SearchIcon size={14} className="search_box_icon" />

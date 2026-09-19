@@ -1,42 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { AlertCircleIcon, CheckIcon } from "lucide-react";
-import { BANG_SEARCH_URLS } from "@/constants";
-import {
-  getCustomBangs,
-  saveCustomBangs,
-  validateBang,
-} from "@/lib/bangs-storage";
 import { BangForm } from "./components/BangForm";
 import { BangsList } from "./components/BangsList";
+import { BookmarkForm } from "./components/BookmarkForm";
+import { BookmarksList } from "./components/BookmarksList";
+import { NavigationTabs, type PopupTab } from "./components/NavigationTabs";
 import { PopupFooter } from "./components/PopupFooter";
 import { PopupHeader } from "./components/PopupHeader";
+import { useBangsManager } from "./hooks/useBangsManager";
+import { useBookmarksManager } from "./hooks/useBookmarksManager";
 import "./App.css";
 
 export default function App() {
-  const [customBangs, setCustomBangs] = useState<Record<string, string>>({});
-
-  const [prefixInput, setPrefixInput] = useState("");
-  const [urlInput, setUrlInput] = useState("");
-  const [editingPrefix, setEditingPrefix] = useState<string | null>(null);
-  const [formErrors, setFormErrors] = useState<{
-    prefix?: string;
-    url?: string;
-  }>({});
-  const [searchFilter, setSearchFilter] = useState("");
+  const [activeTab, setActiveTab] = useState<PopupTab>("bangs");
   const [statusMessage, setStatusMessage] = useState<{
     text: string;
     type: "success" | "error";
   } | null>(null);
-
-  useEffect(() => {
-    getCustomBangs().then((loaded) => {
-      setCustomBangs(loaded);
-    });
-  }, []);
-
-  const allBangs = useMemo(() => {
-    return { ...BANG_SEARCH_URLS, ...customBangs };
-  }, [customBangs]);
 
   const showStatus = (text: string, type: "success" | "error" = "success") => {
     setStatusMessage({ text, type });
@@ -45,157 +25,111 @@ export default function App() {
     }, 2800);
   };
 
-  const handleEditClick = (prefix: string, url: string) => {
-    setEditingPrefix(prefix);
-    setPrefixInput(prefix);
-    setUrlInput(url);
-    setFormErrors({});
-  };
+  const bangsManager = useBangsManager(showStatus);
+  const bookmarksManager = useBookmarksManager(showStatus);
 
-  const handleCancelEdit = () => {
-    setEditingPrefix(null);
-    setPrefixInput("");
-    setUrlInput("");
-    setFormErrors({});
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const validation = validateBang(
-      prefixInput,
-      urlInput,
-      allBangs,
-      editingPrefix || undefined,
-    );
-
-    if (!validation.isValid) {
-      setFormErrors({
-        prefix: validation.prefixError,
-        url: validation.urlError,
-      });
-      return;
-    }
-
-    const finalPrefix = validation.normalizedPrefix!;
-    const finalUrl = validation.normalizedUrl!;
-
-    const updated = { ...customBangs };
-
-    if (editingPrefix && editingPrefix !== finalPrefix) {
-      delete updated[editingPrefix];
-    }
-
-    updated[finalPrefix] = finalUrl;
-
-    try {
-      await saveCustomBangs(updated);
-      setCustomBangs(updated);
-      handleCancelEdit();
-      showStatus(
-        editingPrefix
-          ? `Updated bang '${finalPrefix}'`
-          : `Added bang '${finalPrefix}'`,
-        "success",
-      );
-    } catch {
-      showStatus("Failed to save bang to storage.", "error");
-    }
-  };
-
-  const handleDelete = async (prefix: string) => {
-    if (!customBangs[prefix]) return;
-
-    const updated = { ...customBangs };
-    delete updated[prefix];
-
-    try {
-      await saveCustomBangs(updated);
-      setCustomBangs(updated);
-      if (editingPrefix === prefix) {
-        handleCancelEdit();
-      }
-      showStatus(`Deleted bang '${prefix}'`, "success");
-    } catch {
-      showStatus("Failed to delete bang.", "error");
-    }
-  };
-
-  const handleResetDefaults = async () => {
-    try {
-      await saveCustomBangs({});
-      setCustomBangs({});
-      handleCancelEdit();
-      showStatus("Reset all bangs to defaults", "success");
-    } catch {
-      showStatus("Failed to reset bangs.", "error");
-    }
-  };
-
-  const filteredBangsList = useMemo(() => {
-    const list = Object.entries(allBangs).map(([prefix, url]) => ({
-      prefix,
-      url,
-      isCustom: Boolean(customBangs[prefix]),
-    }));
-
-    if (!searchFilter.trim()) {
-      return list;
-    }
-
-    const query = searchFilter.trim().toLowerCase();
-    return list.filter(
-      (item) =>
-        item.prefix.toLowerCase().includes(query) ||
-        item.url.toLowerCase().includes(query),
-    );
-  }, [allBangs, customBangs, searchFilter]);
+  const currentCount =
+    activeTab === "bangs"
+      ? Object.keys(bangsManager.allBangs).length
+      : bookmarksManager.bookmarks.length;
 
   return (
     <div className="popup_container">
-      <PopupHeader totalBangs={Object.keys(allBangs).length} />
+      <PopupHeader activeTab={activeTab} totalCount={currentCount} />
+
+      <NavigationTabs
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        bangsCount={Object.keys(bangsManager.allBangs).length}
+        bookmarksCount={bookmarksManager.bookmarks.length}
+      />
 
       {statusMessage && (
         <div className={`status_banner status_${statusMessage.type}`}>
           {statusMessage.type === "success" ? (
-            <CheckIcon size={14} />
+            <CheckIcon size={16} />
           ) : (
-            <AlertCircleIcon size={14} />
+            <AlertCircleIcon size={16} />
           )}
           <span>{statusMessage.text}</span>
         </div>
       )}
 
-      <BangForm
-        prefixInput={prefixInput}
-        urlInput={urlInput}
-        editingPrefix={editingPrefix}
-        formErrors={formErrors}
-        onPrefixChange={(value) => {
-          setPrefixInput(value);
-          if (formErrors.prefix) {
-            setFormErrors((prev) => ({ ...prev, prefix: undefined }));
-          }
-        }}
-        onUrlChange={(value) => {
-          setUrlInput(value);
-          if (formErrors.url) {
-            setFormErrors((prev) => ({ ...prev, url: undefined }));
-          }
-        }}
-        onSubmit={handleSubmit}
-        onCancelEdit={handleCancelEdit}
-      />
-
-      <BangsList
-        bangs={filteredBangsList}
-        searchFilter={searchFilter}
-        customCount={Object.keys(customBangs).length}
-        onSearchFilterChange={setSearchFilter}
-        onEdit={handleEditClick}
-        onDelete={handleDelete}
-        onResetDefaults={handleResetDefaults}
-      />
+      {activeTab === "bangs" ? (
+        <>
+          <BangForm
+            prefixInput={bangsManager.prefixInput}
+            urlInput={bangsManager.urlInput}
+            editingPrefix={bangsManager.editingPrefix}
+            formErrors={bangsManager.formErrors}
+            onPrefixChange={(val) => {
+              bangsManager.setPrefixInput(val);
+              if (bangsManager.formErrors.prefix) {
+                bangsManager.setFormErrors((prev) => ({
+                  ...prev,
+                  prefix: undefined,
+                }));
+              }
+            }}
+            onUrlChange={(val) => {
+              bangsManager.setUrlInput(val);
+              if (bangsManager.formErrors.url) {
+                bangsManager.setFormErrors((prev) => ({
+                  ...prev,
+                  url: undefined,
+                }));
+              }
+            }}
+            onSubmit={bangsManager.handleSubmit}
+            onCancelEdit={bangsManager.handleCancelEdit}
+          />
+          <BangsList
+            bangs={bangsManager.filteredBangsList}
+            searchFilter={bangsManager.searchFilter}
+            customCount={Object.keys(bangsManager.customBangs).length}
+            onSearchFilterChange={bangsManager.setSearchFilter}
+            onEdit={bangsManager.handleEditClick}
+            onDelete={bangsManager.handleDelete}
+            onResetDefaults={bangsManager.handleResetDefaults}
+          />
+        </>
+      ) : (
+        <>
+          <BookmarkForm
+            titleInput={bookmarksManager.titleInput}
+            urlInput={bookmarksManager.urlInput}
+            editingId={bookmarksManager.editingId}
+            formErrors={bookmarksManager.formErrors}
+            onTitleChange={(val) => {
+              bookmarksManager.setTitleInput(val);
+              if (bookmarksManager.formErrors.title) {
+                bookmarksManager.setFormErrors((prev) => ({
+                  ...prev,
+                  title: undefined,
+                }));
+              }
+            }}
+            onUrlChange={(val) => {
+              bookmarksManager.setUrlInput(val);
+              if (bookmarksManager.formErrors.url) {
+                bookmarksManager.setFormErrors((prev) => ({
+                  ...prev,
+                  url: undefined,
+                }));
+              }
+            }}
+            onSubmit={bookmarksManager.handleSubmit}
+            onCancelEdit={bookmarksManager.handleCancelEdit}
+          />
+          <BookmarksList
+            bookmarks={bookmarksManager.filteredBookmarks}
+            searchFilter={bookmarksManager.searchFilter}
+            onSearchFilterChange={bookmarksManager.setSearchFilter}
+            onEdit={bookmarksManager.handleEditClick}
+            onDelete={bookmarksManager.handleDelete}
+          />
+        </>
+      )}
 
       <PopupFooter />
     </div>
