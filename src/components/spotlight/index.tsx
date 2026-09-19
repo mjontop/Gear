@@ -8,6 +8,7 @@ import type {
   SpotlightResultData,
 } from "./components/active-tabs";
 import { SpotlightView } from "./components/spotlight-view";
+import { useSpotlightPreferences } from "@/lib/preferences";
 import {
   getSpotlightResults,
   useBookmarks,
@@ -38,9 +39,19 @@ export const Spotlight = () => {
 
   const { rawQuery, cleanQuery, bang } = parseQueryWithBangs(searchValue);
 
-  const { tabs } = useOpenTabs();
-  const bookmarks = useBookmarks({ isOpen, rawQuery, cleanQuery });
-  const history = useHistory({ isOpen, cleanQuery });
+  const { preferences } = useSpotlightPreferences();
+  const { tabs } = useOpenTabs(isOpen);
+  const bookmarks = useBookmarks({
+    isOpen,
+    rawQuery,
+    cleanQuery,
+    enabled: preferences.includeBookmarks,
+  });
+  const history = useHistory({
+    isOpen,
+    cleanQuery,
+    enabled: preferences.includeHistory,
+  });
   const searchSuggestions = useSearchSuggestions({
     isOpen,
     cleanQuery,

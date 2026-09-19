@@ -73,17 +73,19 @@ export const useSpotlightShortcut = ({
   }, [onToggle, setIsOpen]);
 };
 
-export const useOpenTabs = () => {
+export const useOpenTabs = (isOpen?: boolean) => {
   const [tabs, setTabs] = useState<OpenTabData[]>([]);
 
   useEffect(() => {
+    if (isOpen === false) return;
+
     chrome.runtime.sendMessage(
       { type: "GET_OPEN_TABS" },
       (response?: TabsResponse) => {
         setTabs(response?.tabs ?? []);
       },
     );
-  }, []);
+  }, [isOpen]);
 
   return { tabs };
 };
@@ -92,15 +94,17 @@ export const useBookmarks = ({
   isOpen,
   rawQuery,
   cleanQuery,
+  enabled = true,
 }: {
   isOpen: boolean;
   rawQuery: string;
   cleanQuery: string;
+  enabled?: boolean;
 }) => {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen || !enabled) {
       setBookmarks([]);
       return;
     }
@@ -122,7 +126,7 @@ export const useBookmarks = ({
       isCurrent = false;
       window.clearTimeout(timeoutId);
     };
-  }, [isOpen, rawQuery, cleanQuery]);
+  }, [isOpen, enabled, rawQuery, cleanQuery]);
 
   return bookmarks;
 };
@@ -130,14 +134,16 @@ export const useBookmarks = ({
 export const useHistory = ({
   isOpen,
   cleanQuery,
+  enabled = true,
 }: {
   isOpen: boolean;
   cleanQuery: string;
+  enabled?: boolean;
 }) => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen || !enabled) {
       setHistory([]);
       return;
     }
@@ -158,7 +164,7 @@ export const useHistory = ({
       isCurrent = false;
       window.clearTimeout(timeoutId);
     };
-  }, [isOpen, cleanQuery]);
+  }, [isOpen, enabled, cleanQuery]);
 
   return history;
 };

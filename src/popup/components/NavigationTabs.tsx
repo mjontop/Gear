@@ -1,6 +1,12 @@
-import { BookmarkIcon, TerminalIcon } from "lucide-react";
+import { useEffect, useRef } from "react";
+import {
+  BookmarkIcon,
+  LayersIcon,
+  SettingsIcon,
+  TerminalIcon,
+} from "lucide-react";
 
-export type PopupTab = "bangs" | "bookmarks";
+export type PopupTab = "bangs" | "bookmarks" | "sources" | "settings";
 
 type NavigationTabsProps = {
   activeTab: PopupTab;
@@ -15,8 +21,34 @@ export const NavigationTabs = ({
   bangsCount,
   bookmarksCount,
 }: NavigationTabsProps) => {
+  const navRef = useRef<HTMLElement>(null);
+
+  const handleWheel = (e: React.WheelEvent<HTMLElement>) => {
+    if (navRef.current && e.deltaY !== 0) {
+      navRef.current.scrollLeft += e.deltaY;
+    }
+  };
+
+  useEffect(() => {
+    const activeButton = navRef.current?.querySelector<HTMLButtonElement>(
+      ".tab_button_active",
+    );
+    if (activeButton) {
+      activeButton.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+    }
+  }, [activeTab]);
+
   return (
-    <nav className="tab_navigation" aria-label="Popup tabs">
+    <nav
+      ref={navRef}
+      onWheel={handleWheel}
+      className="tab_navigation"
+      aria-label="Popup tabs"
+    >
       <button
         type="button"
         className={`tab_button ${activeTab === "bangs" ? "tab_button_active" : ""}`}
@@ -35,6 +67,24 @@ export const NavigationTabs = ({
         <BookmarkIcon size={15} />
         <span>Bookmarks</span>
         <span className="tab_counter">{bookmarksCount}</span>
+      </button>
+
+      <button
+        type="button"
+        className={`tab_button ${activeTab === "sources" ? "tab_button_active" : ""}`}
+        onClick={() => onTabChange("sources")}
+      >
+        <LayersIcon size={15} />
+        <span>Sources</span>
+      </button>
+
+      <button
+        type="button"
+        className={`tab_button ${activeTab === "settings" ? "tab_button_active" : ""}`}
+        onClick={() => onTabChange("settings")}
+      >
+        <SettingsIcon size={15} />
+        <span>Settings</span>
       </button>
     </nav>
   );

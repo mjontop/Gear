@@ -19,10 +19,14 @@ export function useBangsManager(
   }>({});
   const [searchFilter, setSearchFilter] = useState("");
 
-  useEffect(() => {
+  const loadBangs = () => {
     getCustomBangs().then((loaded) => {
       setCustomBangs(loaded);
     });
+  };
+
+  useEffect(() => {
+    loadBangs();
   }, []);
 
   const allBangs = useMemo(() => {
@@ -153,5 +157,6 @@ export function useBangsManager(
     handleSubmit,
     handleDelete,
     handleResetDefaults,
+    loadBangs,
   };
 }

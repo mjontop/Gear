@@ -124,5 +124,6 @@ export function useBookmarksManager(
     handleCancelEdit,
     handleSubmit,
     handleDelete,
+    loadBookmarks: loadData,
   };
 }

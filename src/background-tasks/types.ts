@@ -5,6 +5,8 @@ export type OpenTab = {
   url: string;
   favIconUrl?: string;
   active: boolean;
+  audible?: boolean;
+  muted?: boolean;
 };
 
 export type SearchSuggestion = {

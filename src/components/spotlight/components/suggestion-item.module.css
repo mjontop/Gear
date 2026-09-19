@@ -64,6 +64,25 @@
   line-height: 1.2;
 }
 
+.tab_audible_indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: #38bdf8;
+  margin-left: 0.35em;
+  margin-right: 0.25em;
+}
+
+.tab_audible_icon {
+  width: 1.15em;
+  height: 1.15em;
+}
+
+.tab_audible_muted {
+  color: rgba(255, 255, 255, 0.45);
+}
+
 .suggestion_action {
   display: inline-flex;
   align-items: center;

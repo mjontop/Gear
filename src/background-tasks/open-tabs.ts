@@ -27,5 +27,7 @@ export const getOpenTabs = async (
       url: tab.url || "",
       favIconUrl: tab.favIconUrl,
       active: Boolean(tab.active),
+      audible: Boolean(tab.audible),
+      muted: Boolean(tab.mutedInfo?.muted),
     }));
 };

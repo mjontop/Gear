@@ -1,6 +1,6 @@
 .popup_container {
   width: 480px;
-  min-height: 540px;
+  height: 600px;
   max-height: 600px;
   box-sizing: border-box;
   display: flex;
@@ -14,7 +14,8 @@
 
 /* Header */
 .popup_header {
-  padding: 18px 20px 14px;
+  flex-shrink: 0;
+  padding: 16px 20px 14px;
   background: #13161c;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
@@ -53,14 +54,26 @@
 
 /* Navigation Tabs */
 .tab_navigation {
+  flex-shrink: 0;
   display: flex;
   background: #11141a;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 0 18px;
+  padding: 0 14px;
   gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tab_navigation::-webkit-scrollbar {
+  display: none;
 }
 
 .tab_button {
+  flex-shrink: 0;
+  white-space: nowrap;
   padding: 10px 14px;
   background: transparent;
   border: none;
@@ -136,6 +149,7 @@
 
 /* Form Section */
 .form_card {
+  flex-shrink: 0;
   margin: 12px 18px 10px;
   padding: 14px 16px;
   background: #15181f;
@@ -251,6 +265,7 @@
 
 /* List & Search Toolbar */
 .list_toolbar {
+  flex-shrink: 0;
   padding: 4px 18px 8px;
   display: flex;
   align-items: center;
@@ -325,12 +340,12 @@
 /* Bangs List */
 .bangs_list {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 0 18px 10px;
   display: flex;
   flex-direction: column;
   gap: 7px;
-  max-height: 250px;
 }
 
 .bangs_list::-webkit-scrollbar {
@@ -483,6 +498,8 @@
 
 /* Footer */
 .popup_footer {
+  flex-shrink: 0;
+  margin-top: auto;
   padding: 12px 18px;
   background: #13161c;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -501,4 +518,299 @@
   color: #e2e8f0;
   font-weight: 600;
   font-size: 0.82rem;
+}
+
+/* Settings Page */
+.settings_container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.settings_container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.settings_container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.settings_container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+}
+
+.settings_container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.settings_card_title_row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings_title_icon {
+  color: #3b82f6;
+}
+
+.settings_subtitle {
+  margin: 6px 0 16px;
+  font-size: 0.83rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.settings_list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setting_row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  background: #1a1e27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.setting_row:hover {
+  background: #1e232d;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.setting_label_group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.setting_label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.setting_icon {
+  color: #60a5fa;
+  flex-shrink: 0;
+}
+
+.setting_helper {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.52);
+  line-height: 1.35;
+}
+
+.setting_control {
+  display: flex;
+  align-items: center;
+}
+
+.setting_checkbox {
+  width: 19px;
+  height: 19px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.settings_tip_card {
+  flex-shrink: 0;
+  margin: 4px 18px 14px;
+  padding: 12px 14px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+}
+
+.settings_tip_title {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #93c5fd;
+  margin-bottom: 4px;
+}
+
+.settings_tip_text {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Theme Selector */
+.theme_selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.theme_btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 8px;
+  background: #1a1e27;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.theme_btn:hover:not(.theme_btn_disabled) {
+  background: #232936;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme_btn_active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+}
+
+.theme_btn_disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.theme_badge_current {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+  font-weight: 600;
+}
+
+.theme_badge_soon {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+}
+
+/* Shortcut Setting */
+.shortcut_setting_row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #1a1e27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.shortcut_info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.shortcut_name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.shortcut_desc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.shortcut_keys {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.shortcut_keys kbd {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 3px 7px;
+  border-radius: 5px;
+  color: #f1f5f9;
+  font-weight: 700;
+  font-size: 0.84rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.shortcut_tip_text {
+  margin: 10px 0 12px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.shortcut_tip_text kbd {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.shortcut_action_btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 0.84rem;
+}
+
+/* Backup & Restore */
+.backup_actions {
+  display: flex;
+  gap: 10px;
+}
+
+.backup_btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 12px;
+  font-size: 0.84rem;
+}
+
+.sr_only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

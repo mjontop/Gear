@@ -7,8 +7,14 @@ import { BookmarksList } from "./components/BookmarksList";
 import { NavigationTabs, type PopupTab } from "./components/NavigationTabs";
 import { PopupFooter } from "./components/PopupFooter";
 import { PopupHeader } from "./components/PopupHeader";
+import { SettingsView } from "./components/SettingsView";
+import { SourcesView } from "./components/SourcesView";
 import { useBangsManager } from "./hooks/useBangsManager";
 import { useBookmarksManager } from "./hooks/useBookmarksManager";
+import {
+  useSpotlightPreferences,
+  type SpotlightPreferences,
+} from "@/lib/preferences";
 import "./App.css";
 
 export default function App() {
@@ -27,6 +33,15 @@ export default function App() {
 
   const bangsManager = useBangsManager(showStatus);
   const bookmarksManager = useBookmarksManager(showStatus);
+  const { preferences, updatePreference } = useSpotlightPreferences();
+
+  const handlePreferenceChange = async <K extends keyof SpotlightPreferences>(
+    key: K,
+    value: SpotlightPreferences[K],
+  ) => {
+    await updatePreference(key, value);
+    showStatus("Preferences saved");
+  };
 
   const currentCount =
     activeTab === "bangs"
@@ -55,7 +70,7 @@ export default function App() {
         </div>
       )}
 
-      {activeTab === "bangs" ? (
+      {activeTab === "bangs" && (
         <>
           <BangForm
             prefixInput={bangsManager.prefixInput}
@@ -93,7 +108,9 @@ export default function App() {
             onResetDefaults={bangsManager.handleResetDefaults}
           />
         </>
-      ) : (
+      )}
+
+      {activeTab === "bookmarks" && (
         <>
           <BookmarkForm
             titleInput={bookmarksManager.titleInput}
@@ -129,6 +146,23 @@ export default function App() {
             onDelete={bookmarksManager.handleDelete}
           />
         </>
+      )}
+
+      {activeTab === "sources" && (
+        <SourcesView
+          preferences={preferences}
+          onPreferenceChange={handlePreferenceChange}
+        />
+      )}
+
+      {activeTab === "settings" && (
+        <SettingsView
+          onShowStatus={showStatus}
+          onDataImported={() => {
+            bangsManager.loadBangs();
+            bookmarksManager.loadBookmarks();
+          }}
+        />
       )}
 
       <PopupFooter />

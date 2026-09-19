@@ -1,4 +1,4 @@
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, Volume2Icon, VolumeXIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
@@ -7,6 +7,8 @@ export type SuggestionItemData = {
   title: string;
   url: string;
   favIconUrl?: string;
+  audible?: boolean;
+  muted?: boolean;
 };
 
 type SuggestionItemProps<T extends SuggestionItemData> = {
@@ -65,6 +67,19 @@ export const SuggestionItem = <T extends SuggestionItemData>({
         )}
       </span>
       <span className="suggestion_title">{item.title}</span>
+      {(item.audible || item.muted) && (
+        <span
+          className={`tab_audible_indicator ${item.muted ? "tab_audible_muted" : ""}`}
+          title={item.muted ? "Tab is muted" : "Playing audio"}
+          aria-label={item.muted ? "Tab is muted" : "Playing audio"}
+        >
+          {item.muted ? (
+            <VolumeXIcon size={14} className="tab_audible_icon" />
+          ) : (
+            <Volume2Icon size={14} className="tab_audible_icon" />
+          )}
+        </span>
+      )}
       {actionLabel && (
         <span className="suggestion_action">
           {actionLabel}
