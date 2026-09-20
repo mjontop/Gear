@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
+import {
+  DEFAULT_SEARCH_PROVIDER_ID,
+  type SearchProviderId,
+} from "@/constants";
 
 export type SpotlightPreferences = {
   includeBookmarks: boolean;
   includeHistory: boolean;
+  searchProvider: SearchProviderId;
 };
 
 export const DEFAULT_SPOTLIGHT_PREFERENCES: SpotlightPreferences = {
   includeBookmarks: true,
   includeHistory: true,
+  searchProvider: DEFAULT_SEARCH_PROVIDER_ID,
 };
 
 export const SPOTLIGHT_PREFERENCES_STORAGE_KEY = "gear_spotlight_preferences";

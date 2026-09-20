@@ -1,4 +1,9 @@
-import { DEFAULT_SEARCH_URL, DEFAULT_URL_PROTOCOL } from "@/constants";
+import {
+  DEFAULT_SEARCH_PROVIDER_ID,
+  DEFAULT_URL_PROTOCOL,
+  SEARCH_PROVIDERS,
+  type SearchProviderId,
+} from "@/constants";
 import { parseQueryWithBangs } from "./bangs";
 
 export function isValidUrl(s: string): string | null {
@@ -40,7 +45,10 @@ export function isValidUrl(s: string): string | null {
   }
 }
 
-export function getRedirectUrl(s: string): string {
+export function getRedirectUrl(
+  s: string,
+  providerId: SearchProviderId = DEFAULT_SEARCH_PROVIDER_ID,
+): string {
   // Check if input string is a valid URL
   const validUrl = isValidUrl(s);
   if (validUrl) {
@@ -53,5 +61,12 @@ export function getRedirectUrl(s: string): string {
     return bangUrl.replace("%s", encodeURIComponent(cleanQuery));
   }
 
-  return `${DEFAULT_SEARCH_URL}?q=${encodeURIComponent(cleanQuery || s.trim())}`;
+  const provider =
+    SEARCH_PROVIDERS[providerId] ||
+    SEARCH_PROVIDERS[DEFAULT_SEARCH_PROVIDER_ID];
+
+  return provider.searchUrl.replace(
+    "%s",
+    encodeURIComponent(cleanQuery || s.trim()),
+  );
 }

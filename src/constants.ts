@@ -1,5 +1,49 @@
 export const DEFAULT_URL_PROTOCOL = "https://";
 
+export type SearchProviderId = "google" | "duckduckgo" | "bing" | "brave";
+
+export type SearchProvider = {
+  id: SearchProviderId;
+  name: string;
+  searchUrl: string;
+  suggestionsEndpoint: string;
+  domain: string;
+};
+
+export const SEARCH_PROVIDERS: Record<SearchProviderId, SearchProvider> = {
+  google: {
+    id: "google",
+    name: "Google",
+    searchUrl: "https://www.google.com/search?q=%s",
+    suggestionsEndpoint:
+      "https://suggestqueries.google.com/complete/search?client=firefox&q=%s",
+    domain: "google.com",
+  },
+  duckduckgo: {
+    id: "duckduckgo",
+    name: "DuckDuckGo",
+    searchUrl: "https://duckduckgo.com/?q=%s",
+    suggestionsEndpoint: "https://duckduckgo.com/ac/?type=list&q=%s",
+    domain: "duckduckgo.com",
+  },
+  bing: {
+    id: "bing",
+    name: "Bing",
+    searchUrl: "https://www.bing.com/search?q=%s",
+    suggestionsEndpoint: "https://api.bing.com/osjson.aspx?query=%s",
+    domain: "bing.com",
+  },
+  brave: {
+    id: "brave",
+    name: "Brave Search",
+    searchUrl: "https://search.brave.com/search?q=%s",
+    suggestionsEndpoint: "https://search.brave.com/api/suggest?q=%s",
+    domain: "search.brave.com",
+  },
+};
+
+export const DEFAULT_SEARCH_PROVIDER_ID: SearchProviderId = "google";
+
 export const DEFAULT_SEARCH_URL = "https://www.google.com/search";
 
 export const SEARCH_SUGGESTIONS_ENDPOINT =
@@ -7,8 +51,15 @@ export const SEARCH_SUGGESTIONS_ENDPOINT =
 
 export const SEARCH_SUGGESTIONS_CLIENT = "firefox";
 
+export const SEARCH_SUGGESTIONS_HOST_PERMISSIONS = [
+  "https://suggestqueries.google.com/*",
+  "https://duckduckgo.com/*",
+  "https://api.bing.com/*",
+  "https://search.brave.com/*",
+];
+
 export const SEARCH_SUGGESTIONS_HOST_PERMISSION =
-  "https://suggestqueries.google.com/*";
+  SEARCH_SUGGESTIONS_HOST_PERMISSIONS[0];
 
 export const CONTENT_SCRIPT_MATCHES = ["http://*/*", "https://*/*"];
 

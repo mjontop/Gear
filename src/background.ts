@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (message.type === "GET_SEARCH_SUGGESTIONS") {
-      getSearchSuggestions(message.query)
+      getSearchSuggestions(message.query, message.provider)
         .then((suggestions) => {
           sendResponse({ suggestions });
         })

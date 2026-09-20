@@ -1,7 +1,7 @@
 import { defineManifest } from "@crxjs/vite-plugin";
 import {
   CONTENT_SCRIPT_MATCHES,
-  SEARCH_SUGGESTIONS_HOST_PERMISSION,
+  SEARCH_SUGGESTIONS_HOST_PERMISSIONS,
 } from "./src/constants.ts";
 import pkg from "./package.json";
 
@@ -52,7 +52,7 @@ export default defineManifest({
       matches: ["<all_urls>"],
     },
   ],
-  host_permissions: [SEARCH_SUGGESTIONS_HOST_PERMISSION],
+  host_permissions: SEARCH_SUGGESTIONS_HOST_PERMISSIONS,
   content_scripts: [
     {
       js: ["src/content/main.tsx"],

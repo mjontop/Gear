@@ -814,3 +814,77 @@
   white-space: nowrap;
   border-width: 0;
 }
+
+/* Search Provider Selector */
+.search_provider_list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.search_provider_option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #1a1e27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.search_provider_option:hover {
+  background: #202632;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.search_provider_option_active {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: #3b82f6;
+}
+
+.search_provider_radio_wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.search_provider_radio {
+  width: 17px;
+  height: 17px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+  margin: 0;
+}
+
+.search_provider_info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.search_provider_name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.search_provider_domain {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.48);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.provider_badge_default {
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.22);
+  color: #93c5fd;
+  font-weight: 600;
+  flex-shrink: 0;
+}

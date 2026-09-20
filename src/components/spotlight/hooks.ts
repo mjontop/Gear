@@ -3,6 +3,7 @@ import type { Dispatch, RefObject, SetStateAction } from "react";
 import {
   SEARCH_RESULT_PRIORITY,
   SEARCH_SUGGESTION_DEBOUNCE_MS,
+  type SearchProviderId,
 } from "@/constants";
 import type { BookmarkItem, HistoryItem } from "@/background-tasks/types";
 import type {
@@ -45,6 +46,7 @@ type UseSearchSuggestionsParams = {
   isOpen: boolean;
   cleanQuery: string;
   validUrl: string | null;
+  provider?: SearchProviderId;
 };
 
 type UseSpotlightScrollLockParams = {
@@ -173,6 +175,7 @@ export const useSearchSuggestions = ({
   isOpen,
   cleanQuery,
   validUrl,
+  provider,
 }: UseSearchSuggestionsParams) => {
   const [searchSuggestions, setSearchSuggestions] = useState<
     SearchSuggestionResponseData[]
@@ -188,7 +191,7 @@ export const useSearchSuggestions = ({
     let isCurrentSearch = true;
     const timeoutId = window.setTimeout(() => {
       chrome.runtime.sendMessage(
-        { type: "GET_SEARCH_SUGGESTIONS", query: trimmedClean },
+        { type: "GET_SEARCH_SUGGESTIONS", query: trimmedClean, provider },
         (response?: SearchSuggestionsResponse) => {
           if (!isCurrentSearch) return;
 
@@ -201,7 +204,7 @@ export const useSearchSuggestions = ({
       isCurrentSearch = false;
       window.clearTimeout(timeoutId);
     };
-  }, [isOpen, cleanQuery, validUrl]);
+  }, [isOpen, cleanQuery, validUrl, provider]);
 
   return searchSuggestions;
 };

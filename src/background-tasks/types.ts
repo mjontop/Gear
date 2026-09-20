@@ -23,6 +23,8 @@ export type BookmarkItem = {
   favIconUrl?: string;
 };
 
+import type { SearchProviderId } from "@/constants";
+
 export type HistoryItem = {
   id: string;
   title: string;
@@ -34,6 +36,10 @@ export type HistoryItem = {
 export type RuntimeMessage =
   | { type: "GET_OPEN_TABS" }
   | { type: "SWITCH_TO_TAB"; tabId: number; windowId: number }
-  | { type: "GET_SEARCH_SUGGESTIONS"; query: string }
+  | {
+      type: "GET_SEARCH_SUGGESTIONS";
+      query: string;
+      provider?: SearchProviderId;
+    }
   | { type: "GET_BOOKMARKS"; query: string }
   | { type: "GET_HISTORY"; query: string };

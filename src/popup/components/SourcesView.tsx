@@ -1,4 +1,10 @@
-import { BookmarkIcon, HistoryIcon, LayersIcon } from "lucide-react";
+import {
+  BookmarkIcon,
+  GlobeIcon,
+  HistoryIcon,
+  LayersIcon,
+} from "lucide-react";
+import { SEARCH_PROVIDERS } from "@/constants";
 import type { SpotlightPreferences } from "@/lib/preferences";
 
 type SourcesViewProps = {
@@ -15,6 +21,7 @@ export const SourcesView = ({
 }: SourcesViewProps) => {
   return (
     <div className="settings_container">
+      {/* 1. Local Sources Card */}
       <div className="form_card">
         <div className="form_header">
           <div className="settings_card_title_row">
@@ -80,6 +87,65 @@ export const SourcesView = ({
               />
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* 2. Search Engine Provider Card */}
+      <div className="form_card">
+        <div className="form_header">
+          <div className="settings_card_title_row">
+            <GlobeIcon size={18} className="settings_title_icon" />
+            <span className="form_title">Search Engine Provider</span>
+          </div>
+        </div>
+
+        <p className="settings_subtitle">
+          Choose which search engine to use for web searches and query
+          suggestions in Spotlight.
+        </p>
+
+        <div
+          className="search_provider_list"
+          role="radiogroup"
+          aria-label="Search Engine Provider"
+        >
+          {Object.values(SEARCH_PROVIDERS).map((provider) => {
+            const isSelected =
+              (preferences.searchProvider || "google") === provider.id;
+
+            return (
+              <label
+                key={provider.id}
+                htmlFor={`provider-${provider.id}`}
+                className={`search_provider_option ${
+                  isSelected ? "search_provider_option_active" : ""
+                }`}
+              >
+                <div className="search_provider_radio_wrap">
+                  <input
+                    id={`provider-${provider.id}`}
+                    type="radio"
+                    name="search-provider"
+                    value={provider.id}
+                    checked={isSelected}
+                    onChange={() =>
+                      onPreferenceChange("searchProvider", provider.id)
+                    }
+                    className="search_provider_radio"
+                  />
+                </div>
+                <div className="search_provider_info">
+                  <span className="search_provider_name">{provider.name}</span>
+                  <span className="search_provider_domain">
+                    {provider.domain}
+                  </span>
+                </div>
+                {provider.id === "google" && (
+                  <span className="provider_badge_default">Default</span>
+                )}
+              </label>
+            );
+          })}
         </div>
       </div>
 

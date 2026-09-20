@@ -56,6 +56,7 @@ export const Spotlight = () => {
     isOpen,
     cleanQuery,
     validUrl,
+    provider: preferences.searchProvider,
   });
 
   const resetSpotlight = () => {
@@ -98,7 +99,10 @@ export const Spotlight = () => {
 
   const handleSearchSuggestion = (suggestion: SearchSuggestionData) => {
     const targetQuery = bang ? `${bang} ${suggestion.query}` : suggestion.query;
-    const redirectUrl = getRedirectUrl(targetQuery);
+    const redirectUrl = getRedirectUrl(
+      targetQuery,
+      preferences.searchProvider,
+    );
     window.open(redirectUrl, "_blank", "noopener");
     setIsOpen(false);
     resetSpotlight();
@@ -167,7 +171,10 @@ export const Spotlight = () => {
         return;
       }
 
-      const redirectUrl = getRedirectUrl(searchValue);
+      const redirectUrl = getRedirectUrl(
+        searchValue,
+        preferences.searchProvider,
+      );
       window.open(redirectUrl, "_blank", "noopener");
       setIsOpen(false);
       resetSpotlight();
