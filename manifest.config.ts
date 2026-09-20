@@ -7,9 +7,9 @@ import pkg from "./package.json";
 
 export default defineManifest({
   manifest_version: 3,
-  name: "Gear - Spotlight & Command Palette",
+  name: "Gear - Spotlight but for Browsers",
   description:
-    "Fast, keyboard-first Spotlight search and command palette. Search open tabs, bookmarks, history, and the web with custom bangs.",
+    "Fast, keyboard-first Spotlight search for browsers. Search open tabs, bookmarks, history, and the web with custom bangs.",
   version: pkg.version,
   icons: {
     16: "public/icon-16.png",
