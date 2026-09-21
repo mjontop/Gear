@@ -29,6 +29,24 @@ const getClampedTabIndex = (index: number, tabCount: number) => {
   return Math.min(index, tabCount - 1);
 };
 
+const formatQueryWithBang = (query: string, bang: string | null): string => {
+  if (bang) {
+    return `${bang} ${query}`;
+  }
+  return query;
+};
+
+const getAutocompletedText = (
+  result: SpotlightResultData,
+  bang: string | null,
+): string => {
+  if (result.kind === "search-suggestion") {
+    return formatQueryWithBang(result.query, bang);
+  }
+
+  return result.title;
+};
+
 export const Spotlight = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -98,7 +116,7 @@ export const Spotlight = () => {
   };
 
   const handleSearchSuggestion = (suggestion: SearchSuggestionData) => {
-    const targetQuery = bang ? `${bang} ${suggestion.query}` : suggestion.query;
+    const targetQuery = formatQueryWithBang(suggestion.query, bang);
     const redirectUrl = getRedirectUrl(
       targetQuery,
       preferences.searchProvider,
@@ -159,6 +177,35 @@ export const Spotlight = () => {
             spotlightResults.length) %
           spotlightResults.length
         );
+      });
+      return;
+    }
+
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const selectedResult = spotlightResults[visibleSelectedTabIndex];
+      if (!selectedResult) {
+        return;
+      }
+
+      const textToInsert = getAutocompletedText(selectedResult, bang);
+
+      setSearchValue(textToInsert);
+      setSelectedTabIndex(0);
+
+      if (inputRef.current) {
+        inputRef.current.value = textToInsert;
+        inputRef.current.focus();
+        const len = textToInsert.length;
+        inputRef.current.setSelectionRange(len, len);
+      }
+
+      requestAnimationFrame(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+          const len = textToInsert.length;
+          inputRef.current.setSelectionRange(len, len);
+        }
       });
       return;
     }
