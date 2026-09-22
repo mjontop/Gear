@@ -265,6 +265,7 @@ export const Spotlight = () => {
       validUrl={validUrl}
       results={spotlightResults}
       selectedTabIndex={visibleSelectedTabIndex}
+      enableBackgroundBlur={preferences.enableBackgroundBlur}
       onClose={() => {
         setIsOpen(false);
         resetSpotlight();

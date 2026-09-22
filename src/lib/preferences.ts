@@ -8,12 +8,14 @@ export type SpotlightPreferences = {
   includeBookmarks: boolean;
   includeHistory: boolean;
   searchProvider: SearchProviderId;
+  enableBackgroundBlur: boolean;
 };
 
 export const DEFAULT_SPOTLIGHT_PREFERENCES: SpotlightPreferences = {
   includeBookmarks: true,
   includeHistory: true,
   searchProvider: DEFAULT_SEARCH_PROVIDER_ID,
+  enableBackgroundBlur: true,
 };
 
 export const SPOTLIGHT_PREFERENCES_STORAGE_KEY = "gear_spotlight_preferences";

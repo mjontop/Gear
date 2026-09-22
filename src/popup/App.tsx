@@ -157,6 +157,8 @@ export default function App() {
 
       {activeTab === "settings" && (
         <SettingsView
+          preferences={preferences}
+          onPreferenceChange={handlePreferenceChange}
           onShowStatus={showStatus}
           onDataImported={() => {
             bangsManager.loadBangs();

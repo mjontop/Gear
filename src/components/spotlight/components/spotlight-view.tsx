@@ -11,6 +11,7 @@ type SpotlightViewProps = {
   validUrl: string | null;
   results: SpotlightResultData[];
   selectedTabIndex: number;
+  enableBackgroundBlur?: boolean;
   onClose: () => void;
   onSearchChange: (value: string) => void;
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
@@ -24,6 +25,7 @@ export const SpotlightView = ({
   validUrl,
   results,
   selectedTabIndex,
+  enableBackgroundBlur = true,
   onClose,
   onSearchChange,
   onKeyDown,
@@ -45,7 +47,7 @@ export const SpotlightView = ({
   return (
     <dialog
       ref={overlayRef}
-      className="spotlight_overlay"
+      className={`spotlight_overlay ${!enableBackgroundBlur ? "spotlight_overlay_no_blur" : ""}`}
       aria-label="Spotlight search"
       onCancel={onClose}
     >
