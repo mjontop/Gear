@@ -6,20 +6,37 @@ import { switchToTab } from "./background-tasks/switch-tab";
 import type { RuntimeMessage } from "./background-tasks/types";
 
 chrome.commands.onCommand.addListener(async (command) => {
-  if (command !== "toggle-spotlight") return;
+  if (command === "toggle-spotlight") {
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
 
-  const [tab] = await chrome.tabs.query({
-    active: true,
-    currentWindow: true,
-  });
+    if (!tab?.id) return;
 
-  if (!tab.id) return;
+    chrome.tabs
+      .sendMessage(tab.id, {
+        type: "TOGGLE_SPOTLIGHT",
+      })
+      .catch(() => {});
+    return;
+  }
 
-  chrome.tabs
-    .sendMessage(tab.id, {
-      type: "TOGGLE_SPOTLIGHT",
-    })
-    .catch(() => {});
+  if (command === "copy-current-url") {
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+
+    if (!tab?.id || !tab.url) return;
+
+    chrome.tabs
+      .sendMessage(tab.id, {
+        type: "COPY_CURRENT_URL",
+        url: tab.url,
+      })
+      .catch(() => {});
+  }
 });
 
 chrome.runtime.onMessage.addListener(

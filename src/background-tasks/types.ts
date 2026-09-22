@@ -42,4 +42,6 @@ export type RuntimeMessage =
       provider?: SearchProviderId;
     }
   | { type: "GET_BOOKMARKS"; query: string }
-  | { type: "GET_HISTORY"; query: string };
+  | { type: "GET_HISTORY"; query: string }
+  | { type: "COPY_CURRENT_URL"; url: string }
+  | { type: "TOGGLE_SPOTLIGHT" };

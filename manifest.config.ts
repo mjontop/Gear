@@ -33,6 +33,13 @@ export default defineManifest({
       },
       description: "Toggle Spotlight search overlay",
     },
+    "copy-current-url": {
+      suggested_key: {
+        default: "Alt+Shift+L",
+        mac: "Alt+Shift+L",
+      },
+      description: "Copy current tab URL to clipboard",
+    },
   },
   background: {
     service_worker: "src/background.ts",
@@ -45,6 +52,7 @@ export default defineManifest({
     "history",
     "favicon",
     "storage",
+    "clipboardWrite",
   ],
   web_accessible_resources: [
     {

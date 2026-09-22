@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   DownloadIcon,
   ExternalLinkIcon,
@@ -26,7 +26,32 @@ export const SettingsView = ({
   onDataImported,
 }: SettingsViewProps) => {
   const [selectedTheme, setSelectedTheme] = useState<"dark" | "light" | "system">("dark");
+  const [shortcuts, setShortcuts] = useState({
+    toggle: ["Alt", "M"],
+    copyUrl: ["Alt", "Shift", "L"],
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (typeof chrome !== "undefined" && chrome.commands?.getAll) {
+      chrome.commands.getAll((commands) => {
+        for (const cmd of commands) {
+          if (cmd.name === "toggle-spotlight" && cmd.shortcut) {
+            setShortcuts((prev) => ({
+              ...prev,
+              toggle: cmd.shortcut!.split("+").map((s) => s.trim()),
+            }));
+          }
+          if (cmd.name === "copy-current-url" && cmd.shortcut) {
+            setShortcuts((prev) => ({
+              ...prev,
+              copyUrl: cmd.shortcut!.split("+").map((s) => s.trim()),
+            }));
+          }
+        }
+      });
+    }
+  }, []);
 
   const handleOpenShortcuts = () => {
     if (typeof chrome !== "undefined" && chrome.tabs?.create) {
@@ -165,7 +190,7 @@ export const SettingsView = ({
         <div className="form_header">
           <div className="settings_card_title_row">
             <KeyboardIcon size={18} className="settings_title_icon" />
-            <span className="form_title">Keyboard Shortcut</span>
+            <span className="form_title">Keyboard Shortcuts</span>
           </div>
         </div>
 
@@ -173,16 +198,38 @@ export const SettingsView = ({
           <div className="shortcut_info">
             <span className="shortcut_name">Toggle Spotlight</span>
             <span className="shortcut_desc">
-              Default shortcut to open the Spotlight search palette.
+              Shortcut to open the Spotlight search palette.
             </span>
           </div>
           <div className="shortcut_keys">
-            <kbd>Alt</kbd> + <kbd>M</kbd>
+            {shortcuts.toggle.map((k, idx) => (
+              <span key={`toggle-${k}-${idx}`} className="shortcut_key_piece">
+                {idx > 0 && <span className="shortcut_plus">+</span>}
+                <kbd>{k}</kbd>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="shortcut_setting_row" style={{ marginTop: "8px" }}>
+          <div className="shortcut_info">
+            <span className="shortcut_name">Copy Current URL</span>
+            <span className="shortcut_desc">
+              Copy active page URL and display notification toast.
+            </span>
+          </div>
+          <div className="shortcut_keys">
+            {shortcuts.copyUrl.map((k, idx) => (
+              <span key={`copy-${k}-${idx}`} className="shortcut_key_piece">
+                {idx > 0 && <span className="shortcut_plus">+</span>}
+                <kbd>{k}</kbd>
+              </span>
+            ))}
           </div>
         </div>
 
         <p className="shortcut_tip_text">
-          💡 <strong>Tip:</strong> Rebind to <kbd>Ctrl</kbd> + <kbd>T</kbd> (Windows) or <kbd>Cmd</kbd> + <kbd>T</kbd> (macOS) to use Spotlight as your default new tab launcher!
+          💡 <strong>Tip:</strong> You can customize any shortcut in browser settings. For instance, rebind Spotlight to <kbd>Ctrl</kbd> + <kbd>T</kbd> / <kbd>Cmd</kbd> + <kbd>T</kbd> to replace your new tab page!
         </p>
 
         <button
@@ -191,7 +238,7 @@ export const SettingsView = ({
           onClick={handleOpenShortcuts}
         >
           <ExternalLinkIcon size={14} />
-          <span>Configure Shortcut in Browser</span>
+          <span>Configure Shortcuts in Browser</span>
         </button>
       </div>
 
