@@ -1,8 +1,1 @@
-.active_tabs {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-  overflow: hidden;
-}
+/* Styles consolidated into src/content/content.css */

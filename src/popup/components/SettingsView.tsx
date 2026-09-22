@@ -32,7 +32,6 @@ type AppearanceCardProps = {
   onSelectTheme: (theme: "dark" | "light" | "system") => void;
   enableBackgroundBlur: boolean;
   onToggleBackgroundBlur: (enabled: boolean) => void;
-  onShowStatus: (text: string) => void;
 };
 
 const AppearanceCard = ({
@@ -40,7 +39,6 @@ const AppearanceCard = ({
   onSelectTheme,
   enableBackgroundBlur,
   onToggleBackgroundBlur,
-  onShowStatus,
 }: AppearanceCardProps) => (
   <div className="form_card">
     <div className="form_header">
@@ -64,31 +62,37 @@ const AppearanceCard = ({
       >
         <MoonIcon size={15} />
         <span>Dark</span>
-        <span className="theme_badge_current">Default</span>
+        {selectedTheme === "dark" && (
+          <span className="theme_badge_current">Active</span>
+        )}
       </button>
 
       <button
         type="button"
-        className={`theme_btn theme_btn_disabled ${selectedTheme === "light" ? "theme_btn_active" : ""}`}
-        onClick={() => onShowStatus("Light theme coming in future update")}
+        className={`theme_btn ${selectedTheme === "light" ? "theme_btn_active" : ""}`}
+        onClick={() => onSelectTheme("light")}
         role="radio"
         aria-checked={selectedTheme === "light"}
       >
         <SunIcon size={15} />
         <span>Light</span>
-        <span className="theme_badge_soon">Soon</span>
+        {selectedTheme === "light" && (
+          <span className="theme_badge_current">Active</span>
+        )}
       </button>
 
       <button
         type="button"
-        className={`theme_btn theme_btn_disabled ${selectedTheme === "system" ? "theme_btn_active" : ""}`}
-        onClick={() => onShowStatus("System theme coming in future update")}
+        className={`theme_btn ${selectedTheme === "system" ? "theme_btn_active" : ""}`}
+        onClick={() => onSelectTheme("system")}
         role="radio"
         aria-checked={selectedTheme === "system"}
       >
         <SettingsIcon size={15} />
         <span>System</span>
-        <span className="theme_badge_soon">Soon</span>
+        {selectedTheme === "system" && (
+          <span className="theme_badge_current">Active</span>
+        )}
       </button>
     </div>
 
@@ -271,7 +275,11 @@ export const SettingsView = ({
   onShowStatus,
   onDataImported,
 }: SettingsViewProps) => {
-  const [selectedTheme, setSelectedTheme] = useState<"dark" | "light" | "system">("dark");
+  const handleSelectTheme = (theme: "dark" | "light" | "system") => {
+    onPreferenceChange("theme", theme);
+    const themeName = theme.charAt(0).toUpperCase() + theme.slice(1);
+    onShowStatus(`Theme switched to ${themeName}`);
+  };
   const [shortcuts, setShortcuts] = useState({
     toggle: ["Alt", "M"],
     copyUrl: ["Alt", "Shift", "L"],
@@ -387,13 +395,12 @@ export const SettingsView = ({
   return (
     <div className="settings_container">
       <AppearanceCard
-        selectedTheme={selectedTheme}
-        onSelectTheme={setSelectedTheme}
+        selectedTheme={preferences.theme || "dark"}
+        onSelectTheme={handleSelectTheme}
         enableBackgroundBlur={preferences.enableBackgroundBlur}
         onToggleBackgroundBlur={(enabled) =>
           onPreferenceChange("enableBackgroundBlur", enabled)
         }
-        onShowStatus={onShowStatus}
       />
 
       <ShortcutsCard
