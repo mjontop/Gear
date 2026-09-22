@@ -1,5 +1,9 @@
 import { useState, useRef, KeyboardEvent } from "react";
-import { MAX_SPOTLIGHT_RESULTS } from "@/constants";
+import {
+  DEFAULT_SEARCH_PROVIDER_ID,
+  MAX_SPOTLIGHT_RESULTS,
+  SEARCH_PROVIDERS,
+} from "@/constants";
 import { parseQueryWithBangs } from "@/lib/bangs";
 import { getRedirectUrl, isValidUrl } from "@/lib/redirect";
 import type { ActiveTabData } from "./components/active-tabs";
@@ -95,6 +99,8 @@ export const Spotlight = () => {
     searchSuggestions,
     rawQuery,
     cleanQuery,
+    validUrl,
+    searchProvider: preferences.searchProvider,
     maxResults: MAX_SPOTLIGHT_RESULTS,
   });
 
@@ -102,6 +108,16 @@ export const Spotlight = () => {
     selectedTabIndex,
     spotlightResults.length,
   );
+
+  const openUrl = (url: string) => {
+    if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
+      chrome.runtime.sendMessage({ type: "OPEN_URL", url });
+    } else {
+      window.open(url, "_blank", "noopener");
+    }
+    setIsOpen(false);
+    resetSpotlight();
+  };
 
   const handleSelectTab = (tab: ActiveTabData) => {
     chrome.runtime.sendMessage(
@@ -116,14 +132,24 @@ export const Spotlight = () => {
   };
 
   const handleSearchSuggestion = (suggestion: SearchSuggestionData) => {
-    const targetQuery = formatQueryWithBang(suggestion.query, bang);
-    const redirectUrl = getRedirectUrl(
-      targetQuery,
-      preferences.searchProvider,
-    );
-    window.open(redirectUrl, "_blank", "noopener");
-    setIsOpen(false);
-    resetSpotlight();
+    if (bang) {
+      const targetQuery = formatQueryWithBang(suggestion.query, bang);
+      const { cleanQuery: parsedClean, bangUrl } =
+        parseQueryWithBangs(targetQuery);
+      if (bangUrl) {
+        openUrl(bangUrl.replace("%s", encodeURIComponent(parsedClean)));
+        return;
+      }
+    }
+
+    const provider =
+      SEARCH_PROVIDERS[preferences.searchProvider] ||
+      SEARCH_PROVIDERS[DEFAULT_SEARCH_PROVIDER_ID];
+    const searchUrl =
+      suggestion.url ||
+      provider.searchUrl.replace("%s", encodeURIComponent(suggestion.query));
+
+    openUrl(searchUrl);
   };
 
   const handleSelectResult = (result: SpotlightResultData) => {
@@ -132,10 +158,13 @@ export const Spotlight = () => {
       return;
     }
 
+    if (result.kind === "direct-url") {
+      openUrl(result.url);
+      return;
+    }
+
     if (result.kind === "bookmark" || result.kind === "history") {
-      window.open(result.url, "_blank", "noopener");
-      setIsOpen(false);
-      resetSpotlight();
+      openUrl(result.url);
       return;
     }
 
@@ -222,9 +251,7 @@ export const Spotlight = () => {
         searchValue,
         preferences.searchProvider,
       );
-      window.open(redirectUrl, "_blank", "noopener");
-      setIsOpen(false);
-      resetSpotlight();
+      openUrl(redirectUrl);
     }
   };
 

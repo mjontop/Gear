@@ -6,6 +6,13 @@ import {
 } from "@/constants";
 import { parseQueryWithBangs } from "./bangs";
 
+const INTERNAL_SCHEME_REGEX = /^(?:chrome|brave|edge|opera|vivaldi|about):/i;
+const WINDOWS_PATH_REGEX = /^[a-zA-Z]:[\\/]/;
+const IP_ADDRESS_REGEX = /^(?:\d{1,3}\.){3}\d{1,3}$/;
+const LOCALHOST_REGEX = /^localhost$/i;
+const DOMAIN_REGEX =
+  /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i;
+
 export function isValidUrl(s: string): string | null {
   const trimmedValue = s.trim();
 
@@ -13,27 +20,63 @@ export function isValidUrl(s: string): string | null {
     return null;
   }
 
-  // handling ip addresses and localhost
-  const ipAddressRegex = /^(?:\d{1,3}\.){3}\d{1,3}$/;
-  const localhostRegex = /^localhost$/;
-  const hostnameRegex =
-    /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?))*\.(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9]))$/i;
+  // 1. Browser-internal schemes (brave://, chrome://, edge://, about:blank, etc.)
+  if (INTERNAL_SCHEME_REGEX.test(trimmedValue)) {
+    try {
+      const url = new URL(trimmedValue);
+      return url.toString();
+    } catch {
+      return null;
+    }
+  }
 
-  if (ipAddressRegex.test(trimmedValue) || localhostRegex.test(trimmedValue)) {
-    return trimmedValue;
+  // 2. Windows absolute local file paths (e.g., C:\Users\... or C:/Users/...)
+  if (WINDOWS_PATH_REGEX.test(trimmedValue)) {
+    try {
+      const normalizedPath = trimmedValue.replace(/\\/g, "/");
+      const url = new URL(`file:///${normalizedPath}`);
+      return url.toString();
+    } catch {
+      return null;
+    }
+  }
+
+  // 3. File URLs (file:///...)
+  if (/^file:\/\/\//i.test(trimmedValue)) {
+    try {
+      const url = new URL(trimmedValue);
+      return url.toString();
+    } catch {
+      return null;
+    }
+  }
+
+  // 4. Standard web URLs, domains, IPs, or localhost
+  // Plain search phrases with spaces should not be treated as URLs
+  if (/\s/.test(trimmedValue)) {
+    return null;
   }
 
   try {
     const hasProtocol = /^https?:\/\//i.test(trimmedValue);
-    const urlValue = hasProtocol
-      ? trimmedValue
-      : DEFAULT_URL_PROTOCOL + trimmedValue;
+    let protocol = DEFAULT_URL_PROTOCOL;
+
+    if (!hasProtocol) {
+      if (
+        trimmedValue.toLowerCase().startsWith("localhost") ||
+        trimmedValue.startsWith("127.0.0.1")
+      ) {
+        protocol = "http://";
+      }
+    }
+
+    const urlValue = hasProtocol ? trimmedValue : protocol + trimmedValue;
     const url = new URL(urlValue);
 
     const isValidHostname =
-      url.hostname === "localhost" ||
-      ipAddressRegex.test(url.hostname) ||
-      hostnameRegex.test(url.hostname);
+      LOCALHOST_REGEX.test(url.hostname) ||
+      IP_ADDRESS_REGEX.test(url.hostname) ||
+      DOMAIN_REGEX.test(url.hostname);
 
     if (!isValidHostname) {
       return null;
@@ -44,6 +87,7 @@ export function isValidUrl(s: string): string | null {
     return null;
   }
 }
+
 
 export function getRedirectUrl(
   s: string,

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Dispatch, RefObject, SetStateAction } from "react";
 import {
+  DEFAULT_SEARCH_PROVIDER_ID,
+  SEARCH_PROVIDERS,
   SEARCH_RESULT_PRIORITY,
   SEARCH_SUGGESTION_DEBOUNCE_MS,
   type SearchProviderId,
@@ -9,6 +11,7 @@ import type { BookmarkItem, HistoryItem } from "@/background-tasks/types";
 import type {
   ActiveTabData,
   BookmarkData,
+  DirectUrlData,
   HistoryData,
   SearchSuggestionData,
   SpotlightResultData,
@@ -389,6 +392,8 @@ export const getSpotlightResults = ({
   searchSuggestions,
   rawQuery,
   cleanQuery,
+  validUrl,
+  searchProvider = DEFAULT_SEARCH_PROVIDER_ID,
   maxResults,
 }: {
   tabs: OpenTabData[];
@@ -397,6 +402,8 @@ export const getSpotlightResults = ({
   searchSuggestions: SearchSuggestionResponseData[];
   rawQuery: string;
   cleanQuery: string;
+  validUrl?: string | null;
+  searchProvider?: SearchProviderId;
   maxResults: number;
 }): SpotlightResultData[] => {
   const normalizedClean = cleanQuery.trim().toLowerCase();
@@ -549,6 +556,34 @@ export const getSpotlightResults = ({
     ...bookmarkResults,
     ...historyResults,
   ];
+
+  if (validUrl) {
+    const directUrlResult: DirectUrlData = {
+      id: validUrl,
+      title: validUrl,
+      url: validUrl,
+      kind: "direct-url",
+      priority: SEARCH_RESULT_PRIORITY.DIRECT_URL,
+    };
+
+    const provider =
+      SEARCH_PROVIDERS[searchProvider] ||
+      SEARCH_PROVIDERS[DEFAULT_SEARCH_PROVIDER_ID];
+
+    const searchUrlResult: SearchSuggestionData = {
+      id: `search-for-${rawQuery}`,
+      title: rawQuery,
+      url: provider.searchUrl.replace("%s", encodeURIComponent(rawQuery)),
+      query: rawQuery,
+      kind: "search-suggestion",
+      priority: SEARCH_RESULT_PRIORITY.SEARCH_SUGGESTION,
+    };
+
+    const remainingSlots = Math.max(0, maxResults - 2);
+    const selectedLocal = localResults.slice(0, remainingSlots);
+
+    return [directUrlResult, searchUrlResult, ...selectedLocal];
+  }
 
   if (searchSuggestionResults.length > 0) {
     const reservedSuggestionSlots = Math.min(2, searchSuggestionResults.length);

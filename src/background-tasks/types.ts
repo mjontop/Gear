@@ -36,6 +36,7 @@ export type HistoryItem = {
 export type RuntimeMessage =
   | { type: "GET_OPEN_TABS" }
   | { type: "SWITCH_TO_TAB"; tabId: number; windowId: number }
+  | { type: "OPEN_URL"; url: string }
   | {
       type: "GET_SEARCH_SUGGESTIONS";
       query: string;
@@ -45,3 +46,4 @@ export type RuntimeMessage =
   | { type: "GET_HISTORY"; query: string }
   | { type: "COPY_CURRENT_URL"; url: string }
   | { type: "TOGGLE_SPOTLIGHT" };
+

@@ -67,6 +67,19 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
+    if (message.type === "OPEN_URL") {
+      chrome.tabs
+        .create({ url: message.url })
+        .then(() => {
+          sendResponse({ success: true });
+        })
+        .catch(() => {
+          sendResponse({ success: false });
+        });
+
+      return true;
+    }
+
     if (message.type === "GET_SEARCH_SUGGESTIONS") {
       getSearchSuggestions(message.query, message.provider)
         .then((suggestions) => {
