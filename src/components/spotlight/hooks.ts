@@ -220,39 +220,6 @@ export const useSpotlightScrollLock = ({
   useEffect(() => {
     if (!isOpen) return;
 
-    const scrollY = window.scrollY;
-    const scrollbarWidth =
-      window.innerWidth - document.documentElement.clientWidth;
-    const bodyPaddingRight =
-      Number.parseFloat(getComputedStyle(document.body).paddingRight) || 0;
-    const previousBodyOverflow = document.body.style.overflow;
-    const previousBodyPaddingRight = document.body.style.paddingRight;
-    const previousBodyPosition = document.body.style.position;
-    const previousBodyTop = document.body.style.top;
-    const previousBodyLeft = document.body.style.left;
-    const previousBodyRight = document.body.style.right;
-    const previousBodyWidth = document.body.style.width;
-    const previousHtmlOverflow = document.documentElement.style.overflow;
-    const previousHtmlScrollbarGutter =
-      document.documentElement.style.scrollbarGutter;
-    const previousBodyOverscroll = document.body.style.overscrollBehavior;
-    const previousHtmlOverscroll =
-      document.documentElement.style.overscrollBehavior;
-
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = "0";
-    document.body.style.right = "0";
-    document.body.style.width = "100%";
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${bodyPaddingRight + scrollbarWidth}px`;
-    }
-    document.documentElement.style.overflow = "hidden";
-    document.documentElement.style.scrollbarGutter = "stable";
-    document.body.style.overscrollBehavior = "none";
-    document.documentElement.style.overscrollBehavior = "none";
-
     const blockedEvents = [
       "click",
       "contextmenu",
@@ -274,13 +241,31 @@ export const useSpotlightScrollLock = ({
       "drop",
     ];
 
+    const isInsideSpotlightContainer = (event: Event) => {
+      const path = event.composedPath();
+      return path.some(
+        (target) =>
+          target instanceof HTMLElement &&
+          target.classList.contains("spotlight_container"),
+      );
+    };
+
     const isSpotlightEvent = (event: Event) => {
       const overlay = overlayRef.current;
       return overlay ? event.composedPath().includes(overlay) : false;
     };
 
     const stopBackgroundInput = (event: Event) => {
-      if (isSpotlightEvent(event)) return;
+      if (isSpotlightEvent(event)) {
+        if (
+          (event.type === "wheel" || event.type === "touchmove") &&
+          !isInsideSpotlightContainer(event)
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        return;
+      }
 
       event.preventDefault();
       event.stopPropagation();
@@ -321,21 +306,6 @@ export const useSpotlightScrollLock = ({
     );
 
     return () => {
-      document.body.style.overflow = previousBodyOverflow;
-      document.body.style.paddingRight = previousBodyPaddingRight;
-      document.body.style.position = previousBodyPosition;
-      document.body.style.top = previousBodyTop;
-      document.body.style.left = previousBodyLeft;
-      document.body.style.right = previousBodyRight;
-      document.body.style.width = previousBodyWidth;
-      document.documentElement.style.overflow = previousHtmlOverflow;
-      document.documentElement.style.scrollbarGutter =
-        previousHtmlScrollbarGutter;
-      document.body.style.overscrollBehavior = previousBodyOverscroll;
-      document.documentElement.style.overscrollBehavior =
-        previousHtmlOverscroll;
-      window.scrollTo(0, scrollY);
-
       blockedEvents.forEach((eventName) => {
         document.removeEventListener(
           eventName,
