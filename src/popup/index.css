@@ -5,6 +5,11 @@
   font-size: 15px;
 }
 
+:root[data-theme="light"],
+[data-theme="light"] {
+  color-scheme: light;
+}
+
 body {
   margin: 0;
   padding: 0;

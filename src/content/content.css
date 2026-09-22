@@ -47,7 +47,8 @@
   --shadow-toast: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-:host([data-theme="light"]) {
+:host([data-theme="light"]),
+[data-theme="light"] {
   /* Light Theme Variant (Ready for future light mode toggle) */
   --color-spotlight-bg: #ffffff;
   --color-spotlight-backdrop: rgba(0, 0, 0, 0.25);

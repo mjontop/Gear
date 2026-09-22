@@ -95,9 +95,10 @@
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
-/* Light Theme Variables (Ready for future light mode toggle) */
+/* Light Theme Variables */
 [data-theme="light"],
-:root.light {
+:root.light,
+.popup_container[data-theme="light"] {
   --bg-app: #f8fafc;
   --bg-body: #ffffff;
   --bg-header: #ffffff;

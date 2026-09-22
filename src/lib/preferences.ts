@@ -4,11 +4,14 @@ import {
   type SearchProviderId,
 } from "@/constants";
 
+export type ThemeMode = "dark" | "light" | "system";
+
 export type SpotlightPreferences = {
   includeBookmarks: boolean;
   includeHistory: boolean;
   searchProvider: SearchProviderId;
   enableBackgroundBlur: boolean;
+  theme: ThemeMode;
 };
 
 export const DEFAULT_SPOTLIGHT_PREFERENCES: SpotlightPreferences = {
@@ -16,6 +19,7 @@ export const DEFAULT_SPOTLIGHT_PREFERENCES: SpotlightPreferences = {
   includeHistory: true,
   searchProvider: DEFAULT_SEARCH_PROVIDER_ID,
   enableBackgroundBlur: true,
+  theme: "dark",
 };
 
 export const SPOTLIGHT_PREFERENCES_STORAGE_KEY = "gear_spotlight_preferences";
@@ -130,4 +134,42 @@ export function useSpotlightPreferences() {
   };
 
   return { preferences, updatePreference, setPreferences };
+}
+
+export function resolveTheme(theme: ThemeMode = "dark"): "dark" | "light" {
+  if (theme === "system") {
+    if (typeof window !== "undefined" && window.matchMedia) {
+      return window.matchMedia("(prefers-color-scheme: light)").matches
+        ? "light"
+        : "dark";
+    }
+    return "dark";
+  }
+  return theme === "light" ? "light" : "dark";
+}
+
+export function useTheme(themePreference: ThemeMode = "dark"): "dark" | "light" {
+  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">(() =>
+    resolveTheme(themePreference),
+  );
+
+  useEffect(() => {
+    setResolvedTheme(resolveTheme(themePreference));
+
+    if (
+      themePreference === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia
+    ) {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
+      const handleChange = (e: MediaQueryListEvent) => {
+        setResolvedTheme(e.matches ? "light" : "dark");
+      };
+
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+  }, [themePreference]);
+
+  return resolvedTheme;
 }

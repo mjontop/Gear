@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertCircleIcon, CheckIcon } from "lucide-react";
 import { BangForm } from "./components/BangForm";
 import { BangsList } from "./components/BangsList";
@@ -13,6 +13,7 @@ import { useBangsManager } from "./hooks/useBangsManager";
 import { useBookmarksManager } from "./hooks/useBookmarksManager";
 import {
   useSpotlightPreferences,
+  useTheme,
   type SpotlightPreferences,
 } from "@/lib/preferences";
 import "./App.css";
@@ -34,6 +35,12 @@ export default function App() {
   const bangsManager = useBangsManager(showStatus);
   const bookmarksManager = useBookmarksManager(showStatus);
   const { preferences, updatePreference } = useSpotlightPreferences();
+  const activeTheme = useTheme(preferences.theme);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", activeTheme);
+    document.body.setAttribute("data-theme", activeTheme);
+  }, [activeTheme]);
 
   const handlePreferenceChange = async <K extends keyof SpotlightPreferences>(
     key: K,
@@ -49,7 +56,7 @@ export default function App() {
       : bookmarksManager.bookmarks.length;
 
   return (
-    <div className="popup_container">
+    <div className="popup_container" data-theme={activeTheme}>
       <PopupHeader activeTab={activeTab} totalCount={currentCount} />
 
       <NavigationTabs
