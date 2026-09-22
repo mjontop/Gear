@@ -129,6 +129,7 @@ type ShortcutsCardProps = {
   shortcuts: {
     toggle: string[];
     copyUrl: string[];
+    openWithUrl: string[];
   };
   onOpenShortcuts: () => void;
 };
@@ -152,6 +153,23 @@ const ShortcutsCard = ({ shortcuts, onOpenShortcuts }: ShortcutsCardProps) => (
       <div className="shortcut_keys">
         {shortcuts.toggle.map((k, idx) => (
           <span key={`toggle-${k}-${idx}`} className="shortcut_key_piece">
+            {idx > 0 && <span className="shortcut_plus">+</span>}
+            <kbd>{k}</kbd>
+          </span>
+        ))}
+      </div>
+    </div>
+
+    <div className="shortcut_setting_row" style={{ marginTop: "8px" }}>
+      <div className="shortcut_info">
+        <span className="shortcut_name">Open with Current URL</span>
+        <span className="shortcut_desc">
+          Open Spotlight with active page URL prefilled and selected.
+        </span>
+      </div>
+      <div className="shortcut_keys">
+        {shortcuts.openWithUrl.map((k, idx) => (
+          <span key={`openWithUrl-${k}-${idx}`} className="shortcut_key_piece">
             {idx > 0 && <span className="shortcut_plus">+</span>}
             <kbd>{k}</kbd>
           </span>
@@ -257,6 +275,7 @@ export const SettingsView = ({
   const [shortcuts, setShortcuts] = useState({
     toggle: ["Alt", "M"],
     copyUrl: ["Alt", "Shift", "L"],
+    openWithUrl: ["Alt", "L"],
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -274,6 +293,12 @@ export const SettingsView = ({
             setShortcuts((prev) => ({
               ...prev,
               copyUrl: cmd.shortcut!.split("+").map((s) => s.trim()),
+            }));
+          }
+          if (cmd.name === "open-spotlight-with-url" && cmd.shortcut) {
+            setShortcuts((prev) => ({
+              ...prev,
+              openWithUrl: cmd.shortcut!.split("+").map((s) => s.trim()),
             }));
           }
         }

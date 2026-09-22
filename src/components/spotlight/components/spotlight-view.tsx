@@ -12,6 +12,7 @@ type SpotlightViewProps = {
   results: SpotlightResultData[];
   selectedTabIndex: number;
   enableBackgroundBlur?: boolean;
+  shouldSelectInputText?: boolean;
   onClose: () => void;
   onSearchChange: (value: string) => void;
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
@@ -26,6 +27,7 @@ export const SpotlightView = ({
   results,
   selectedTabIndex,
   enableBackgroundBlur = true,
+  shouldSelectInputText = false,
   onClose,
   onSearchChange,
   onKeyDown,
@@ -37,12 +39,24 @@ export const SpotlightView = ({
     if (!dialog || dialog.open) return;
 
     dialog.showModal();
-    inputRef.current?.focus();
+    if (inputRef.current) {
+      inputRef.current.focus();
+      if (shouldSelectInputText) {
+        inputRef.current.select();
+      }
+    }
 
     return () => {
       if (dialog.open) dialog.close();
     };
-  }, [inputRef, overlayRef]);
+  }, [inputRef, overlayRef, shouldSelectInputText]);
+
+  useEffect(() => {
+    if (shouldSelectInputText && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [shouldSelectInputText, searchValue, inputRef]);
 
   return (
     <dialog

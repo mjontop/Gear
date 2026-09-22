@@ -81,14 +81,31 @@ export const Spotlight = () => {
     provider: preferences.searchProvider,
   });
 
+  const [shouldSelectInputText, setShouldSelectInputText] = useState(false);
+
   const resetSpotlight = () => {
     setSearchValue("");
     setSelectedTabIndex(0);
+    setShouldSelectInputText(false);
+  };
+
+  const handleOpenWithUrl = (url: string) => {
+    setSearchValue(url);
+    setSelectedTabIndex(0);
+    setShouldSelectInputText(true);
+
+    requestAnimationFrame(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    });
   };
 
   useSpotlightShortcut({
     setIsOpen,
     onToggle: resetSpotlight,
+    onOpenWithUrl: handleOpenWithUrl,
   });
   useSpotlightScrollLock({ isOpen, overlayRef, setIsOpen });
 
@@ -266,6 +283,7 @@ export const Spotlight = () => {
       results={spotlightResults}
       selectedTabIndex={visibleSelectedTabIndex}
       enableBackgroundBlur={preferences.enableBackgroundBlur}
+      shouldSelectInputText={shouldSelectInputText}
       onClose={() => {
         setIsOpen(false);
         resetSpotlight();
@@ -273,6 +291,7 @@ export const Spotlight = () => {
       onSearchChange={(value) => {
         setSearchValue(value);
         setSelectedTabIndex(0);
+        setShouldSelectInputText(false);
       }}
       onKeyDown={handleKeydown}
       onSelectResult={handleSelectResult}

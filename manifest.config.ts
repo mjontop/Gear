@@ -40,6 +40,13 @@ export default defineManifest({
       },
       description: "Copy current tab URL to clipboard",
     },
+    "open-spotlight-with-url": {
+      suggested_key: {
+        default: "Alt+L",
+        mac: "Alt+L",
+      },
+      description: "Open Spotlight with current URL prefilled and selected",
+    },
   },
   background: {
     service_worker: "src/background.ts",

@@ -43,6 +43,7 @@ type SearchSuggestionsResponse = {
 type UseSpotlightShortcutParams = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   onToggle: () => void;
+  onOpenWithUrl?: (url: string) => void;
 };
 
 type UseSearchSuggestionsParams = {
@@ -61,21 +62,51 @@ type UseSpotlightScrollLockParams = {
 export const useSpotlightShortcut = ({
   setIsOpen,
   onToggle,
+  onOpenWithUrl,
 }: UseSpotlightShortcutParams) => {
   useEffect(() => {
-    const handleMessage = (message: { type?: string }) => {
+    const handleMessage = (message: { type?: string; url?: string }) => {
       if (message.type === "TOGGLE_SPOTLIGHT") {
         onToggle();
         setIsOpen((prev) => !prev);
+        return;
+      }
+
+      if (message.type === "OPEN_SPOTLIGHT_WITH_URL") {
+        const targetUrl = message.url || window.location.href;
+        onOpenWithUrl?.(targetUrl);
+        setIsOpen(true);
       }
     };
 
-    chrome.runtime.onMessage.addListener(handleMessage);
+    const handleKeydown = (e: globalThis.KeyboardEvent) => {
+      if (
+        e.altKey &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.shiftKey &&
+        (e.key === "l" || e.key === "L" || e.code === "KeyL")
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetUrl = window.location.href;
+        onOpenWithUrl?.(targetUrl);
+        setIsOpen(true);
+      }
+    };
+
+    if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
+      chrome.runtime.onMessage.addListener(handleMessage);
+    }
+    window.addEventListener("keydown", handleKeydown, { capture: true });
 
     return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage);
+      if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
+        chrome.runtime.onMessage.removeListener(handleMessage);
+      }
+      window.removeEventListener("keydown", handleKeydown, { capture: true });
     };
-  }, [onToggle, setIsOpen]);
+  }, [onToggle, setIsOpen, onOpenWithUrl]);
 };
 
 export const useOpenTabs = (isOpen?: boolean) => {

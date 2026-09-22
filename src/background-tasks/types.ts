@@ -45,5 +45,6 @@ export type RuntimeMessage =
   | { type: "GET_BOOKMARKS"; query: string }
   | { type: "GET_HISTORY"; query: string }
   | { type: "COPY_CURRENT_URL"; url: string }
-  | { type: "TOGGLE_SPOTLIGHT" };
+  | { type: "TOGGLE_SPOTLIGHT" }
+  | { type: "OPEN_SPOTLIGHT_WITH_URL"; url?: string };
 

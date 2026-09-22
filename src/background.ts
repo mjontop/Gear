@@ -36,6 +36,23 @@ chrome.commands.onCommand.addListener(async (command) => {
         url: tab.url,
       })
       .catch(() => {});
+    return;
+  }
+
+  if (command === "open-spotlight-with-url") {
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+
+    if (!tab?.id) return;
+
+    chrome.tabs
+      .sendMessage(tab.id, {
+        type: "OPEN_SPOTLIGHT_WITH_URL",
+        url: tab.url,
+      })
+      .catch(() => {});
   }
 });
 
