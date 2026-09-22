@@ -1,7 +1,7 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color-scheme: dark;
-  background-color: #0f1013;
+  background-color: var(--bg-body);
   font-size: 15px;
 }
 
@@ -9,7 +9,7 @@ body {
   margin: 0;
   padding: 0;
   width: 480px;
-  background-color: #0f1013;
+  background-color: var(--bg-body);
   overflow: hidden;
 }
 
