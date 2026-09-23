@@ -11,20 +11,9 @@ import { BookmarkForm } from "@/popup/components/BookmarkForm";
 import { BookmarksList } from "@/popup/components/BookmarksList";
 import { SourcesView } from "@/popup/components/SourcesView";
 import { SettingsView } from "@/popup/components/SettingsView";
-import HelloWorld from "@/components/HelloWorld";
 import { MESSAGE_TYPES } from "@/constants";
 
 describe("UI Components", () => {
-  it("renders HelloWorld component and handles click", () => {
-    render(<HelloWorld msg="Hello World" />);
-    expect(screen.getByText("Hello World")).toBeInTheDocument();
-    const btn = screen.getByRole("button", { name: /count is 0/i });
-    fireEvent.click(btn);
-    expect(
-      screen.getByRole("button", { name: /count is 1/i }),
-    ).toBeInTheDocument();
-  });
-
   it("renders and interacts with CopyUrlToast upon receiving message", async () => {
     let msgListener: any;
     (globalThis as any).chrome.runtime.onMessage.addListener = vi.fn((fn) => {
