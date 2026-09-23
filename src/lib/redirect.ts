@@ -6,7 +6,8 @@ import {
 } from "@/constants";
 import { parseQueryWithBangs } from "./bangs";
 
-const INTERNAL_SCHEME_REGEX = /^(?:chrome|brave|edge|opera|vivaldi|about):/i;
+const INTERNAL_SCHEME_REGEX =
+  /^(?:chrome|brave|edge|opera|vivaldi|about|moz-extension):/i;
 const WINDOWS_PATH_REGEX = /^[a-zA-Z]:[\\/]/;
 const IP_ADDRESS_REGEX = /^(?:\d{1,3}\.){3}\d{1,3}$/;
 const LOCALHOST_REGEX = /^localhost$/i;
@@ -20,7 +21,6 @@ export function isValidUrl(s: string): string | null {
     return null;
   }
 
-  // 1. Browser-internal schemes (brave://, chrome://, edge://, about:blank, etc.)
   if (INTERNAL_SCHEME_REGEX.test(trimmedValue)) {
     try {
       const url = new URL(trimmedValue);
@@ -30,7 +30,6 @@ export function isValidUrl(s: string): string | null {
     }
   }
 
-  // 2. Windows absolute local file paths (e.g., C:\Users\... or C:/Users/...)
   if (WINDOWS_PATH_REGEX.test(trimmedValue)) {
     try {
       const normalizedPath = trimmedValue.replace(/\\/g, "/");
@@ -41,7 +40,6 @@ export function isValidUrl(s: string): string | null {
     }
   }
 
-  // 3. File URLs (file:///...)
   if (/^file:\/\/\//i.test(trimmedValue)) {
     try {
       const url = new URL(trimmedValue);
@@ -51,8 +49,6 @@ export function isValidUrl(s: string): string | null {
     }
   }
 
-  // 4. Standard web URLs, domains, IPs, or localhost
-  // Plain search phrases with spaces should not be treated as URLs
   if (/\s/.test(trimmedValue)) {
     return null;
   }
@@ -88,12 +84,10 @@ export function isValidUrl(s: string): string | null {
   }
 }
 
-
 export function getRedirectUrl(
   s: string,
   providerId: SearchProviderId = DEFAULT_SEARCH_PROVIDER_ID,
 ): string {
-  // Check if input string is a valid URL
   const validUrl = isValidUrl(s);
   if (validUrl) {
     return validUrl;

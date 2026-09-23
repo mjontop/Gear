@@ -11,6 +11,7 @@ import {
   UploadIcon,
 } from "lucide-react";
 import { getCustomBangs, saveCustomBangs } from "@/lib/bangs-storage";
+import { isFirefoxBrowser } from "@/lib/favicon";
 import {
   getSpotlightPreferences,
   saveSpotlightPreferences,
@@ -135,10 +136,15 @@ type ShortcutsCardProps = {
     copyUrl: string[];
     openWithUrl: string[];
   };
+  isFirefox: boolean;
   onOpenShortcuts: () => void;
 };
 
-const ShortcutsCard = ({ shortcuts, onOpenShortcuts }: ShortcutsCardProps) => (
+const ShortcutsCard = ({
+  shortcuts,
+  isFirefox,
+  onOpenShortcuts,
+}: ShortcutsCardProps) => (
   <div className="form_card">
     <div className="form_header">
       <div className="settings_card_title_row">
@@ -198,18 +204,26 @@ const ShortcutsCard = ({ shortcuts, onOpenShortcuts }: ShortcutsCardProps) => (
       </div>
     </div>
 
-    <p className="shortcut_tip_text">
-      💡 <strong>Tip:</strong> You can customize any shortcut in browser settings. For instance, rebind Spotlight to <kbd>Ctrl</kbd> + <kbd>T</kbd> / <kbd>Cmd</kbd> + <kbd>T</kbd> to replace your new tab page!
-    </p>
+    {isFirefox ? (
+      <p className="shortcut_tip_text">
+        💡 <strong>In Firefox:</strong> Open <kbd>about:addons</kbd> in a new tab → click ⚙️ (gear icon) → select <strong>Manage Extension Shortcuts</strong> to customize these keys.
+      </p>
+    ) : (
+      <>
+        <p className="shortcut_tip_text">
+          💡 <strong>Tip:</strong> You can customize any shortcut in browser settings. For instance, rebind Spotlight to <kbd>Ctrl</kbd> + <kbd>T</kbd> / <kbd>Cmd</kbd> + <kbd>T</kbd> to replace your new tab page!
+        </p>
 
-    <button
-      type="button"
-      className="btn btn_secondary shortcut_action_btn"
-      onClick={onOpenShortcuts}
-    >
-      <ExternalLinkIcon size={14} />
-      <span>Configure Shortcuts in Browser</span>
-    </button>
+        <button
+          type="button"
+          className="btn btn_secondary shortcut_action_btn"
+          onClick={onOpenShortcuts}
+        >
+          <ExternalLinkIcon size={14} />
+          <span>Configure Shortcuts in Browser</span>
+        </button>
+      </>
+    )}
   </div>
 );
 
@@ -314,7 +328,16 @@ export const SettingsView = ({
     }
   }, []);
 
+  const isFirefox = isFirefoxBrowser();
+
   const handleOpenShortcuts = () => {
+    if (isFirefox) {
+      onShowStatus(
+        "In Firefox: Open about:addons -> click ⚙️ -> Manage Extension Shortcuts",
+      );
+      return;
+    }
+
     if (typeof chrome !== "undefined" && chrome.tabs?.create) {
       chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
     } else {
@@ -405,6 +428,7 @@ export const SettingsView = ({
 
       <ShortcutsCard
         shortcuts={shortcuts}
+        isFirefox={isFirefox}
         onOpenShortcuts={handleOpenShortcuts}
       />
 

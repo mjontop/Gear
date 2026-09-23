@@ -3,25 +3,42 @@ import { crx } from '@crxjs/vite-plugin'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import zip from 'vite-plugin-zip-pack'
-import manifest from './manifest.config.js'
-import { name, version } from './package.json'
+import manifest from './manifest.config.ts'
+import pkg from './package.json' with { type: 'json' }
 
-export default defineConfig({
-  resolve: {
-    alias: {
-      '@': `${path.resolve(__dirname, 'src')}`,
+export default defineConfig(({ mode }) => {
+  const isFirefox = mode === 'firefox' || process.env.BROWSER === 'firefox'
+  const outDir = isFirefox ? 'dist/firefox' : 'dist/chrome'
+
+  return {
+    build: {
+      outDir,
+      emptyOutDir: true,
     },
-  },
-  plugins: [
-    react(),
-    crx({ manifest }),
-    zip({ outDir: 'release', outFileName: `crx-${name}-${version}.zip` }),
-  ],
-  server: {
-    cors: {
-      origin: [
-        /chrome-extension:\/\//,
-      ],
+    resolve: {
+      alias: {
+        '@': `${path.resolve(import.meta.dirname, 'src')}`,
+      },
     },
-  },
+    plugins: [
+      react(),
+      crx({
+        manifest,
+        browser: isFirefox ? 'firefox' : 'chrome',
+      }),
+      zip({
+        inDir: outDir,
+        outDir: 'release',
+        outFileName: `${isFirefox ? 'firefox' : 'crx'}-${pkg.name}-${pkg.version}.zip`,
+      }),
+    ],
+    server: {
+      cors: {
+        origin: [
+          /chrome-extension:\/\//,
+          /moz-extension:\/\//,
+        ],
+      },
+    },
+  }
 })

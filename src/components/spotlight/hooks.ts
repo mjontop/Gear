@@ -440,7 +440,6 @@ export const getSpotlightResults = ({
   const normalizedRaw = rawQuery.trim().toLowerCase();
   const seenUrls = new Set<string>();
 
-  // 1. Open Tabs (searched using cleanQuery or rawQuery, priority 0)
   const openTabResults: ActiveTabData[] = tabs
     .filter((tab) => {
       if (!normalizedClean && !normalizedRaw) {
@@ -467,7 +466,6 @@ export const getSpotlightResults = ({
       };
     });
 
-  // 2. Bookmarks (matches either rawQuery e.g. !f OR cleanQuery, priority 1)
   const bookmarkResults: BookmarkData[] = bookmarks
     .filter((bookmark) => {
       const normUrl = normalizeUrl(bookmark.url);
@@ -520,7 +518,6 @@ export const getSpotlightResults = ({
       };
     });
 
-  // 3. Browsing History (searched using cleanQuery, priority 2)
   const historyResults: HistoryData[] = history
     .filter((item) => {
       const normUrl = normalizeUrl(item.url);
@@ -566,7 +563,6 @@ export const getSpotlightResults = ({
       };
     });
 
-  // 4. Search Suggestions (priority 3)
   const searchSuggestionResults: SearchSuggestionData[] = searchSuggestions.map(
     (suggestion) => ({
       ...suggestion,
@@ -575,12 +571,10 @@ export const getSpotlightResults = ({
     }),
   );
 
-  // If query is empty, return top open tabs and top bookmarks
   if (!normalizedRaw) {
     return [...openTabResults, ...bookmarkResults].slice(0, maxResults);
   }
 
-  // Combined local results: Tabs -> Bookmarks -> History
   const localResults = [
     ...openTabResults,
     ...bookmarkResults,

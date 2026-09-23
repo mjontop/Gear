@@ -33,7 +33,6 @@ export function validateBookmark(
   if (!trimmedUrl) {
     urlError = "URL cannot be empty.";
   } else {
-    // If protocol missing, auto-prepend https://
     if (!/^https?:\/\//i.test(trimmedUrl)) {
       trimmedUrl = `https://${trimmedUrl}`;
     }
@@ -76,7 +75,7 @@ export async function fetchBookmarks(
   const results: ManageableBookmark[] = [];
 
   for (const node of nodes) {
-    if (!node.url) continue; // Skip folders
+    if (!node.url) continue;
 
     results.push({
       id: node.id,

@@ -23,9 +23,7 @@ chrome.commands.onCommand.addListener(async (command) => {
       .sendMessage(tab.id, {
         type: MESSAGE_TYPES.TOGGLE_SPOTLIGHT,
       })
-      .catch(() => {
-        // Silently do nothing if page cannot receive messages
-      });
+      .catch(() => {});
     return;
   }
 
@@ -42,9 +40,7 @@ chrome.commands.onCommand.addListener(async (command) => {
         type: MESSAGE_TYPES.COPY_CURRENT_URL,
         url: tab.url,
       })
-      .catch(() => {
-        // Silently do nothing if page cannot receive messages
-      });
+      .catch(() => {});
     return;
   }
 
@@ -61,9 +57,7 @@ chrome.commands.onCommand.addListener(async (command) => {
         type: MESSAGE_TYPES.OPEN_SPOTLIGHT_WITH_URL,
         url: tab.url,
       })
-      .catch(() => {
-        // Silently do nothing if page cannot receive messages
-      });
+      .catch(() => {});
   }
 });
 
