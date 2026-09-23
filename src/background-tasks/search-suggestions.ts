@@ -5,9 +5,7 @@ import {
 } from "@/constants";
 import type { SearchSuggestion } from "./types";
 
-const isSearchSuggestionValue = (
-  suggestion: unknown,
-): suggestion is string => {
+const isSearchSuggestionValue = (suggestion: unknown): suggestion is string => {
   return typeof suggestion === "string" && suggestion.trim() !== "";
 };
 

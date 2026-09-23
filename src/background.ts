@@ -1,8 +1,4 @@
-import {
-  COMMAND_NAMES,
-  MESSAGE_TYPES,
-  isRestrictedUrl,
-} from "@/constants";
+import { COMMAND_NAMES, MESSAGE_TYPES, isRestrictedUrl } from "@/constants";
 import { getBookmarks } from "./background-tasks/bookmarks";
 import { getHistory } from "./background-tasks/history";
 import { getOpenTabs } from "./background-tasks/open-tabs";

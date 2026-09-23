@@ -138,4 +138,3 @@ export const isRestrictedUrl = (url?: string): boolean => {
   }
   return false;
 };
-

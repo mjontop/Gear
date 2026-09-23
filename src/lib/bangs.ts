@@ -1,8 +1,5 @@
 import { BANG_SEARCH_URLS } from "@/constants";
-import {
-  CUSTOM_BANGS_STORAGE_KEY,
-  getCustomBangs,
-} from "./bangs-storage";
+import { CUSTOM_BANGS_STORAGE_KEY, getCustomBangs } from "./bangs-storage";
 
 export const defaultBangs: Record<string, string> = BANG_SEARCH_URLS;
 

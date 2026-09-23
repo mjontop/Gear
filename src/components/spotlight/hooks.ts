@@ -401,11 +401,7 @@ const normalizeUrl = (url: string): string => {
   }
 };
 
-const getMatchScore = (
-  title: string,
-  url: string,
-  query: string,
-): number => {
+const getMatchScore = (title: string, url: string, query: string): number => {
   if (!query) return 0;
   const lowerTitle = title.toLowerCase();
   const lowerUrl = url.toLowerCase();
@@ -447,8 +443,7 @@ export const getSpotlightResults = ({
       }
       const q = normalizedClean || normalizedRaw;
       return (
-        tab.title.toLowerCase().includes(q) ||
-        tab.url.toLowerCase().includes(q)
+        tab.title.toLowerCase().includes(q) || tab.url.toLowerCase().includes(q)
       );
     })
     .sort((firstTab, secondTab) => {
@@ -482,7 +477,8 @@ export const getSpotlightResults = ({
 
       const matchesRaw =
         Boolean(normalizedRaw) &&
-        (lowerTitle.includes(normalizedRaw) || lowerUrl.includes(normalizedRaw));
+        (lowerTitle.includes(normalizedRaw) ||
+          lowerUrl.includes(normalizedRaw));
 
       const matchesClean =
         Boolean(normalizedClean) &&
@@ -492,8 +488,16 @@ export const getSpotlightResults = ({
       return matchesRaw || matchesClean;
     })
     .sort((firstBm, secondBm) => {
-      const scoreRawA = getMatchScore(firstBm.title, firstBm.url, normalizedRaw);
-      const scoreRawB = getMatchScore(secondBm.title, secondBm.url, normalizedRaw);
+      const scoreRawA = getMatchScore(
+        firstBm.title,
+        firstBm.url,
+        normalizedRaw,
+      );
+      const scoreRawB = getMatchScore(
+        secondBm.title,
+        secondBm.url,
+        normalizedRaw,
+      );
       const scoreCleanA = getMatchScore(
         firstBm.title,
         firstBm.url,

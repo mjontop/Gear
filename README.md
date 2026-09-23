@@ -20,12 +20,12 @@
 
 ## ⌨️ Keyboard Shortcuts
 
-| Shortcut                                | Action                                             |
-| :-------------------------------------- | :------------------------------------------------- |
-| <kbd>Alt</kbd> + <kbd>M</kbd> *(default)* | Toggle Spotlight overlay on/off                    |
-| <kbd>↑</kbd> / <kbd>↓</kbd>             | Navigate search results and tabs                   |
-| <kbd>Enter</kbd>                        | Select tab / open search suggestion / navigate URL |
-| <kbd>Esc</kbd>                          | Close Spotlight overlay                            |
+| Shortcut                                  | Action                                             |
+| :---------------------------------------- | :------------------------------------------------- |
+| <kbd>Alt</kbd> + <kbd>M</kbd> _(default)_ | Toggle Spotlight overlay on/off                    |
+| <kbd>↑</kbd> / <kbd>↓</kbd>               | Navigate search results and tabs                   |
+| <kbd>Enter</kbd>                          | Select tab / open search suggestion / navigate URL |
+| <kbd>Esc</kbd>                            | Close Spotlight overlay                            |
 
 > [!TIP]
 > **Make it your New Tab experience**: You can customize this shortcut anytime in your browser's shortcut manager by visiting `chrome://extensions/shortcuts` (or `brave://extensions/shortcuts`).

@@ -1,9 +1,4 @@
-import {
-  BookmarkIcon,
-  GlobeIcon,
-  HistoryIcon,
-  LayersIcon,
-} from "lucide-react";
+import { BookmarkIcon, GlobeIcon, HistoryIcon, LayersIcon } from "lucide-react";
 import { SEARCH_PROVIDERS } from "@/constants";
 import type { SpotlightPreferences } from "@/lib/preferences";
 

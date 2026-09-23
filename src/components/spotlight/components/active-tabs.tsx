@@ -1,9 +1,4 @@
-import {
-  BookmarkIcon,
-  GlobeIcon,
-  HistoryIcon,
-  SearchIcon,
-} from "lucide-react";
+import { BookmarkIcon, GlobeIcon, HistoryIcon, SearchIcon } from "lucide-react";
 import { SuggestionItem } from "./suggestion-item";
 import type { SuggestionItemData } from "./suggestion-item";
 

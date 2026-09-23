@@ -35,4 +35,3 @@ export const getFaviconUrl = (pageUrl: string, size = 32): string => {
     return `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(pageUrl)}&sz=${size}`;
   }
 };
-

@@ -149,7 +149,9 @@ export function resolveTheme(theme: ThemeMode = "dark"): "dark" | "light" {
   return theme === "light" ? "light" : "dark";
 }
 
-export function useTheme(themePreference: ThemeMode = "dark"): "dark" | "light" {
+export function useTheme(
+  themePreference: ThemeMode = "dark",
+): "dark" | "light" {
   const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">(() =>
     resolveTheme(themePreference),
   );

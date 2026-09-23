@@ -53,7 +53,11 @@ const AppearanceCard = ({
       Select your preferred interface color theme.
     </p>
 
-    <div className="theme_selector" role="radiogroup" aria-label="Theme selection">
+    <div
+      className="theme_selector"
+      role="radiogroup"
+      aria-label="Theme selection"
+    >
       <button
         type="button"
         className={`theme_btn ${selectedTheme === "dark" ? "theme_btn_active" : ""}`}
@@ -206,12 +210,17 @@ const ShortcutsCard = ({
 
     {isFirefox ? (
       <p className="shortcut_tip_text">
-        💡 <strong>In Firefox:</strong> Open <kbd>about:addons</kbd> in a new tab → click ⚙️ (gear icon) → select <strong>Manage Extension Shortcuts</strong> to customize these keys.
+        💡 <strong>In Firefox:</strong> Open <kbd>about:addons</kbd> in a new
+        tab → click ⚙️ (gear icon) → select{" "}
+        <strong>Manage Extension Shortcuts</strong> to customize these keys.
       </p>
     ) : (
       <>
         <p className="shortcut_tip_text">
-          💡 <strong>Tip:</strong> You can customize any shortcut in browser settings. For instance, rebind Spotlight to <kbd>Ctrl</kbd> + <kbd>T</kbd> / <kbd>Cmd</kbd> + <kbd>T</kbd> to replace your new tab page!
+          💡 <strong>Tip:</strong> You can customize any shortcut in browser
+          settings. For instance, rebind Spotlight to <kbd>Ctrl</kbd> +{" "}
+          <kbd>T</kbd> / <kbd>Cmd</kbd> + <kbd>T</kbd> to replace your new tab
+          page!
         </p>
 
         <button
@@ -249,7 +258,8 @@ const BackupRestoreCard = ({
     </div>
 
     <p className="settings_subtitle">
-      Export your custom bangs and preferences to a backup file, or restore from a previous backup.
+      Export your custom bangs and preferences to a backup file, or restore from
+      a previous backup.
     </p>
 
     <div className="backup_actions">
@@ -341,7 +351,11 @@ export const SettingsView = ({
     if (typeof chrome !== "undefined" && chrome.tabs?.create) {
       chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
     } else {
-      window.open("chrome://extensions/shortcuts", "_blank", "noopener,noreferrer");
+      window.open(
+        "chrome://extensions/shortcuts",
+        "_blank",
+        "noopener,noreferrer",
+      );
     }
   };
 

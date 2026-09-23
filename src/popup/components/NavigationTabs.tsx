@@ -30,9 +30,8 @@ export const NavigationTabs = ({
   };
 
   useEffect(() => {
-    const activeButton = navRef.current?.querySelector<HTMLButtonElement>(
-      ".tab_button_active",
-    );
+    const activeButton =
+      navRef.current?.querySelector<HTMLButtonElement>(".tab_button_active");
     if (activeButton) {
       activeButton.scrollIntoView({
         behavior: "smooth",

@@ -11,8 +11,7 @@ const INTERNAL_SCHEME_REGEX =
 const WINDOWS_PATH_REGEX = /^[a-zA-Z]:[\\/]/;
 const IP_ADDRESS_REGEX = /^(?:\d{1,3}\.){3}\d{1,3}$/;
 const LOCALHOST_REGEX = /^localhost$/i;
-const DOMAIN_REGEX =
-  /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i;
+const DOMAIN_REGEX = /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i;
 
 export function isValidUrl(s: string): string | null {
   const trimmedValue = s.trim();

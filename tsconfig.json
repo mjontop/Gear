@@ -11,12 +11,8 @@
     }
   ],
   "files": [],
-  "types": [
-    "chrome"
-  ],
+  "types": ["chrome"],
   "compilerOptions": {
-    "types": [
-      "chrome"
-    ]
+    "types": ["chrome"]
   }
 }
