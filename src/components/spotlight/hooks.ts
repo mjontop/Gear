@@ -148,7 +148,7 @@ export const useBookmarks = ({
     let isCurrent = true;
     const queryToSearch = cleanQuery || rawQuery;
 
-    const timeoutId = window.setTimeout(() => {
+    const fetchBookmarks = () => {
       chrome.runtime.sendMessage(
         { type: "GET_BOOKMARKS", query: queryToSearch },
         (response?: BookmarksResponse) => {
@@ -156,7 +156,19 @@ export const useBookmarks = ({
           setBookmarks(response?.bookmarks ?? []);
         },
       );
-    }, SEARCH_SUGGESTION_DEBOUNCE_MS);
+    };
+
+    if (!queryToSearch) {
+      fetchBookmarks();
+      return () => {
+        isCurrent = false;
+      };
+    }
+
+    const timeoutId = window.setTimeout(
+      fetchBookmarks,
+      SEARCH_SUGGESTION_DEBOUNCE_MS,
+    );
 
     return () => {
       isCurrent = false;
@@ -186,7 +198,7 @@ export const useHistory = ({
 
     let isCurrent = true;
 
-    const timeoutId = window.setTimeout(() => {
+    const fetchHistory = () => {
       chrome.runtime.sendMessage(
         { type: "GET_HISTORY", query: cleanQuery },
         (response?: HistoryResponse) => {
@@ -194,7 +206,19 @@ export const useHistory = ({
           setHistory(response?.history ?? []);
         },
       );
-    }, SEARCH_SUGGESTION_DEBOUNCE_MS);
+    };
+
+    if (!cleanQuery) {
+      fetchHistory();
+      return () => {
+        isCurrent = false;
+      };
+    }
+
+    const timeoutId = window.setTimeout(
+      fetchHistory,
+      SEARCH_SUGGESTION_DEBOUNCE_MS,
+    );
 
     return () => {
       isCurrent = false;

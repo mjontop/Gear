@@ -56,6 +56,10 @@ export const SuggestionItem = <T extends SuggestionItemData>({
             className="favicon"
             src={item.favIconUrl}
             alt=""
+            width={20}
+            height={20}
+            loading="eager"
+            decoding="async"
             onError={() => setImageError(true)}
           />
         ) : fallbackIcon ? (

@@ -68,6 +68,10 @@ export const BookmarksList = ({
                     <img
                       src={item.favIconUrl}
                       alt=""
+                      width={18}
+                      height={18}
+                      loading="lazy"
+                      decoding="async"
                       className="bookmark_favicon"
                       onError={() => handleImageError(item.id)}
                     />
