@@ -21,7 +21,6 @@ export const SourcesView = ({
 }: SourcesViewProps) => {
   return (
     <div className="settings_container">
-      {/* 1. Local Sources Card */}
       <div className="form_card">
         <div className="form_header">
           <div className="settings_card_title_row">
@@ -36,7 +35,6 @@ export const SourcesView = ({
         </p>
 
         <div className="settings_list">
-          {/* Bookmarks Checkbox */}
           <div className="setting_row">
             <div className="setting_label_group">
               <label htmlFor="pref-bookmarks" className="setting_label">
@@ -62,7 +60,6 @@ export const SourcesView = ({
             </div>
           </div>
 
-          {/* History Checkbox */}
           <div className="setting_row">
             <div className="setting_label_group">
               <label htmlFor="pref-history" className="setting_label">
@@ -90,7 +87,6 @@ export const SourcesView = ({
         </div>
       </div>
 
-      {/* 2. Search Engine Provider Card */}
       <div className="form_card">
         <div className="form_header">
           <div className="settings_card_title_row">

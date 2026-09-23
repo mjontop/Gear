@@ -4,9 +4,7 @@ export const isFirefoxBrowser = (): boolean => {
       if (chrome.runtime.getURL("").startsWith("moz-extension://")) {
         return true;
       }
-    } catch {
-      // noop
-    }
+    } catch {}
   }
 
   if (

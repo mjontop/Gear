@@ -7,9 +7,7 @@ async function copyTextToClipboard(text: string): Promise<boolean> {
     try {
       await navigator.clipboard.writeText(text);
       return true;
-    } catch {
-      // Fallback below
-    }
+    } catch {}
   }
 
   try {
