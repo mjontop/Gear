@@ -2,6 +2,7 @@ import { useState, useRef, KeyboardEvent } from "react";
 import {
   DEFAULT_SEARCH_PROVIDER_ID,
   MAX_SPOTLIGHT_RESULTS,
+  MESSAGE_TYPES,
   SEARCH_PROVIDERS,
 } from "@/constants";
 import { parseQueryWithBangs } from "@/lib/bangs";
@@ -128,7 +129,7 @@ export const Spotlight = () => {
 
   const openUrl = (url: string) => {
     if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
-      chrome.runtime.sendMessage({ type: "OPEN_URL", url });
+      chrome.runtime.sendMessage({ type: MESSAGE_TYPES.OPEN_URL, url });
     } else {
       window.open(url, "_blank", "noopener");
     }
@@ -138,7 +139,11 @@ export const Spotlight = () => {
 
   const handleSelectTab = (tab: ActiveTabData) => {
     chrome.runtime.sendMessage(
-      { type: "SWITCH_TO_TAB", tabId: tab.id, windowId: tab.windowId },
+      {
+        type: MESSAGE_TYPES.SWITCH_TO_TAB,
+        tabId: tab.id,
+        windowId: tab.windowId,
+      },
       (response?: SwitchTabResponse) => {
         if (response?.success) {
           setIsOpen(false);

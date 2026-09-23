@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import {
   DEFAULT_SEARCH_PROVIDER_ID,
+  SPOTLIGHT_PREFERENCES_STORAGE_KEY,
   type SearchProviderId,
 } from "@/constants";
+
+export { SPOTLIGHT_PREFERENCES_STORAGE_KEY };
 
 export type ThemeMode = "dark" | "light" | "system";
 
@@ -21,8 +24,6 @@ export const DEFAULT_SPOTLIGHT_PREFERENCES: SpotlightPreferences = {
   enableBackgroundBlur: true,
   theme: "dark",
 };
-
-export const SPOTLIGHT_PREFERENCES_STORAGE_KEY = "gear_spotlight_preferences";
 
 export async function getSpotlightPreferences(): Promise<SpotlightPreferences> {
   try {

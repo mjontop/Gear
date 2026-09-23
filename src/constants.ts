@@ -83,3 +83,64 @@ export const SEARCH_RESULT_PRIORITY = {
   HISTORY: 2,
   SEARCH_SUGGESTION: 3,
 } as const;
+
+// Storage Keys
+export const STORAGE_KEYS = {
+  SPOTLIGHT_PREFERENCES: "gear_spotlight_preferences",
+  CUSTOM_BANGS: "gear_custom_bangs",
+} as const;
+
+export const SPOTLIGHT_PREFERENCES_STORAGE_KEY =
+  STORAGE_KEYS.SPOTLIGHT_PREFERENCES;
+export const CUSTOM_BANGS_STORAGE_KEY = STORAGE_KEYS.CUSTOM_BANGS;
+
+// Keyboard Command Names (manifest commands)
+export const COMMAND_NAMES = {
+  TOGGLE_SPOTLIGHT: "toggle-spotlight",
+  COPY_CURRENT_URL: "copy-current-url",
+  OPEN_SPOTLIGHT_WITH_URL: "open-spotlight-with-url",
+} as const;
+
+// Runtime Message Types
+export const MESSAGE_TYPES = {
+  TOGGLE_SPOTLIGHT: "TOGGLE_SPOTLIGHT",
+  COPY_CURRENT_URL: "COPY_CURRENT_URL",
+  OPEN_SPOTLIGHT_WITH_URL: "OPEN_SPOTLIGHT_WITH_URL",
+  GET_OPEN_TABS: "GET_OPEN_TABS",
+  SWITCH_TO_TAB: "SWITCH_TO_TAB",
+  OPEN_URL: "OPEN_URL",
+  GET_BOOKMARKS: "GET_BOOKMARKS",
+  GET_HISTORY: "GET_HISTORY",
+  GET_SEARCH_SUGGESTIONS: "GET_SEARCH_SUGGESTIONS",
+} as const;
+
+// Restricted URL Schemes & Domains (where content scripts cannot be injected)
+export const RESTRICTED_URL_SCHEMES = [
+  "chrome://",
+  "chrome-extension://",
+  "edge://",
+  "brave://",
+  "view-source://",
+  "about:",
+  "file://",
+] as const;
+
+export const RESTRICTED_URL_DOMAINS = [
+  "chromewebstore.google.com",
+  "chrome.google.com/webstore",
+] as const;
+
+/**
+ * Checks if a URL is restricted from content script injection by Chromium security policies.
+ */
+export const isRestrictedUrl = (url?: string): boolean => {
+  if (!url) return true;
+  for (const scheme of RESTRICTED_URL_SCHEMES) {
+    if (url.startsWith(scheme)) return true;
+  }
+  for (const domain of RESTRICTED_URL_DOMAINS) {
+    if (url.includes(domain)) return true;
+  }
+  return false;
+};
+

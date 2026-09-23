@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Dispatch, RefObject, SetStateAction } from "react";
 import {
   DEFAULT_SEARCH_PROVIDER_ID,
+  MESSAGE_TYPES,
   SEARCH_PROVIDERS,
   SEARCH_RESULT_PRIORITY,
   SEARCH_SUGGESTION_DEBOUNCE_MS,
@@ -66,13 +67,13 @@ export const useSpotlightShortcut = ({
 }: UseSpotlightShortcutParams) => {
   useEffect(() => {
     const handleMessage = (message: { type?: string; url?: string }) => {
-      if (message.type === "TOGGLE_SPOTLIGHT") {
+      if (message.type === MESSAGE_TYPES.TOGGLE_SPOTLIGHT) {
         onToggle();
         setIsOpen((prev) => !prev);
         return;
       }
 
-      if (message.type === "OPEN_SPOTLIGHT_WITH_URL") {
+      if (message.type === MESSAGE_TYPES.OPEN_SPOTLIGHT_WITH_URL) {
         const targetUrl = message.url || window.location.href;
         onOpenWithUrl?.(targetUrl);
         setIsOpen(true);
@@ -116,7 +117,7 @@ export const useOpenTabs = (isOpen?: boolean) => {
     if (isOpen === false) return;
 
     chrome.runtime.sendMessage(
-      { type: "GET_OPEN_TABS" },
+      { type: MESSAGE_TYPES.GET_OPEN_TABS },
       (response?: TabsResponse) => {
         setTabs(response?.tabs ?? []);
       },
@@ -150,7 +151,7 @@ export const useBookmarks = ({
 
     const fetchBookmarks = () => {
       chrome.runtime.sendMessage(
-        { type: "GET_BOOKMARKS", query: queryToSearch },
+        { type: MESSAGE_TYPES.GET_BOOKMARKS, query: queryToSearch },
         (response?: BookmarksResponse) => {
           if (!isCurrent) return;
           setBookmarks(response?.bookmarks ?? []);
@@ -200,7 +201,7 @@ export const useHistory = ({
 
     const fetchHistory = () => {
       chrome.runtime.sendMessage(
-        { type: "GET_HISTORY", query: cleanQuery },
+        { type: MESSAGE_TYPES.GET_HISTORY, query: cleanQuery },
         (response?: HistoryResponse) => {
           if (!isCurrent) return;
           setHistory(response?.history ?? []);
@@ -249,7 +250,11 @@ export const useSearchSuggestions = ({
     let isCurrentSearch = true;
     const timeoutId = window.setTimeout(() => {
       chrome.runtime.sendMessage(
-        { type: "GET_SEARCH_SUGGESTIONS", query: trimmedClean, provider },
+        {
+          type: MESSAGE_TYPES.GET_SEARCH_SUGGESTIONS,
+          query: trimmedClean,
+          provider,
+        },
         (response?: SearchSuggestionsResponse) => {
           if (!isCurrentSearch) return;
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { CheckIcon } from "lucide-react";
+import { MESSAGE_TYPES } from "@/constants";
 
 async function copyTextToClipboard(text: string): Promise<boolean> {
   if (navigator.clipboard && window.isSecureContext) {
@@ -41,7 +42,7 @@ export const CopyUrlToast = () => {
 
   useEffect(() => {
     const handleMessage = async (message: { type?: string; url?: string }) => {
-      if (message.type === "COPY_CURRENT_URL") {
+      if (message.type === MESSAGE_TYPES.COPY_CURRENT_URL) {
         const urlToCopy = message.url || window.location.href;
         await copyTextToClipboard(urlToCopy);
 

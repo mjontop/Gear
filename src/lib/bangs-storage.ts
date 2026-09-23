@@ -1,6 +1,6 @@
-import { BANG_SEARCH_URLS } from "@/constants";
+import { BANG_SEARCH_URLS, CUSTOM_BANGS_STORAGE_KEY } from "@/constants";
 
-export const CUSTOM_BANGS_STORAGE_KEY = "gear_custom_bangs";
+export { CUSTOM_BANGS_STORAGE_KEY };
 
 export type BangItem = {
   prefix: string;

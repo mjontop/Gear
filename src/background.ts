@@ -1,3 +1,8 @@
+import {
+  COMMAND_NAMES,
+  MESSAGE_TYPES,
+  isRestrictedUrl,
+} from "@/constants";
 import { getBookmarks } from "./background-tasks/bookmarks";
 import { getHistory } from "./background-tasks/history";
 import { getOpenTabs } from "./background-tasks/open-tabs";
@@ -6,59 +11,65 @@ import { switchToTab } from "./background-tasks/switch-tab";
 import type { RuntimeMessage } from "./background-tasks/types";
 
 chrome.commands.onCommand.addListener(async (command) => {
-  if (command === "toggle-spotlight") {
+  if (command === COMMAND_NAMES.TOGGLE_SPOTLIGHT) {
     const [tab] = await chrome.tabs.query({
       active: true,
       currentWindow: true,
     });
 
-    if (!tab?.id) return;
+    if (!tab?.id || isRestrictedUrl(tab.url)) return;
 
     chrome.tabs
       .sendMessage(tab.id, {
-        type: "TOGGLE_SPOTLIGHT",
+        type: MESSAGE_TYPES.TOGGLE_SPOTLIGHT,
       })
-      .catch(() => {});
+      .catch(() => {
+        // Silently do nothing if page cannot receive messages
+      });
     return;
   }
 
-  if (command === "copy-current-url") {
+  if (command === COMMAND_NAMES.COPY_CURRENT_URL) {
     const [tab] = await chrome.tabs.query({
       active: true,
       currentWindow: true,
     });
 
-    if (!tab?.id || !tab.url) return;
+    if (!tab?.id || isRestrictedUrl(tab.url)) return;
 
     chrome.tabs
       .sendMessage(tab.id, {
-        type: "COPY_CURRENT_URL",
+        type: MESSAGE_TYPES.COPY_CURRENT_URL,
         url: tab.url,
       })
-      .catch(() => {});
+      .catch(() => {
+        // Silently do nothing if page cannot receive messages
+      });
     return;
   }
 
-  if (command === "open-spotlight-with-url") {
+  if (command === COMMAND_NAMES.OPEN_SPOTLIGHT_WITH_URL) {
     const [tab] = await chrome.tabs.query({
       active: true,
       currentWindow: true,
     });
 
-    if (!tab?.id) return;
+    if (!tab?.id || isRestrictedUrl(tab.url)) return;
 
     chrome.tabs
       .sendMessage(tab.id, {
-        type: "OPEN_SPOTLIGHT_WITH_URL",
+        type: MESSAGE_TYPES.OPEN_SPOTLIGHT_WITH_URL,
         url: tab.url,
       })
-      .catch(() => {});
+      .catch(() => {
+        // Silently do nothing if page cannot receive messages
+      });
   }
 });
 
 chrome.runtime.onMessage.addListener(
   (message: RuntimeMessage, sender, sendResponse) => {
-    if (message.type === "GET_OPEN_TABS") {
+    if (message.type === MESSAGE_TYPES.GET_OPEN_TABS) {
       const currentTabId = sender.tab?.id;
 
       getOpenTabs(currentTabId)
@@ -72,7 +83,7 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
-    if (message.type === "SWITCH_TO_TAB") {
+    if (message.type === MESSAGE_TYPES.SWITCH_TO_TAB) {
       switchToTab(message.tabId, message.windowId)
         .then(() => {
           sendResponse({ success: true });
@@ -84,7 +95,7 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
-    if (message.type === "OPEN_URL") {
+    if (message.type === MESSAGE_TYPES.OPEN_URL) {
       chrome.tabs
         .create({ url: message.url })
         .then(() => {
@@ -97,7 +108,7 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
-    if (message.type === "GET_SEARCH_SUGGESTIONS") {
+    if (message.type === MESSAGE_TYPES.GET_SEARCH_SUGGESTIONS) {
       getSearchSuggestions(message.query, message.provider)
         .then((suggestions) => {
           sendResponse({ suggestions });
@@ -109,7 +120,7 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
-    if (message.type === "GET_BOOKMARKS") {
+    if (message.type === MESSAGE_TYPES.GET_BOOKMARKS) {
       getBookmarks(message.query)
         .then((bookmarks) => {
           sendResponse({ bookmarks });
@@ -121,7 +132,7 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
-    if (message.type === "GET_HISTORY") {
+    if (message.type === MESSAGE_TYPES.GET_HISTORY) {
       getHistory(message.query)
         .then((history) => {
           sendResponse({ history });
