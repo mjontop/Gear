@@ -58,6 +58,34 @@ describe("isValidUrl", () => {
     expect(isValidUrl("not_a_valid_hostname")).toBeNull();
     expect(isValidUrl("xyz")).toBeNull();
   });
+
+  it("handles malformed URLs that throw during URL construction", () => {
+    expect(isValidUrl("chrome://test:999999")).toBeNull();
+    expect(isValidUrl("https://test:999999")).toBeNull();
+  });
+
+  it("handles error during URL construction for Windows paths and file URLs", () => {
+    const OriginalURL = globalThis.URL;
+    class ThrowingURL extends OriginalURL {
+      constructor(url: string | URL, base?: string | URL) {
+        if (
+          typeof url === "string" &&
+          (url.startsWith("file:///") || url.includes("mock-fail"))
+        ) {
+          throw new Error("Invalid URL");
+        }
+        super(url, base);
+      }
+    }
+    globalThis.URL = ThrowingURL;
+
+    try {
+      expect(isValidUrl("C:\\mock-fail\\test.txt")).toBeNull();
+      expect(isValidUrl("file:///mock-fail/test.txt")).toBeNull();
+    } finally {
+      globalThis.URL = OriginalURL;
+    }
+  });
 });
 
 describe("getRedirectUrl", () => {

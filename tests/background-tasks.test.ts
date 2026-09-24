@@ -18,11 +18,13 @@ describe("background-tasks", () => {
           { id: "1", title: "Repo 1", url: "https://github.com/repo" },
           { id: "2", title: "Repo 2", url: "https://github.com/repo" },
           { id: "3", title: "Empty Folder" },
+          { id: "4", title: "", url: "https://notitle.com" },
         ]);
 
       const res = await getBookmarks("");
-      expect(res).toHaveLength(1);
+      expect(res).toHaveLength(2);
       expect(res[0].id).toBe("1");
+      expect(res[1].title).toBe("https://notitle.com");
     });
   });
 
@@ -42,11 +44,13 @@ describe("background-tasks", () => {
           lastVisitTime: 2000,
         },
         { id: "h3", title: "Invalid" },
+        { id: "h4", title: "", url: "https://notitlehistory.com" },
       ]);
 
       const res = await getHistory("google");
-      expect(res).toHaveLength(1);
+      expect(res).toHaveLength(2);
       expect(res[0].id).toBe("h1");
+      expect(res[1].title).toBe("https://notitlehistory.com");
     });
   });
 
@@ -84,6 +88,58 @@ describe("background-tasks", () => {
       expect(tabs[0].id).toBe(11);
       expect(tabs[1].id).toBe(10);
     });
+
+    it("handles active tab already first in sorting", async () => {
+      (globalThis as any).chrome.tabs.query = vi.fn().mockResolvedValue([
+        { id: 1, windowId: 1, active: true, index: 1, title: "Active" },
+        { id: 2, windowId: 1, active: false, index: 2, title: "Inactive" },
+      ]);
+
+      const tabs = await getOpenTabs();
+      expect(tabs[0].id).toBe(1);
+    });
+
+    it("sorts by windowId and index, and handles title fallbacks and audio states", async () => {
+      (globalThis as any).chrome.tabs.query = vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          windowId: 2,
+          url: "https://tab-window2.com",
+          active: false,
+          index: 0,
+        },
+        {
+          id: 2,
+          windowId: 1,
+          title: "",
+          url: "",
+          active: false,
+          index: 5,
+        },
+        {
+          id: 3,
+          windowId: 1,
+          title: "Audible Tab",
+          url: "https://music.com",
+          active: false,
+          index: 2,
+          audible: true,
+          mutedInfo: { muted: true },
+        },
+      ]);
+
+      const tabs = await getOpenTabs();
+      expect(tabs).toHaveLength(3);
+      // Window 1 tabs sorted by index: index 2 (id 3) then index 5 (id 2)
+      expect(tabs[0].id).toBe(3);
+      expect(tabs[0].audible).toBe(true);
+      expect(tabs[0].muted).toBe(true);
+      expect(tabs[1].id).toBe(2);
+      expect(tabs[1].title).toBe("Untitled");
+      // Window 2 tab comes after Window 1
+      expect(tabs[2].id).toBe(1);
+      expect(tabs[2].title).toBe("https://tab-window2.com");
+    });
   });
 
   describe("search-suggestions", () => {
@@ -95,13 +151,51 @@ describe("background-tasks", () => {
     it("fetches suggestions from search engine API and formats results", async () => {
       globalThis.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ["react", ["react query", "react router"]],
+        json: async () => [
+          "react",
+          ["react query", "react router", "react", "react router"],
+        ],
       }) as any;
 
       const res = await getSearchSuggestions("react", "google");
       expect(res).toHaveLength(3);
       expect(res[0].query).toBe("react");
       expect(res[1].query).toBe("react query");
+      expect(res[2].query).toBe("react router");
+    });
+
+    it("handles non-ok HTTP response", async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+      }) as any;
+
+      const res = await getSearchSuggestions("react", "google");
+      expect(res).toHaveLength(1);
+      expect(res[0].query).toBe("react");
+    });
+
+    it("handles non-array or invalid JSON payload", async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ invalid: true }),
+      }) as any;
+
+      const res = await getSearchSuggestions("react", "google");
+      expect(res).toHaveLength(1);
+      expect(res[0].query).toBe("react");
+    });
+
+    it("falls back to default provider for unknown provider ID", async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ["react", ["react docs"]],
+      }) as any;
+
+      const res = await getSearchSuggestions(
+        "react",
+        "unknown-provider" as any,
+      );
+      expect(res).toHaveLength(2);
     });
 
     it("falls back to single search suggestion when fetch fails", async () => {

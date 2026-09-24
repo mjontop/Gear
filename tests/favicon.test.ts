@@ -65,4 +65,20 @@ describe("favicon", () => {
     expect(url).toContain("domain_url=https%3A%2F%2Fgithub.com%2Fmanikantjha");
     expect(url).toContain("sz=32");
   });
+
+  it("falls back to Google S2 favicon URL when chrome.runtime.getURL throws", () => {
+    (globalThis as any).chrome.runtime.getURL = vi.fn(() => {
+      throw new Error("Runtime unavailable");
+    });
+    const url = getFaviconUrl("https://github.com/manikantjha", 16);
+    expect(url).toContain("https://www.google.com/s2/favicons");
+    expect(url).toContain("sz=16");
+  });
+
+  it("handles exception in isFirefoxBrowser getURL gracefully", () => {
+    (globalThis as any).chrome.runtime.getURL = vi.fn(() => {
+      throw new Error("Cannot getURL");
+    });
+    expect(isFirefoxBrowser()).toBe(false);
+  });
 });

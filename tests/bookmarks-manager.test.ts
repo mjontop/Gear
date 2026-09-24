@@ -27,21 +27,43 @@ describe("bookmarks-manager", () => {
       expect(res.normalizedUrl).toBe("https://google.com");
     });
 
-    it("rejects unsupported protocols", () => {
+    it("rejects unsupported protocols and invalid URL format", () => {
       const res = validateBookmark("Hack", "javascript:alert(1)");
       expect(res.isValid).toBe(false);
       expect(res.urlError).toBe("Invalid URL format.");
+
+      const invalidPortRes = validateBookmark("Bad", "https://test:999999");
+      expect(invalidPortRes.isValid).toBe(false);
+      expect(invalidPortRes.urlError).toBe("Invalid URL format.");
+    });
+
+    it("flags bookmark when protocol is not http or https", () => {
+      const OriginalURL = globalThis.URL;
+      class MockURL extends OriginalURL {
+        override get protocol() {
+          return "ftp:";
+        }
+      }
+      globalThis.URL = MockURL as any;
+
+      try {
+        const res = validateBookmark("FTP Site", "https://ftp.com");
+        expect(res.isValid).toBe(false);
+        expect(res.urlError).toBe("URL must use http or https.");
+      } finally {
+        globalThis.URL = OriginalURL;
+      }
     });
   });
 
   describe("CRUD operations", () => {
-    it("fetches recent bookmarks when query is empty", async () => {
+    it("fetches recent bookmarks when query is empty and falls back to URL when title is empty", async () => {
       (globalThis as any).chrome.bookmarks.getRecent = vi
         .fn()
         .mockResolvedValue([
           {
             id: "1",
-            title: "GitHub",
+            title: "",
             url: "https://github.com",
             dateAdded: 100,
           },
@@ -50,7 +72,7 @@ describe("bookmarks-manager", () => {
 
       const list = await fetchBookmarks("");
       expect(list).toHaveLength(1);
-      expect(list[0].title).toBe("GitHub");
+      expect(list[0].title).toBe("https://github.com");
     });
 
     it("searches bookmarks when query is provided", async () => {
@@ -68,7 +90,7 @@ describe("bookmarks-manager", () => {
       expect(list[0].title).toBe("Vitest Docs");
     });
 
-    it("adds bookmark via chrome.bookmarks.create", async () => {
+    it("adds bookmark via chrome.bookmarks.create and handles null url", async () => {
       const created = await addBookmark("New Tab", "https://newtab.com");
       expect(created).toBeDefined();
       expect(created?.title).toBe("New Tab");
@@ -76,6 +98,13 @@ describe("bookmarks-manager", () => {
         title: "New Tab",
         url: "https://newtab.com",
       });
+
+      // When node has no url
+      (globalThis as any).chrome.bookmarks.create = vi
+        .fn()
+        .mockResolvedValue({ id: "99" });
+      const noUrl = await addBookmark("No URL", "https://nourl.com");
+      expect(noUrl).toBeNull();
     });
 
     it("updates bookmark via chrome.bookmarks.update", async () => {
@@ -94,6 +123,20 @@ describe("bookmarks-manager", () => {
       expect((globalThis as any).chrome.bookmarks.remove).toHaveBeenCalledWith(
         "1",
       );
+    });
+
+    it("returns safely when chrome.bookmarks is unavailable", async () => {
+      const origBookmarks = (globalThis as any).chrome.bookmarks;
+      delete (globalThis as any).chrome.bookmarks;
+
+      expect(await fetchBookmarks()).toEqual([]);
+      expect(await addBookmark("Title", "https://test.com")).toBeNull();
+      await expect(
+        editBookmark("1", "Title", "https://test.com"),
+      ).resolves.not.toThrow();
+      await expect(deleteBookmark("1")).resolves.not.toThrow();
+
+      (globalThis as any).chrome.bookmarks = origBookmarks;
     });
   });
 });

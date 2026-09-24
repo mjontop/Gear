@@ -86,6 +86,40 @@ describe("bangs-storage", () => {
       expect(res.urlError).toContain("must include '%s'");
     });
 
+    it("flags invalid URL format when URL cannot be parsed", () => {
+      const res = validateBang(
+        "!test",
+        "https://test:999999/%s",
+        existingBangs,
+      );
+      expect(res.isValid).toBe(false);
+      expect(res.urlError).toBe("Invalid URL format.");
+    });
+
+    it("flags empty prefix when only '!' is provided", () => {
+      const res = validateBang("!", "https://test.com?q=%s", existingBangs);
+      expect(res.isValid).toBe(false);
+      expect(res.prefixError).toBe("Bang prefix cannot be empty.");
+    });
+
+    it("flags URL when protocol is not http or https", () => {
+      const OriginalURL = globalThis.URL;
+      class MockURL extends OriginalURL {
+        override get protocol() {
+          return "ftp:";
+        }
+      }
+      globalThis.URL = MockURL as any;
+
+      try {
+        const res = validateBang("!ftp", "https://ftp.com?q=%s", existingBangs);
+        expect(res.isValid).toBe(false);
+        expect(res.urlError).toBe("URL must use http or https.");
+      } finally {
+        globalThis.URL = OriginalURL;
+      }
+    });
+
     it("accepts valid bang definitions", () => {
       const res = validateBang(
         "!npm",
@@ -134,6 +168,19 @@ describe("bangs-storage", () => {
       expect(res).toEqual({});
 
       (globalThis as any).chrome.storage.sync.get = originalGet;
+    });
+
+    it("rethrows error when saveCustomBangs fails", async () => {
+      const originalSet = (globalThis as any).chrome.storage.sync.set;
+      (globalThis as any).chrome.storage.sync.set = vi
+        .fn()
+        .mockRejectedValue(new Error("Disk write error"));
+
+      await expect(
+        saveCustomBangs({ "!fail": "https://fail.com?q=%s" }),
+      ).rejects.toThrow("Disk write error");
+
+      (globalThis as any).chrome.storage.sync.set = originalSet;
     });
   });
 });
