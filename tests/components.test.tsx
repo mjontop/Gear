@@ -151,7 +151,7 @@ describe("UI Components", () => {
     // Trigger image error
     fireEvent.error(img!);
 
-    // Rerender with empty title to test "?" fallback
+    // Rerender with empty title / no favicon to test GlobeIcon fallback
     rerender(
       <SuggestionItem
         item={{ id: "3", title: "", url: "https://empty.com" }}
@@ -159,7 +159,9 @@ describe("UI Components", () => {
         onSelect={onSelect}
       />,
     );
-    expect(screen.getByText("?")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button").querySelector(".search_suggestion_icon"),
+    ).toBeInTheDocument();
   });
 
   it("renders NavigationTabs, switches tabs, handles wheel scroll and active tab change", () => {

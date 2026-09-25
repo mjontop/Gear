@@ -73,6 +73,7 @@ export const ActiveTabs = ({
   const getFallbackIcon = (result: SpotlightResultData) => {
     switch (result.kind) {
       case "direct-url":
+      case "open-tab":
         return <GlobeIcon size={20} className="search_suggestion_icon" />;
       case "bookmark":
         return <BookmarkIcon size={20} className="search_suggestion_icon" />;

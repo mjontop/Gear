@@ -1,4 +1,9 @@
-import { ArrowRightIcon, Volume2Icon, VolumeXIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  GlobeIcon,
+  Volume2Icon,
+  VolumeXIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
@@ -18,12 +23,6 @@ type SuggestionItemProps<T extends SuggestionItemData> = {
   actionLabel?: string;
   fallbackIcon?: ReactNode;
   onSelect: (item: T) => void;
-};
-
-const getFallbackLabel = (title: string) => {
-  const trimmedTitle = title.trim();
-
-  return trimmedTitle ? trimmedTitle.charAt(0).toUpperCase() : "?";
 };
 
 export const SuggestionItem = <T extends SuggestionItemData>({
@@ -65,9 +64,7 @@ export const SuggestionItem = <T extends SuggestionItemData>({
         ) : fallbackIcon ? (
           fallbackIcon
         ) : (
-          <span className="favicon_fallback">
-            {getFallbackLabel(item.title)}
-          </span>
+          <GlobeIcon size={20} className="search_suggestion_icon" />
         )}
       </span>
       <span className="suggestion_title">{item.title}</span>
