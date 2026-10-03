@@ -20,7 +20,8 @@
     "doctor": "npx react-doctor@latest",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky"
   },
   "dependencies": {
     "lucide-react": "^1.45.0",
@@ -40,6 +41,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "^5.0.1",
     "eslint": "^10.10.0",
+    "husky": "^9.1.7",
     "jsdom": "^30.0.1",
     "prettier": "^3.9.7",
     "typescript": "~5.9.3",
