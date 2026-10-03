@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 
 :host {
   all: initial;
@@ -79,7 +79,7 @@
 
 :host,
 :host * {
-  font-family: Roboto, sans-serif;
+  font-family: var(--spotlight-font-family, Roboto, sans-serif);
 }
 
 :host *,
@@ -173,7 +173,8 @@
   max-width: none;
   max-height: none;
   box-sizing: border-box;
-  font-size: 16px;
+  font-size: var(--spotlight-font-size, 16px);
+  font-family: var(--spotlight-font-family, Roboto, sans-serif);
   margin: 0;
   border: none;
   padding: 15vh 0 0;
@@ -214,7 +215,7 @@
   max-height: 21.2em !important;
   height: fit-content !important;
   background-color: var(--color-spotlight-bg);
-  border-radius: 10px;
+  border-radius: var(--spotlight-border-radius, 10px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -232,7 +233,7 @@
 }
 
 .search_icon {
-  color: var(--color-spotlight-icon);
+  color: var(--spotlight-accent-color, var(--color-spotlight-icon));
   margin-right: 12px;
   width: 24px;
   height: 24px;
@@ -255,10 +256,11 @@
   outline: none !important;
   outline-offset: 0 !important;
   font-size: 1.2em;
-  color: var(--color-spotlight-input-text);
-  font-weight: 300;
+  color: var(--spotlight-font-color, var(--color-spotlight-input-text));
+  font-weight: var(--spotlight-font-weight, 300);
   background: var(--color-spotlight-bg);
   box-shadow: none !important;
+  font-family: inherit;
 }
 
 .search_input:focus {
@@ -269,8 +271,11 @@
 }
 
 .search_input::placeholder {
-  color: var(--color-spotlight-placeholder);
-  font-weight: 500;
+  color: var(
+    --spotlight-secondary-font-color,
+    var(--color-spotlight-placeholder)
+  );
+  font-weight: var(--spotlight-font-weight, 500);
   letter-spacing: 0.02em;
 }
 
@@ -289,13 +294,13 @@
   box-sizing: border-box;
   height: 3.08125em;
   border: 0;
-  border-radius: 0.425em;
+  border-radius: calc(var(--spotlight-border-radius, 10px) * 0.5);
   padding: 0 0.74375em;
   display: flex;
   align-items: center;
   gap: 0.6375em;
   background: transparent;
-  color: var(--color-item-text);
+  color: var(--spotlight-font-color, var(--color-item-text));
   cursor: pointer;
   font: inherit;
   text-align: left;
@@ -363,6 +368,8 @@
   white-space: nowrap;
   font-size: 0.9em;
   line-height: 1.2;
+  color: var(--spotlight-font-color, var(--color-item-text));
+  font-weight: var(--spotlight-font-weight, 400);
 }
 
 .tab_audible_indicator {
@@ -370,7 +377,7 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  color: var(--color-audio-active);
+  color: var(--spotlight-accent-color, var(--color-audio-active));
   margin-left: 0.35em;
   margin-right: 0.25em;
 }
@@ -388,7 +395,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.425em;
-  color: var(--color-item-action-text);
+  color: var(--spotlight-secondary-font-color, var(--color-item-action-text));
   font-size: 0.6em;
   line-height: 1;
   white-space: nowrap;

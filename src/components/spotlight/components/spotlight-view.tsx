@@ -3,6 +3,10 @@ import { useEffect } from "react";
 import type { KeyboardEvent, RefObject } from "react";
 import { ActiveTabs } from "./active-tabs";
 import type { SpotlightResultData } from "./active-tabs";
+import {
+  getSpotlightStyleVariables,
+  type SpotlightPreferences,
+} from "@/lib/preferences";
 
 type SpotlightViewProps = {
   inputRef: RefObject<HTMLInputElement | null>;
@@ -13,6 +17,8 @@ type SpotlightViewProps = {
   selectedTabIndex: number;
   enableBackgroundBlur?: boolean;
   shouldSelectInputText?: boolean;
+  preferences?: SpotlightPreferences;
+  customStyles?: React.CSSProperties;
   onClose: () => void;
   onSearchChange: (value: string) => void;
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
@@ -28,11 +34,17 @@ export const SpotlightView = ({
   selectedTabIndex,
   enableBackgroundBlur = true,
   shouldSelectInputText = false,
+  preferences,
+  customStyles,
   onClose,
   onSearchChange,
   onKeyDown,
   onSelectResult,
 }: SpotlightViewProps) => {
+  const styleVars = {
+    ...getSpotlightStyleVariables(preferences),
+    ...customStyles,
+  };
   useEffect(() => {
     const dialog = overlayRef.current;
 
@@ -63,6 +75,7 @@ export const SpotlightView = ({
       ref={overlayRef}
       className={`spotlight_overlay ${!enableBackgroundBlur ? "spotlight_overlay_no_blur" : ""}`}
       aria-label="Spotlight search"
+      style={styleVars}
       onCancel={onClose}
     >
       <button
@@ -71,7 +84,7 @@ export const SpotlightView = ({
         aria-label="Close Spotlight search"
         onClick={onClose}
       />
-      <div className="spotlight_container">
+      <div className="spotlight_container" style={styleVars}>
         <div className="search_header">
           {validUrl ? (
             <GlobeIcon size={24} className="search_icon" />

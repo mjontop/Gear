@@ -6,6 +6,7 @@ import {
   resolveTheme,
   useSpotlightPreferences,
   useTheme,
+  getSpotlightStyleVariables,
   DEFAULT_SPOTLIGHT_PREFERENCES,
   SPOTLIGHT_PREFERENCES_STORAGE_KEY,
 } from "@/lib/preferences";
@@ -178,5 +179,50 @@ describe("preferences", () => {
       "change",
       mediaChangeHandler,
     );
+  });
+
+  it("generates correct CSS style variables from preferences", () => {
+    expect(getSpotlightStyleVariables(undefined)).toEqual({});
+    expect(getSpotlightStyleVariables({})).toEqual({});
+
+    const customStyles = getSpotlightStyleVariables({
+      fontSize: 18,
+      fontWeight: "600",
+      fontFamily: "Inter",
+      fontColor: "#00ffcc",
+      secondaryFontColor: "#888888",
+      accentColor: "#ff0055",
+      borderRadius: 16,
+    }) as Record<string, string>;
+
+    expect(customStyles["--spotlight-font-size"]).toBe("18px");
+    expect(customStyles["--spotlight-font-weight"]).toBe("600");
+    expect(customStyles["--spotlight-font-family"]).toContain("Inter");
+    expect(customStyles["--spotlight-font-color"]).toBe("#00ffcc");
+    expect(customStyles["--spotlight-secondary-font-color"]).toBe("#888888");
+    expect(customStyles["--spotlight-accent-color"]).toBe("#ff0055");
+    expect(customStyles["--spotlight-border-radius"]).toBe("16px");
+  });
+
+  it("saves and retrieves custom typography and style preferences", async () => {
+    await saveSpotlightPreferences({
+      ...DEFAULT_SPOTLIGHT_PREFERENCES,
+      fontSize: 20,
+      fontWeight: "700",
+      fontFamily: "Monospace",
+      fontColor: "#ffffff",
+      secondaryFontColor: "#cccccc",
+      accentColor: "#38bdf8",
+      borderRadius: 24,
+    });
+
+    const updated = await getSpotlightPreferences();
+    expect(updated.fontSize).toBe(20);
+    expect(updated.fontWeight).toBe("700");
+    expect(updated.fontFamily).toBe("Monospace");
+    expect(updated.fontColor).toBe("#ffffff");
+    expect(updated.secondaryFontColor).toBe("#cccccc");
+    expect(updated.accentColor).toBe("#38bdf8");
+    expect(updated.borderRadius).toBe(24);
   });
 });

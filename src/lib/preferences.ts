@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import {
   DEFAULT_SEARCH_PROVIDER_ID,
+  DEFAULT_STYLE_VALUES,
+  FONT_FAMILY_OPTIONS,
   SPOTLIGHT_PREFERENCES_STORAGE_KEY,
   type SearchProviderId,
 } from "@/constants";
@@ -15,7 +17,16 @@ export type SpotlightPreferences = {
   searchProvider: SearchProviderId;
   enableBackgroundBlur: boolean;
   theme: ThemeMode;
+  fontSize?: number;
+  fontWeight?: string;
+  fontFamily?: string;
+  fontColor?: string;
+  secondaryFontColor?: string;
+  accentColor?: string;
+  borderRadius?: number;
 };
+
+export const DEFAULT_STYLE_PREFERENCES = DEFAULT_STYLE_VALUES;
 
 export const DEFAULT_SPOTLIGHT_PREFERENCES: SpotlightPreferences = {
   includeBookmarks: true,
@@ -23,7 +34,47 @@ export const DEFAULT_SPOTLIGHT_PREFERENCES: SpotlightPreferences = {
   searchProvider: DEFAULT_SEARCH_PROVIDER_ID,
   enableBackgroundBlur: true,
   theme: "dark",
+  ...DEFAULT_STYLE_VALUES,
 };
+
+export function getSpotlightStyleVariables(
+  preferences?: Partial<SpotlightPreferences>,
+): React.CSSProperties {
+  if (!preferences) return {};
+
+  const styles: Record<string, string> = {};
+
+  if (preferences.fontSize) {
+    styles["--spotlight-font-size"] = `${preferences.fontSize}px`;
+  }
+  if (preferences.fontWeight) {
+    styles["--spotlight-font-weight"] = preferences.fontWeight;
+  }
+  if (preferences.fontFamily) {
+    const fontOpt = FONT_FAMILY_OPTIONS.find(
+      (f) =>
+        f.id.toLowerCase() === preferences.fontFamily?.toLowerCase() ||
+        f.name.toLowerCase() === preferences.fontFamily?.toLowerCase(),
+    );
+    styles["--spotlight-font-family"] = fontOpt
+      ? fontOpt.value
+      : preferences.fontFamily;
+  }
+  if (preferences.fontColor) {
+    styles["--spotlight-font-color"] = preferences.fontColor;
+  }
+  if (preferences.secondaryFontColor) {
+    styles["--spotlight-secondary-font-color"] = preferences.secondaryFontColor;
+  }
+  if (preferences.accentColor) {
+    styles["--spotlight-accent-color"] = preferences.accentColor;
+  }
+  if (preferences.borderRadius !== undefined) {
+    styles["--spotlight-border-radius"] = `${preferences.borderRadius}px`;
+  }
+
+  return styles as React.CSSProperties;
+}
 
 export async function getSpotlightPreferences(): Promise<SpotlightPreferences> {
   try {

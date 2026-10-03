@@ -138,3 +138,105 @@ export const isRestrictedUrl = (url?: string): boolean => {
   }
   return false;
 };
+
+export const FONT_FAMILY_OPTIONS = [
+  {
+    id: "Roboto",
+    name: "Roboto",
+    value: "Roboto, -apple-system, BlinkMacSystemFont, sans-serif",
+  },
+  {
+    id: "Inter",
+    name: "Inter",
+    value: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+  },
+  {
+    id: "System",
+    name: "System Native",
+    value:
+      "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
+  {
+    id: "Monospace",
+    name: "Monospace",
+    value:
+      "'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Consolas, monospace",
+  },
+  {
+    id: "Serif",
+    name: "Serif",
+    value: "Georgia, 'Times New Roman', Cambria, serif",
+  },
+] as const;
+
+export const FONT_WEIGHT_OPTIONS = [
+  { label: "Light", value: "300" },
+  { label: "Regular", value: "400" },
+  { label: "Medium", value: "500" },
+  { label: "Semi-Bold", value: "600" },
+  { label: "Bold", value: "700" },
+] as const;
+
+export const FONT_SIZE_PRESETS = [
+  { label: "Small", value: 14 },
+  { label: "Default", value: 16 },
+  { label: "Large", value: 18 },
+  { label: "X-Large", value: 20 },
+] as const;
+
+export const BORDER_RADIUS_PRESETS = [
+  { label: "Sharp", value: 4 },
+  { label: "Default", value: 10 },
+  { label: "Rounded", value: 16 },
+  { label: "Pill", value: 24 },
+] as const;
+
+export const COLOR_PALETTE_PRESETS = [
+  { name: "Default", primary: "", secondary: "", accent: "" },
+  {
+    name: "Slate",
+    primary: "#f8fafc",
+    secondary: "#94a3b8",
+    accent: "#38bdf8",
+  },
+  {
+    name: "Emerald",
+    primary: "#ecfdf5",
+    secondary: "#a7f3d0",
+    accent: "#10b981",
+  },
+  {
+    name: "Sky Blue",
+    primary: "#f0f9ff",
+    secondary: "#bae6fd",
+    accent: "#0284c7",
+  },
+  {
+    name: "Amber",
+    primary: "#fffbeb",
+    secondary: "#fde68a",
+    accent: "#f59e0b",
+  },
+  {
+    name: "Rose",
+    primary: "#fff1f2",
+    secondary: "#fecdd3",
+    accent: "#f43f5e",
+  },
+  {
+    name: "Purple",
+    primary: "#faf5ff",
+    secondary: "#e9d5ff",
+    accent: "#a855f7",
+  },
+] as const;
+
+export const DEFAULT_STYLE_VALUES = {
+  fontSize: 16,
+  fontWeight: "400",
+  fontFamily: "Roboto",
+  fontColor: "",
+  secondaryFontColor: "",
+  accentColor: "",
+  borderRadius: 10,
+} as const;

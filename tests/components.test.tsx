@@ -474,6 +474,96 @@ describe("UI Components", () => {
     });
   });
 
+  it("renders SettingsView typography and styles controls and updates preferences", () => {
+    const onPreferenceChange = vi.fn();
+    const onShowStatus = vi.fn();
+    render(
+      <SettingsView
+        preferences={{
+          includeBookmarks: true,
+          includeHistory: true,
+          searchProvider: "google",
+          enableBackgroundBlur: true,
+          theme: "dark",
+          fontSize: 16,
+          fontWeight: "400",
+          fontFamily: "Roboto",
+          fontColor: "#ffffff",
+          secondaryFontColor: "#aaaaaa",
+          accentColor: "#38bdf8",
+          borderRadius: 10,
+        }}
+        onPreferenceChange={onPreferenceChange}
+        onShowStatus={onShowStatus}
+      />,
+    );
+
+    expect(screen.getByText("Typography & Styles")).toBeInTheDocument();
+    expect(screen.getByText("Live Preview")).toBeInTheDocument();
+
+    // Font size slider & preset
+    const fontSizeSlider = screen.getByLabelText("Font size");
+    fireEvent.change(fontSizeSlider, { target: { value: "18" } });
+    expect(onPreferenceChange).toHaveBeenCalledWith("fontSize", 18);
+
+    const smallPresetBtn = screen.getByRole("button", {
+      name: /Small \(14px\)/i,
+    });
+    fireEvent.click(smallPresetBtn);
+    expect(onPreferenceChange).toHaveBeenCalledWith("fontSize", 14);
+
+    // Font weight preset
+    const boldWeightBtn = screen.getByRole("button", {
+      name: /Bold \(700\)/i,
+    });
+    fireEvent.click(boldWeightBtn);
+    expect(onPreferenceChange).toHaveBeenCalledWith("fontWeight", "700");
+
+    // Font family dropdown
+    const fontFamilySelect = screen.getByLabelText("Font family");
+    fireEvent.change(fontFamilySelect, { target: { value: "Inter" } });
+    expect(onPreferenceChange).toHaveBeenCalledWith("fontFamily", "Inter");
+
+    // Corner radius slider & preset
+    const borderRadiusSlider = screen.getByLabelText("Corner radius");
+    fireEvent.change(borderRadiusSlider, { target: { value: "16" } });
+    expect(onPreferenceChange).toHaveBeenCalledWith("borderRadius", 16);
+
+    const pillPresetBtn = screen.getByRole("button", {
+      name: /Pill \(24px\)/i,
+    });
+    fireEvent.click(pillPresetBtn);
+    expect(onPreferenceChange).toHaveBeenCalledWith("borderRadius", 24);
+
+    // Color Palette preset
+    const emeraldPaletteBtn = screen.getByTitle(/Emerald Palette/i);
+    fireEvent.click(emeraldPaletteBtn);
+    expect(onPreferenceChange).toHaveBeenCalledWith("fontColor", "#ecfdf5");
+    expect(onPreferenceChange).toHaveBeenCalledWith(
+      "secondaryFontColor",
+      "#a7f3d0",
+    );
+    expect(onPreferenceChange).toHaveBeenCalledWith("accentColor", "#10b981");
+    expect(onShowStatus).toHaveBeenCalledWith('Applied "Emerald" palette');
+
+    // Custom color input & clear
+    const fontColorInput = screen.getByLabelText("Primary font color hex code");
+    fireEvent.change(fontColorInput, { target: { value: "#123456" } });
+    expect(onPreferenceChange).toHaveBeenCalledWith("fontColor", "#123456");
+
+    const clearBtns = screen.getAllByRole("button", { name: "Clear" });
+    fireEvent.click(clearBtns[0]);
+    expect(onPreferenceChange).toHaveBeenCalledWith("fontColor", "");
+
+    // Reset styles
+    const resetBtn = screen.getByRole("button", {
+      name: /Reset/i,
+    });
+    fireEvent.click(resetBtn);
+    expect(onPreferenceChange).toHaveBeenCalledWith("fontSize", 16);
+    expect(onShowStatus).toHaveBeenCalledWith("Styles reset to defaults");
+  });
+
   it("handles SettingsView shortcuts in Firefox environment", () => {
     const originalGetURL = (globalThis as any).chrome.runtime.getURL;
     (globalThis as any).chrome.runtime.getURL = vi

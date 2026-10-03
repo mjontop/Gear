@@ -135,12 +135,14 @@ describe("spotlight hooks and algorithms", () => {
           windowId: 1,
           title: "Dashboard",
           url: "https://unique-query-term.com",
+          active: false,
         },
         {
           id: 100,
           windowId: 1,
           title: "Invalid URL Item unique-query-term",
           url: "invalid:url:%%",
+          active: false,
         },
       ];
 

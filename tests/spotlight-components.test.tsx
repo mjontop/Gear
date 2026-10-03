@@ -179,6 +179,61 @@ describe("Spotlight UI and Views", () => {
         false,
       );
     });
+
+    it("applies custom style preferences to dialog and container", () => {
+      const inputRef = createRef<HTMLInputElement>();
+      const overlayRef = createRef<HTMLDialogElement>();
+
+      const { container } = render(
+        <SpotlightView
+          inputRef={inputRef}
+          overlayRef={overlayRef}
+          searchValue=""
+          validUrl={null}
+          results={[]}
+          selectedTabIndex={0}
+          preferences={{
+            includeBookmarks: true,
+            includeHistory: true,
+            searchProvider: "google",
+            enableBackgroundBlur: true,
+            theme: "dark",
+            fontSize: 20,
+            fontWeight: "600",
+            fontFamily: "Inter",
+            fontColor: "#ffffff",
+            secondaryFontColor: "#aaaaaa",
+            accentColor: "#38bdf8",
+            borderRadius: 18,
+          }}
+          onClose={vi.fn()}
+          onSearchChange={vi.fn()}
+          onKeyDown={vi.fn()}
+          onSelectResult={vi.fn()}
+        />,
+      );
+
+      const dialog = overlayRef.current!;
+      expect(dialog.style.getPropertyValue("--spotlight-font-size")).toBe(
+        "20px",
+      );
+      expect(dialog.style.getPropertyValue("--spotlight-font-weight")).toBe(
+        "600",
+      );
+      expect(dialog.style.getPropertyValue("--spotlight-font-color")).toBe(
+        "#ffffff",
+      );
+      expect(dialog.style.getPropertyValue("--spotlight-border-radius")).toBe(
+        "18px",
+      );
+
+      const spotlightContainer = container.querySelector(
+        ".spotlight_container",
+      ) as HTMLElement;
+      expect(
+        spotlightContainer.style.getPropertyValue("--spotlight-border-radius"),
+      ).toBe("18px");
+    });
   });
 
   describe("Spotlight root component", () => {

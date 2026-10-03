@@ -2,17 +2,30 @@ import { useEffect, useRef, useState } from "react";
 import {
   DownloadIcon,
   ExternalLinkIcon,
+  EyeIcon,
   KeyboardIcon,
   MoonIcon,
   PaletteIcon,
+  RotateCcwIcon,
+  SearchIcon,
   SettingsIcon,
   SparklesIcon,
   SunIcon,
+  TypeIcon,
   UploadIcon,
 } from "lucide-react";
+import {
+  BORDER_RADIUS_PRESETS,
+  COLOR_PALETTE_PRESETS,
+  DEFAULT_STYLE_VALUES,
+  FONT_FAMILY_OPTIONS,
+  FONT_SIZE_PRESETS,
+  FONT_WEIGHT_OPTIONS,
+} from "@/constants";
 import { getCustomBangs, saveCustomBangs } from "@/lib/bangs-storage";
 import { isFirefoxBrowser } from "@/lib/favicon";
 import {
+  DEFAULT_STYLE_PREFERENCES,
   getSpotlightPreferences,
   saveSpotlightPreferences,
   type SpotlightPreferences,
@@ -133,6 +146,414 @@ const AppearanceCard = ({
     </div>
   </div>
 );
+
+type StylesCardProps = {
+  preferences: SpotlightPreferences;
+  onPreferenceChange: <K extends keyof SpotlightPreferences>(
+    key: K,
+    value: SpotlightPreferences[K],
+  ) => void;
+  onResetStyles: () => void;
+  onShowStatus: (text: string, type?: "success" | "error") => void;
+};
+
+const StylesCard = ({
+  preferences,
+  onPreferenceChange,
+  onResetStyles,
+  onShowStatus,
+}: StylesCardProps) => {
+  const currentFontSize = preferences.fontSize ?? DEFAULT_STYLE_VALUES.fontSize;
+  const currentFontWeight =
+    preferences.fontWeight ?? DEFAULT_STYLE_VALUES.fontWeight;
+  const currentFontFamily =
+    preferences.fontFamily ?? DEFAULT_STYLE_VALUES.fontFamily;
+  const currentFontColor = preferences.fontColor ?? "";
+  const currentSecondaryFontColor = preferences.secondaryFontColor ?? "";
+  const currentAccentColor = preferences.accentColor ?? "";
+  const currentBorderRadius =
+    preferences.borderRadius ?? DEFAULT_STYLE_VALUES.borderRadius;
+
+  const resolvedFontFamily =
+    FONT_FAMILY_OPTIONS.find(
+      (f) =>
+        f.id.toLowerCase() === currentFontFamily.toLowerCase() ||
+        f.name.toLowerCase() === currentFontFamily.toLowerCase(),
+    )?.value || currentFontFamily;
+
+  const handleApplyPalette = (
+    palette: (typeof COLOR_PALETTE_PRESETS)[number],
+  ) => {
+    onPreferenceChange("fontColor", palette.primary);
+    onPreferenceChange("secondaryFontColor", palette.secondary);
+    onPreferenceChange("accentColor", palette.accent);
+    onShowStatus(`Applied "${palette.name}" palette`);
+  };
+
+  return (
+    <div className="form_card">
+      <div className="form_header">
+        <div className="settings_card_title_row">
+          <TypeIcon size={18} className="settings_title_icon" />
+          <span className="form_title">Typography & Styles</span>
+        </div>
+        <button
+          type="button"
+          className="btn_reset_header"
+          onClick={onResetStyles}
+          title="Reset styles to defaults"
+        >
+          <RotateCcwIcon size={13} />
+          <span>Reset</span>
+        </button>
+      </div>
+
+      <p className="settings_subtitle">
+        Customize font size, weight, colors, typeface, and corner curvature.
+      </p>
+
+      {/* Live Preview */}
+      <div className="preview_section">
+        <div className="preview_label_row">
+          <EyeIcon size={14} className="preview_icon" />
+          <span className="preview_heading">Live Preview</span>
+        </div>
+        <div
+          className="spotlight_preview_container"
+          style={{
+            borderRadius: `${currentBorderRadius}px`,
+            fontFamily: resolvedFontFamily,
+          }}
+        >
+          <div className="preview_search_header">
+            <SearchIcon
+              size={18}
+              style={{
+                color: currentAccentColor || "var(--color-primary)",
+              }}
+              className="preview_search_icon"
+            />
+            <span
+              className="preview_search_text"
+              style={{
+                fontSize: `${currentFontSize}px`,
+                fontWeight: currentFontWeight,
+                color: currentFontColor || "inherit",
+              }}
+            >
+              Search or enter URL...
+            </span>
+          </div>
+          <div className="preview_results_list">
+            <div className="preview_item">
+              <span
+                className="preview_item_bullet"
+                style={{
+                  backgroundColor: currentAccentColor || "var(--color-primary)",
+                }}
+              />
+              <span
+                className="preview_item_title"
+                style={{
+                  fontSize: `calc(${currentFontSize}px * 0.9)`,
+                  fontWeight: currentFontWeight,
+                  color: currentFontColor || "inherit",
+                }}
+              >
+                GitHub Dashboard
+              </span>
+              <span
+                className="preview_item_badge"
+                style={{
+                  fontSize: `calc(${currentFontSize}px * 0.7)`,
+                  color: currentSecondaryFontColor || "var(--text-muted)",
+                }}
+              >
+                Jump to tab ↵
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Font Size */}
+      <div className="style_control_group">
+        <div className="style_control_header">
+          <label htmlFor="pref-font-size" className="style_control_label">
+            Font Size
+          </label>
+          <span className="style_value_badge">{currentFontSize}px</span>
+        </div>
+        <input
+          id="pref-font-size"
+          type="range"
+          min="12"
+          max="24"
+          step="1"
+          value={currentFontSize}
+          onChange={(e) =>
+            onPreferenceChange("fontSize", Number(e.target.value))
+          }
+          className="style_range_slider"
+          aria-label="Font size"
+        />
+        <div
+          className="preset_buttons_row"
+          role="group"
+          aria-label="Font size presets"
+        >
+          {FONT_SIZE_PRESETS.map((preset) => (
+            <button
+              key={preset.label}
+              type="button"
+              className={`preset_pill_btn ${currentFontSize === preset.value ? "preset_pill_btn_active" : ""}`}
+              onClick={() => onPreferenceChange("fontSize", preset.value)}
+            >
+              {preset.label} ({preset.value}px)
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Font Weight */}
+      <div className="style_control_group">
+        <div className="style_control_header">
+          <label className="style_control_label">Font Weight</label>
+          <span className="style_value_badge">
+            {FONT_WEIGHT_OPTIONS.find((o) => o.value === currentFontWeight)
+              ?.label || currentFontWeight}
+          </span>
+        </div>
+        <div
+          className="preset_buttons_row"
+          role="group"
+          aria-label="Font weight presets"
+        >
+          {FONT_WEIGHT_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`preset_pill_btn ${currentFontWeight === opt.value ? "preset_pill_btn_active" : ""}`}
+              onClick={() => onPreferenceChange("fontWeight", opt.value)}
+            >
+              {opt.label} ({opt.value})
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Font Family */}
+      <div className="style_control_group">
+        <div className="style_control_header">
+          <label htmlFor="pref-font-family" className="style_control_label">
+            Font Family
+          </label>
+        </div>
+        <select
+          id="pref-font-family"
+          value={currentFontFamily}
+          onChange={(e) => onPreferenceChange("fontFamily", e.target.value)}
+          className="style_select_input"
+          aria-label="Font family"
+        >
+          {FONT_FAMILY_OPTIONS.map((opt) => (
+            <option key={opt.id} value={opt.id}>
+              {opt.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Corner Radius */}
+      <div className="style_control_group">
+        <div className="style_control_header">
+          <label htmlFor="pref-border-radius" className="style_control_label">
+            Corner Radius
+          </label>
+          <span className="style_value_badge">{currentBorderRadius}px</span>
+        </div>
+        <input
+          id="pref-border-radius"
+          type="range"
+          min="0"
+          max="24"
+          step="2"
+          value={currentBorderRadius}
+          onChange={(e) =>
+            onPreferenceChange("borderRadius", Number(e.target.value))
+          }
+          className="style_range_slider"
+          aria-label="Corner radius"
+        />
+        <div
+          className="preset_buttons_row"
+          role="group"
+          aria-label="Corner radius presets"
+        >
+          {BORDER_RADIUS_PRESETS.map((preset) => (
+            <button
+              key={preset.label}
+              type="button"
+              className={`preset_pill_btn ${currentBorderRadius === preset.value ? "preset_pill_btn_active" : ""}`}
+              onClick={() => onPreferenceChange("borderRadius", preset.value)}
+            >
+              {preset.label} ({preset.value}px)
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Font Colors & Palettes */}
+      <div className="style_control_group">
+        <div className="style_control_header">
+          <label className="style_control_label">Color Palettes</label>
+        </div>
+        <div
+          className="palette_presets_row"
+          role="group"
+          aria-label="Color palettes"
+        >
+          {COLOR_PALETTE_PRESETS.map((palette) => (
+            <button
+              key={palette.name}
+              type="button"
+              className="palette_preset_btn"
+              onClick={() => handleApplyPalette(palette)}
+              title={`${palette.name} Palette`}
+            >
+              <span
+                className="palette_swatch"
+                style={{
+                  backgroundColor: palette.accent || "var(--color-primary)",
+                }}
+              />
+              <span>{palette.name}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="color_pickers_list">
+          {/* Primary Text Color */}
+          <div className="color_picker_row">
+            <label htmlFor="pref-font-color" className="color_picker_name">
+              Primary Text Color
+            </label>
+            <div className="color_picker_actions">
+              <input
+                id="pref-font-color"
+                type="color"
+                value={currentFontColor || "#ffffff"}
+                onChange={(e) =>
+                  onPreferenceChange("fontColor", e.target.value)
+                }
+                className="color_picker_swatch_input"
+                aria-label="Primary font color"
+              />
+              <input
+                type="text"
+                value={currentFontColor}
+                placeholder="Default"
+                onChange={(e) =>
+                  onPreferenceChange("fontColor", e.target.value)
+                }
+                className="color_hex_text_input"
+                aria-label="Primary font color hex code"
+              />
+              {currentFontColor && (
+                <button
+                  type="button"
+                  className="btn_clear_small"
+                  onClick={() => onPreferenceChange("fontColor", "")}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Secondary Font Color */}
+          <div className="color_picker_row">
+            <label
+              htmlFor="pref-secondary-font-color"
+              className="color_picker_name"
+            >
+              Secondary / Hint Color
+            </label>
+            <div className="color_picker_actions">
+              <input
+                id="pref-secondary-font-color"
+                type="color"
+                value={currentSecondaryFontColor || "#94a3b8"}
+                onChange={(e) =>
+                  onPreferenceChange("secondaryFontColor", e.target.value)
+                }
+                className="color_picker_swatch_input"
+                aria-label="Secondary font color"
+              />
+              <input
+                type="text"
+                value={currentSecondaryFontColor}
+                placeholder="Default"
+                onChange={(e) =>
+                  onPreferenceChange("secondaryFontColor", e.target.value)
+                }
+                className="color_hex_text_input"
+                aria-label="Secondary font color hex code"
+              />
+              {currentSecondaryFontColor && (
+                <button
+                  type="button"
+                  className="btn_clear_small"
+                  onClick={() => onPreferenceChange("secondaryFontColor", "")}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Accent Color */}
+          <div className="color_picker_row">
+            <label htmlFor="pref-accent-color" className="color_picker_name">
+              Accent / Highlight Color
+            </label>
+            <div className="color_picker_actions">
+              <input
+                id="pref-accent-color"
+                type="color"
+                value={currentAccentColor || "#38bdf8"}
+                onChange={(e) =>
+                  onPreferenceChange("accentColor", e.target.value)
+                }
+                className="color_picker_swatch_input"
+                aria-label="Accent color"
+              />
+              <input
+                type="text"
+                value={currentAccentColor}
+                placeholder="Default"
+                onChange={(e) =>
+                  onPreferenceChange("accentColor", e.target.value)
+                }
+                className="color_hex_text_input"
+                aria-label="Accent color hex code"
+              />
+              {currentAccentColor && (
+                <button
+                  type="button"
+                  className="btn_clear_small"
+                  onClick={() => onPreferenceChange("accentColor", "")}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 type ShortcutsCardProps = {
   shortcuts: {
@@ -429,6 +850,20 @@ export const SettingsView = ({
     }
   };
 
+  const handleResetStyles = () => {
+    onPreferenceChange("fontSize", DEFAULT_STYLE_PREFERENCES.fontSize);
+    onPreferenceChange("fontWeight", DEFAULT_STYLE_PREFERENCES.fontWeight);
+    onPreferenceChange("fontFamily", DEFAULT_STYLE_PREFERENCES.fontFamily);
+    onPreferenceChange("fontColor", DEFAULT_STYLE_PREFERENCES.fontColor);
+    onPreferenceChange(
+      "secondaryFontColor",
+      DEFAULT_STYLE_PREFERENCES.secondaryFontColor,
+    );
+    onPreferenceChange("accentColor", DEFAULT_STYLE_PREFERENCES.accentColor);
+    onPreferenceChange("borderRadius", DEFAULT_STYLE_PREFERENCES.borderRadius);
+    onShowStatus("Styles reset to defaults");
+  };
+
   return (
     <div className="settings_container">
       <AppearanceCard
@@ -438,6 +873,13 @@ export const SettingsView = ({
         onToggleBackgroundBlur={(enabled) =>
           onPreferenceChange("enableBackgroundBlur", enabled)
         }
+      />
+
+      <StylesCard
+        preferences={preferences}
+        onPreferenceChange={onPreferenceChange}
+        onResetStyles={handleResetStyles}
+        onShowStatus={onShowStatus}
       />
 
       <ShortcutsCard

@@ -289,6 +289,7 @@ export const Spotlight = () => {
       selectedTabIndex={visibleSelectedTabIndex}
       enableBackgroundBlur={preferences.enableBackgroundBlur}
       shouldSelectInputText={shouldSelectInputText}
+      preferences={preferences}
       onClose={() => {
         setIsOpen(false);
         resetSpotlight();
