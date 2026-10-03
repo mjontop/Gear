@@ -434,6 +434,25 @@ describe("UI Components", () => {
     );
   });
 
+  it("renders SourcesView with fallback default provider when searchProvider is omitted", () => {
+    render(
+      <SourcesView
+        preferences={
+          {
+            includeBookmarks: true,
+            includeHistory: true,
+            enableBackgroundBlur: true,
+            theme: "dark",
+          } as any
+        }
+        onPreferenceChange={vi.fn()}
+      />,
+    );
+
+    const googleRadio = screen.getByDisplayValue("google") as HTMLInputElement;
+    expect(googleRadio.checked).toBe(true);
+  });
+
   it("renders SettingsView with themes, background blur, and shortcuts", () => {
     const onPreferenceChange = vi.fn();
     render(
@@ -547,13 +566,47 @@ describe("UI Components", () => {
     expect(onShowStatus).toHaveBeenCalledWith('Applied "Emerald" palette');
 
     // Custom color input & clear
+    const fontColorSwatch = screen.getByLabelText("Primary font color");
+    fireEvent.change(fontColorSwatch, { target: { value: "#abcdef" } });
+    expect(onPreferenceChange).toHaveBeenCalledWith("fontColor", "#abcdef");
+
     const fontColorInput = screen.getByLabelText("Primary font color hex code");
     fireEvent.change(fontColorInput, { target: { value: "#123456" } });
     expect(onPreferenceChange).toHaveBeenCalledWith("fontColor", "#123456");
 
+    const secColorSwatch = screen.getByLabelText("Secondary font color");
+    fireEvent.change(secColorSwatch, { target: { value: "#654321" } });
+    expect(onPreferenceChange).toHaveBeenCalledWith(
+      "secondaryFontColor",
+      "#654321",
+    );
+
+    const secColorInput = screen.getByLabelText(
+      "Secondary font color hex code",
+    );
+    fireEvent.change(secColorInput, { target: { value: "#555555" } });
+    expect(onPreferenceChange).toHaveBeenCalledWith(
+      "secondaryFontColor",
+      "#555555",
+    );
+
+    const accentColorSwatch = screen.getByLabelText("Accent color");
+    fireEvent.change(accentColorSwatch, { target: { value: "#778899" } });
+    expect(onPreferenceChange).toHaveBeenCalledWith("accentColor", "#778899");
+
+    const accentColorInput = screen.getByLabelText("Accent color hex code");
+    fireEvent.change(accentColorInput, { target: { value: "#8899aa" } });
+    expect(onPreferenceChange).toHaveBeenCalledWith("accentColor", "#8899aa");
+
     const clearBtns = screen.getAllByRole("button", { name: "Clear" });
     fireEvent.click(clearBtns[0]);
     expect(onPreferenceChange).toHaveBeenCalledWith("fontColor", "");
+
+    fireEvent.click(clearBtns[1]);
+    expect(onPreferenceChange).toHaveBeenCalledWith("secondaryFontColor", "");
+
+    fireEvent.click(clearBtns[2]);
+    expect(onPreferenceChange).toHaveBeenCalledWith("accentColor", "");
 
     // Reset styles
     const resetBtn = screen.getByRole("button", {
@@ -562,6 +615,43 @@ describe("UI Components", () => {
     fireEvent.click(resetBtn);
     expect(onPreferenceChange).toHaveBeenCalledWith("fontSize", 16);
     expect(onShowStatus).toHaveBeenCalledWith("Styles reset to defaults");
+  });
+
+  it("handles SettingsView shortcuts fallback to window.open when chrome.tabs.create is unavailable", () => {
+    const originalTabs = (globalThis as any).chrome.tabs;
+    (globalThis as any).chrome.tabs = undefined;
+    const windowOpenSpy = vi
+      .spyOn(window, "open")
+      .mockImplementation(() => null);
+
+    try {
+      render(
+        <SettingsView
+          preferences={{
+            includeBookmarks: true,
+            includeHistory: true,
+            searchProvider: "google",
+            enableBackgroundBlur: true,
+            theme: "dark",
+          }}
+          onPreferenceChange={vi.fn()}
+          onShowStatus={vi.fn()}
+        />,
+      );
+
+      const openShortcutsBtn = screen.getByRole("button", {
+        name: /Configure Shortcuts in Browser/i,
+      });
+      fireEvent.click(openShortcutsBtn);
+      expect(windowOpenSpy).toHaveBeenCalledWith(
+        "chrome://extensions/shortcuts",
+        "_blank",
+        "noopener,noreferrer",
+      );
+    } finally {
+      (globalThis as any).chrome.tabs = originalTabs;
+      windowOpenSpy.mockRestore();
+    }
   });
 
   it("handles SettingsView shortcuts in Firefox environment", () => {

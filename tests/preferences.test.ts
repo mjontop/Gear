@@ -138,6 +138,34 @@ describe("preferences", () => {
     expect(result.current.preferences.theme).toBe("dark");
     expect(result.current.preferences.searchProvider).toBe("bing");
 
+    // Area "managed" should be ignored
+    await act(async () => {
+      storageListener(
+        {
+          [SPOTLIGHT_PREFERENCES_STORAGE_KEY]: {
+            newValue: { theme: "light" },
+          },
+        },
+        "managed",
+      );
+    });
+    expect(result.current.preferences.theme).toBe("dark");
+
+    // Area "local" with undefined newValue should fallback to defaults
+    await act(async () => {
+      storageListener(
+        {
+          [SPOTLIGHT_PREFERENCES_STORAGE_KEY]: {
+            newValue: undefined,
+          },
+        },
+        "local",
+      );
+    });
+    expect(result.current.preferences.theme).toBe(
+      DEFAULT_SPOTLIGHT_PREFERENCES.theme,
+    );
+
     unmount();
   });
 

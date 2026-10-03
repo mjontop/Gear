@@ -60,13 +60,13 @@ export function getSpotlightStyleVariables(
       ? fontOpt.value
       : preferences.fontFamily;
   }
-  if (preferences.fontColor) {
+  if (preferences.fontColor !== undefined) {
     styles["--spotlight-font-color"] = preferences.fontColor;
   }
-  if (preferences.secondaryFontColor) {
+  if (preferences.secondaryFontColor !== undefined) {
     styles["--spotlight-secondary-font-color"] = preferences.secondaryFontColor;
   }
-  if (preferences.accentColor) {
+  if (preferences.accentColor !== undefined) {
     styles["--spotlight-accent-color"] = preferences.accentColor;
   }
   if (preferences.borderRadius !== undefined) {

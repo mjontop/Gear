@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { getBangs, parseQueryWithBangs } from "@/lib/bangs";
-import { saveCustomBangs } from "@/lib/bangs-storage";
+import { CUSTOM_BANGS_STORAGE_KEY, saveCustomBangs } from "@/lib/bangs-storage";
+import { triggerStorageChanged } from "./setup";
 
 describe("bangs", () => {
   it("returns default bangs initially", () => {
@@ -45,5 +46,24 @@ describe("bangs", () => {
     const parsed = parseQueryWithBangs("!custom test");
     expect(parsed.bang).toBe("!custom");
     expect(parsed.bangUrl).toBe("https://custom.search.io?q=%s");
+  });
+
+  it("handles storage onChanged edge cases such as non-sync/local areas, missing keys, and empty newValues", () => {
+    // Call listener with non-sync/local area (e.g. managed)
+    triggerStorageChanged(
+      { [CUSTOM_BANGS_STORAGE_KEY]: { newValue: { "!managed": "url" } } },
+      "managed",
+    );
+    expect(getBangs()["!managed"]).toBeUndefined();
+
+    // Call listener with unrelated change in sync
+    triggerStorageChanged({ "unrelated-key": { newValue: "val" } }, "sync");
+
+    // Call listener with custom-bangs having falsy/undefined newValue (cleared)
+    triggerStorageChanged(
+      { [CUSTOM_BANGS_STORAGE_KEY]: { newValue: undefined } },
+      "local",
+    );
+    expect(getBangs()["!custom"]).toBeUndefined();
   });
 });

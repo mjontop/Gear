@@ -4,12 +4,23 @@ import React from "react";
 import ContentApp from "@/content/views/App";
 import PopupApp from "@/popup/App";
 
+import { SPOTLIGHT_PREFERENCES_STORAGE_KEY } from "@/constants";
+
 describe("Application Root Views", () => {
   describe("Content App (content/views/App.tsx)", () => {
-    it("renders ContentApp and sets data-theme on host container", async () => {
+    it("renders ContentApp and sets data-theme and style variables on host container", async () => {
       const hostElem = document.createElement("div");
       hostElem.id = "crxjs-app";
       document.body.appendChild(hostElem);
+
+      await (globalThis as any).chrome.storage.sync.set({
+        [SPOTLIGHT_PREFERENCES_STORAGE_KEY]: {
+          fontSize: 18,
+          fontColor: "",
+          secondaryFontColor: "",
+          accentColor: "",
+        },
+      });
 
       let container: any;
       await act(async () => {
@@ -41,6 +52,20 @@ describe("Application Root Views", () => {
       expect(screen.getByText("Gear Manager")).toBeInTheDocument();
       expect(screen.getByText("Add Custom Bang")).toBeInTheDocument();
 
+      // Typing into inputs when no errors exist (false branch of if (formErrors...))
+      const prefixInput = screen.getByPlaceholderText("e.g. !gh, !ddg");
+      fireEvent.change(prefixInput, { target: { value: "!temp" } });
+      const urlInput = screen.getByPlaceholderText(
+        "https://github.com/search?q=%s",
+      );
+      fireEvent.change(urlInput, {
+        target: { value: "https://temp.com?q=%s" },
+      });
+
+      // Clear inputs to trigger validation errors
+      fireEvent.change(prefixInput, { target: { value: "" } });
+      fireEvent.change(urlInput, { target: { value: "" } });
+
       // Trigger validation error on Bang form by submitting empty inputs
       const addBangBtn = screen.getByRole("button", { name: /Add Bang/i });
       await act(async () => {
@@ -53,14 +78,10 @@ describe("Application Root Views", () => {
         screen.getByText("Destination URL cannot be empty."),
       ).toBeInTheDocument();
 
-      // Typing into inputs should clear the error states
-      const prefixInput = screen.getByPlaceholderText("e.g. !gh, !ddg");
+      // Typing into inputs when errors exist (true branch of if (formErrors...))
       fireEvent.change(prefixInput, { target: { value: "!myb" } });
       expect(screen.queryByText("Bang prefix cannot be empty.")).toBeNull();
 
-      const urlInput = screen.getByPlaceholderText(
-        "https://github.com/search?q=%s",
-      );
       fireEvent.change(urlInput, {
         target: { value: "https://mysite.com?q=%s" },
       });
@@ -74,6 +95,20 @@ describe("Application Root Views", () => {
       fireEvent.click(screen.getByText("Bookmarks"));
       expect(screen.getByText("Add New Bookmark")).toBeInTheDocument();
 
+      // Typing when no errors exist (false branch of if (formErrors...))
+      const titleInput = screen.getByPlaceholderText(
+        "e.g. !f Facebook, GitHub Dashboard",
+      );
+      fireEvent.change(titleInput, { target: { value: "Initial Title" } });
+      const bmUrlInput = screen.getByPlaceholderText("https://facebook.com");
+      fireEvent.change(bmUrlInput, {
+        target: { value: "https://initial.com" },
+      });
+
+      // Clear inputs to trigger validation error
+      fireEvent.change(titleInput, { target: { value: "" } });
+      fireEvent.change(bmUrlInput, { target: { value: "" } });
+
       // Trigger bookmark validation error by submitting empty
       const addBmBtn = screen.getByRole("button", { name: /Add Bookmark/i });
       await act(async () => {
@@ -82,14 +117,10 @@ describe("Application Root Views", () => {
       expect(screen.getByText("Title cannot be empty.")).toBeInTheDocument();
       expect(screen.getByText("URL cannot be empty.")).toBeInTheDocument();
 
-      // Typing should clear errors
-      const titleInput = screen.getByPlaceholderText(
-        "e.g. !f Facebook, GitHub Dashboard",
-      );
+      // Typing should clear errors (true branch of if (formErrors...))
       fireEvent.change(titleInput, { target: { value: "My Book" } });
       expect(screen.queryByText("Title cannot be empty.")).toBeNull();
 
-      const bmUrlInput = screen.getByPlaceholderText("https://facebook.com");
       fireEvent.change(bmUrlInput, { target: { value: "https://mybook.com" } });
       expect(screen.queryByText("URL cannot be empty.")).toBeNull();
 
@@ -161,6 +192,30 @@ describe("Application Root Views", () => {
 
       expect(screen.queryByText("Preferences saved")).toBeNull();
       vi.useRealTimers();
+    });
+
+    it("renders error status message banner with alert icon", async () => {
+      render(<PopupApp />);
+
+      fireEvent.click(screen.getByText("Settings"));
+      const originalCreateObjectURL = window.URL.createObjectURL;
+      window.URL.createObjectURL = vi.fn(() => {
+        throw new Error("Blob error");
+      });
+
+      try {
+        const exportBtn = screen.getByRole("button", {
+          name: /Export Backup/i,
+        });
+        await act(async () => {
+          fireEvent.click(exportBtn);
+        });
+
+        expect(screen.getByText("Failed to export backup")).toBeInTheDocument();
+        expect(document.querySelector(".status_error")).toBeInTheDocument();
+      } finally {
+        window.URL.createObjectURL = originalCreateObjectURL;
+      }
     });
   });
 });

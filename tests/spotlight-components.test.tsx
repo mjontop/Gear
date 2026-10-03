@@ -234,6 +234,67 @@ describe("Spotlight UI and Views", () => {
         spotlightContainer.style.getPropertyValue("--spotlight-border-radius"),
       ).toBe("18px");
     });
+
+    it("handles shouldSelectInputText, enableBackgroundBlur disabled, and dialog cleanup", () => {
+      const inputRef = createRef<HTMLInputElement>();
+      const overlayRef = createRef<HTMLDialogElement>();
+
+      const { unmount, rerender } = render(
+        <SpotlightView
+          inputRef={inputRef}
+          overlayRef={overlayRef}
+          searchValue="initial text"
+          validUrl={null}
+          results={[]}
+          selectedTabIndex={0}
+          enableBackgroundBlur={false}
+          shouldSelectInputText={true}
+          preferences={{
+            includeBookmarks: true,
+            includeHistory: true,
+            searchProvider: "google",
+            enableBackgroundBlur: false,
+            theme: "dark",
+          }}
+          onClose={vi.fn()}
+          onSearchChange={vi.fn()}
+          onKeyDown={vi.fn()}
+          onSelectResult={vi.fn()}
+        />,
+      );
+
+      const dialog = overlayRef.current!;
+      expect(dialog.classList.contains("spotlight_overlay_no_blur")).toBe(true);
+      expect(dialog.showModal).toHaveBeenCalled();
+
+      // Rerender when dialog is already open to verify early return
+      rerender(
+        <SpotlightView
+          inputRef={inputRef}
+          overlayRef={overlayRef}
+          searchValue="changed text"
+          validUrl={null}
+          results={[]}
+          selectedTabIndex={0}
+          enableBackgroundBlur={false}
+          shouldSelectInputText={true}
+          preferences={{
+            includeBookmarks: true,
+            includeHistory: true,
+            searchProvider: "google",
+            enableBackgroundBlur: false,
+            theme: "dark",
+          }}
+          onClose={vi.fn()}
+          onSearchChange={vi.fn()}
+          onKeyDown={vi.fn()}
+          onSelectResult={vi.fn()}
+        />,
+      );
+
+      unmount();
+      expect(dialog.close).toHaveBeenCalled();
+    });
   });
 
   describe("Spotlight root component", () => {
@@ -262,6 +323,29 @@ describe("Spotlight UI and Views", () => {
       expect(
         screen.queryByPlaceholderText("Search or Enter URL...."),
       ).toBeNull();
+    });
+
+    it("opens spotlight prefilled with URL on OPEN_SPOTLIGHT_WITH_URL message", async () => {
+      let messageListener: any;
+      (globalThis as any).chrome.runtime.onMessage.addListener = vi.fn((fn) => {
+        messageListener = fn;
+      });
+
+      render(<Spotlight />);
+
+      await act(async () => {
+        messageListener({
+          type: MESSAGE_TYPES.OPEN_SPOTLIGHT_WITH_URL,
+          url: "https://example.com/active-page",
+        });
+        await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+      });
+
+      const input = screen.getByPlaceholderText(
+        "Search or Enter URL....",
+      ) as HTMLInputElement;
+      expect(input).toBeInTheDocument();
+      expect(input.value).toBe("https://example.com/active-page");
     });
 
     it("handles keyboard navigation and tab autocomplete in Spotlight", async () => {
@@ -616,6 +700,82 @@ describe("Spotlight UI and Views", () => {
         (globalThis as any).chrome.runtime.sendMessage = originalSendMessage;
         windowOpenSpy.mockRestore();
       }
+    });
+
+    it("handles search suggestion with active bang format", async () => {
+      let messageListener: any;
+      (globalThis as any).chrome.runtime.onMessage.addListener = vi.fn((fn) => {
+        messageListener = fn;
+      });
+
+      (globalThis as any).chrome.runtime.sendMessage = vi.fn(
+        (msg: any, cb: any) => {
+          if (msg.type === MESSAGE_TYPES.GET_SEARCH_SUGGESTIONS && cb) {
+            cb({
+              suggestions: [
+                {
+                  id: "s_bang",
+                  title: "gear repo",
+                  url: "",
+                  query: "gear repo",
+                },
+              ],
+            });
+          }
+        },
+      );
+
+      render(<Spotlight />);
+
+      await act(async () => {
+        messageListener({ type: MESSAGE_TYPES.TOGGLE_SPOTLIGHT });
+      });
+
+      const input = screen.getByPlaceholderText("Search or Enter URL....");
+      fireEvent.change(input, { target: { value: "!wi gear" } });
+
+      const suggestionBtn = await screen.findByRole("button", {
+        name: /gear repo/i,
+      });
+
+      await act(async () => {
+        fireEvent.click(suggestionBtn);
+      });
+
+      expect(
+        (globalThis as any).chrome.runtime.sendMessage,
+      ).toHaveBeenCalledWith({
+        type: MESSAGE_TYPES.OPEN_URL,
+        url: "https://www.google.com/search?q=gear%20repo+site:wikipedia.org",
+      });
+    });
+
+    it("redirects to web search provider on Enter when no result is selected", async () => {
+      let messageListener: any;
+      (globalThis as any).chrome.runtime.onMessage.addListener = vi.fn((fn) => {
+        messageListener = fn;
+      });
+      (globalThis as any).chrome.runtime.sendMessage = vi.fn();
+
+      render(<Spotlight />);
+
+      await act(async () => {
+        messageListener({ type: MESSAGE_TYPES.TOGGLE_SPOTLIGHT });
+      });
+
+      const input = screen.getByPlaceholderText("Search or Enter URL....");
+      fireEvent.change(input, { target: { value: "my direct search" } });
+
+      await act(async () => {
+        fireEvent.keyDown(input, { key: "Enter" });
+      });
+
+      expect(
+        (globalThis as any).chrome.runtime.sendMessage,
+      ).toHaveBeenCalledWith({
+        type: MESSAGE_TYPES.OPEN_URL,
+        url: "https://www.google.com/search?q=my%20direct%20search",
+      });
     });
   });
 });

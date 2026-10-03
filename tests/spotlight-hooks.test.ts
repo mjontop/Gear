@@ -94,6 +94,21 @@ describe("spotlight hooks and algorithms", () => {
       expect(results[0].title.toLowerCase()).toContain("react");
     });
 
+    it("scores correctly when rawQuery differs from cleanQuery (e.g. with bang)", () => {
+      const results = getSpotlightResults({
+        tabs: mockTabs,
+        bookmarks: mockBookmarks,
+        history: mockHistory,
+        searchSuggestions: [],
+        rawQuery: "!g react",
+        cleanQuery: "react",
+        maxResults: 5,
+      });
+
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].title.toLowerCase()).toContain("react");
+    });
+
     it("deduplicates identical URLs across sources", () => {
       const duplicateHistory = [
         {
@@ -141,7 +156,14 @@ describe("spotlight hooks and algorithms", () => {
           id: 100,
           windowId: 1,
           title: "Invalid URL Item unique-query-term",
-          url: "invalid:url:%%",
+          url: "not a valid url without protocol",
+          active: false,
+        },
+        {
+          id: 101,
+          windowId: 1,
+          title: "Completely Unmatched Title",
+          url: "https://completely-unmatched-url.com",
           active: false,
         },
       ];
@@ -159,6 +181,7 @@ describe("spotlight hooks and algorithms", () => {
       expect(results).toHaveLength(2);
       expect(results[0].id).toBe(100);
       expect(results[1].id).toBe(99);
+      expect(results.some((r) => r.id === 101)).toBe(false);
     });
 
     it("allocates slots for search suggestions and preserves local results", () => {

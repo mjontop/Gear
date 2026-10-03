@@ -391,6 +391,7 @@ describe("popup custom hooks", () => {
       const onStatus = vi.fn();
       const { result } = renderHook(() => useBookmarksManager(onStatus));
 
+      // Delete another bookmark while editing bm1
       await act(async () => {
         result.current.handleEditClick({
           id: "bm1",
@@ -398,7 +399,15 @@ describe("popup custom hooks", () => {
           url: "https://vitest.dev",
         });
       });
+      expect(result.current.editingId).toBe("bm1");
 
+      await act(async () => {
+        await result.current.handleDelete("bm-other");
+      });
+      // editingId should still be bm1 because bm-other was deleted
+      expect(result.current.editingId).toBe("bm1");
+
+      // Delete the currently edited bookmark bm1
       await act(async () => {
         await result.current.handleDelete("bm1");
       });

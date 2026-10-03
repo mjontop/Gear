@@ -99,6 +99,15 @@ describe("bookmarks-manager", () => {
         url: "https://newtab.com",
       });
 
+      // When node has empty title
+      (globalThis as any).chrome.bookmarks.create = vi.fn().mockResolvedValue({
+        id: "bm_fallback",
+        title: "",
+        url: "https://fallback.com",
+      });
+      const fallbackTitle = await addBookmark("", "https://fallback.com");
+      expect(fallbackTitle?.title).toBe("https://fallback.com");
+
       // When node has no url
       (globalThis as any).chrome.bookmarks.create = vi
         .fn()

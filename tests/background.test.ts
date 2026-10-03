@@ -77,6 +77,16 @@ describe("background script", () => {
     );
   });
 
+  it("ignores unrecognized commands", async () => {
+    (globalThis as any).chrome.tabs.query = vi
+      .fn()
+      .mockResolvedValue([{ id: 105, url: "https://vitest.dev" }]);
+
+    await commandListener("unknown-command");
+
+    expect((globalThis as any).chrome.tabs.sendMessage).not.toHaveBeenCalled();
+  });
+
   it("handles runtime message: GET_OPEN_TABS", async () => {
     (globalThis as any).chrome.tabs.query = vi.fn().mockResolvedValue([
       {

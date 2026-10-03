@@ -151,9 +151,21 @@ describe("bangs-storage", () => {
       const originalSync = (globalThis as any).chrome.storage.sync;
       (globalThis as any).chrome.storage.sync = undefined;
 
+      // Empty in local storage returns {}
+      const emptyLoaded = await getCustomBangs();
+      expect(emptyLoaded).toEqual({});
+
       await saveCustomBangs({ "!local": "https://local.test?q=%s" });
       const loaded = await getCustomBangs();
       expect(loaded["!local"]).toBe("https://local.test?q=%s");
+
+      // Local storage save error
+      (globalThis as any).chrome.storage.local.set = vi
+        .fn()
+        .mockRejectedValue(new Error("Local error"));
+      await expect(saveCustomBangs({ "!fail": "url" })).rejects.toThrow(
+        "Local error",
+      );
 
       (globalThis as any).chrome.storage.sync = originalSync;
     });

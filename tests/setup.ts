@@ -12,6 +12,15 @@ export const resetStorageMocks = () => {
   localStorage = {};
 };
 
+export const triggerStorageChanged = (
+  changes: Record<string, any>,
+  area: string,
+) => {
+  for (const listener of storageListeners) {
+    listener(changes, area);
+  }
+};
+
 export const getStorageData = () => ({ syncStorage, localStorage });
 
 export const createChromeMock = () => {
@@ -161,6 +170,19 @@ if (typeof window !== "undefined") {
   });
 
   window.Element.prototype.scrollIntoView = vi.fn();
+
+  if (typeof HTMLDialogElement !== "undefined") {
+    HTMLDialogElement.prototype.showModal = vi.fn(function (
+      this: HTMLDialogElement,
+    ) {
+      this.open = true;
+    });
+    HTMLDialogElement.prototype.close = vi.fn(function (
+      this: HTMLDialogElement,
+    ) {
+      this.open = false;
+    });
+  }
 }
 
 beforeEach(() => {

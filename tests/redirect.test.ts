@@ -129,4 +129,10 @@ describe("getRedirectUrl", () => {
       "https://www.google.com/search?q=vite%20react",
     );
   });
+
+  it("falls back to s.trim() when cleanQuery is empty with unrecognized bang", () => {
+    expect(getRedirectUrl("!unrecognizedbang")).toBe(
+      "https://www.google.com/search?q=!unrecognizedbang",
+    );
+  });
 });
