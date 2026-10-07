@@ -232,14 +232,11 @@ export const SidebarArchiveView = ({
                       type="button"
                       className="sidebar_tab_main_btn"
                       onClick={() => handleOpenUrl(item.url)}
-                      title={item.title}
+                      title={item.url}
                     >
                       <FaviconImage favIconUrl={item.favIconUrl} />
                       <div className="sidebar_item_info">
                         <span className="sidebar_item_title">{item.title}</span>
-                        <span className="sidebar_item_domain sidebar_item_url">
-                          {item.url.replace(/^https?:\/\//i, "")}
-                        </span>
                       </div>
                     </button>
                     <button

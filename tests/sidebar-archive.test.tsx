@@ -54,6 +54,15 @@ describe("SidebarArchiveView", () => {
     // Shows title
     expect(screen.getByText("GitHub Repository")).toBeInTheDocument();
 
+    // Has URL tooltip on main item button
+    const mainItemBtn = screen.getByRole("button", {
+      name: "GitHub Repository",
+    });
+    expect(mainItemBtn).toHaveAttribute(
+      "title",
+      "https://github.com/manikantjha/gear",
+    );
+
     // Verify copy button exists
     const copyBtn = screen.getByRole("button", {
       name: "Copy URL",
@@ -133,6 +142,7 @@ describe("SidebarArchiveView", () => {
     render(<SidebarArchiveView onBack={onBack} onClose={onClose} />);
 
     const itemBtn = screen.getByRole("button", { name: /Test Tab/i });
+    expect(itemBtn).toHaveAttribute("title", "https://test.com");
     fireEvent.click(itemBtn);
 
     expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({

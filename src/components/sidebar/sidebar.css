@@ -417,29 +417,6 @@ button.sidebar_list_item {
   color: #22c55e !important;
 }
 
-.sidebar_item_url {
-  font-size: 0.72rem !important;
-  color: var(
-    --color-spotlight-placeholder,
-    rgba(255, 255, 255, 0.42)
-  ) !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-}
-
-.sidebar_archive_item .sidebar_item_url,
-.sidebar_archive_item .sidebar_item_domain {
-  display: none !important;
-}
-
-.sidebar_archive_item:hover .sidebar_item_url,
-.sidebar_archive_item:hover .sidebar_item_domain,
-.sidebar_archive_item:focus-within .sidebar_item_url,
-.sidebar_archive_item:focus-within .sidebar_item_domain {
-  display: block !important;
-}
-
 .sidebar_bookmark_tag_icon {
   color: #eab308 !important;
   margin-left: auto !important;
