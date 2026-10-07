@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  DEFAULT_ARCHIVE_CONFIG,
   DEFAULT_SEARCH_PROVIDER_ID,
   DEFAULT_STYLE_VALUES,
   FONT_FAMILY_OPTIONS,
@@ -17,6 +18,9 @@ export type SpotlightPreferences = {
   searchProvider: SearchProviderId;
   enableBackgroundBlur: boolean;
   theme: ThemeMode;
+  autoCloseDiscardedTabs?: boolean;
+  maxArchivedTabs?: number;
+  archiveRetentionDays?: number;
   fontSize?: number;
   fontWeight?: string;
   fontFamily?: string;
@@ -34,6 +38,9 @@ export const DEFAULT_SPOTLIGHT_PREFERENCES: SpotlightPreferences = {
   searchProvider: DEFAULT_SEARCH_PROVIDER_ID,
   enableBackgroundBlur: true,
   theme: "dark",
+  autoCloseDiscardedTabs: DEFAULT_ARCHIVE_CONFIG.AUTO_CLOSE_DISCARDED,
+  maxArchivedTabs: DEFAULT_ARCHIVE_CONFIG.MAX_ARCHIVED_TABS,
+  archiveRetentionDays: DEFAULT_ARCHIVE_CONFIG.RETENTION_DAYS,
   ...DEFAULT_STYLE_VALUES,
 };
 

@@ -1,5 +1,8 @@
 import "@testing-library/jest-dom/vitest";
 import { vi, beforeEach } from "vitest";
+import { configure } from "@testing-library/react";
+
+configure({ asyncUtilTimeout: 4000 });
 
 let syncStorage: Record<string, any> = {};
 let localStorage: Record<string, any> = {};
@@ -118,6 +121,11 @@ export const createChromeMock = () => {
         id: tabId,
         ...props,
       })),
+      remove: vi.fn(async () => {}),
+      onUpdated: {
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+      },
     },
     windows: {
       update: vi.fn(async (winId: number, props: any) => ({

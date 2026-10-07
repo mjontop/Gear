@@ -27,11 +27,17 @@ describe("preferences", () => {
       ...DEFAULT_SPOTLIGHT_PREFERENCES,
       theme: "light",
       searchProvider: "duckduckgo",
+      autoCloseDiscardedTabs: false,
+      maxArchivedTabs: 250,
+      archiveRetentionDays: 14,
     });
 
     const updated = await getSpotlightPreferences();
     expect(updated.theme).toBe("light");
     expect(updated.searchProvider).toBe("duckduckgo");
+    expect(updated.autoCloseDiscardedTabs).toBe(false);
+    expect(updated.maxArchivedTabs).toBe(250);
+    expect(updated.archiveRetentionDays).toBe(14);
   });
 
   it("falls back to storage.local when sync storage is unavailable or empty", async () => {

@@ -87,11 +87,19 @@ export const SEARCH_RESULT_PRIORITY = {
 export const STORAGE_KEYS = {
   SPOTLIGHT_PREFERENCES: "gear_spotlight_preferences",
   CUSTOM_BANGS: "gear_custom_bangs",
+  ARCHIVED_TABS: "gear_archived_tabs",
 } as const;
 
 export const SPOTLIGHT_PREFERENCES_STORAGE_KEY =
   STORAGE_KEYS.SPOTLIGHT_PREFERENCES;
 export const CUSTOM_BANGS_STORAGE_KEY = STORAGE_KEYS.CUSTOM_BANGS;
+export const ARCHIVED_TABS_STORAGE_KEY = STORAGE_KEYS.ARCHIVED_TABS;
+
+export const DEFAULT_ARCHIVE_CONFIG = {
+  AUTO_CLOSE_DISCARDED: true,
+  MAX_ARCHIVED_TABS: 100,
+  RETENTION_DAYS: 7,
+} as const;
 
 export const COMMAND_NAMES = {
   TOGGLE_SPOTLIGHT: "toggle-spotlight",

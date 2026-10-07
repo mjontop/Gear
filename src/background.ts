@@ -4,7 +4,22 @@ import { getHistory } from "./background-tasks/history";
 import { getOpenTabs } from "./background-tasks/open-tabs";
 import { getSearchSuggestions } from "./background-tasks/search-suggestions";
 import { switchToTab } from "./background-tasks/switch-tab";
+import { handleTabDiscarded } from "./background-tasks/discarded-tabs";
+import { pruneExpiredArchivedTabs } from "./lib/archived-tabs-storage";
+import { getSpotlightPreferences } from "./lib/preferences";
 import type { RuntimeMessage } from "./background-tasks/types";
+
+getSpotlightPreferences()
+  .then((prefs) =>
+    pruneExpiredArchivedTabs(prefs.maxArchivedTabs, prefs.archiveRetentionDays),
+  )
+  .catch(() => {});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.discarded) {
+    handleTabDiscarded(tabId, changeInfo, tab).catch(() => {});
+  }
+});
 
 chrome.commands.onCommand.addListener(async (command) => {
   if (command === COMMAND_NAMES.TOGGLE_SPOTLIGHT) {

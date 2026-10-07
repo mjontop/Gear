@@ -8,6 +8,8 @@ import {
   COMMAND_NAMES,
   MESSAGE_TYPES,
   SEARCH_RESULT_PRIORITY,
+  DEFAULT_ARCHIVE_CONFIG,
+  ARCHIVED_TABS_STORAGE_KEY,
 } from "@/constants";
 
 describe("constants and isRestrictedUrl", () => {
@@ -53,5 +55,12 @@ describe("constants and isRestrictedUrl", () => {
     expect(SEARCH_RESULT_PRIORITY.OPEN_TAB).toBeLessThan(
       SEARCH_RESULT_PRIORITY.BOOKMARK,
     );
+  });
+
+  it("defines valid default archive configuration and storage keys", () => {
+    expect(ARCHIVED_TABS_STORAGE_KEY).toBe("gear_archived_tabs");
+    expect(DEFAULT_ARCHIVE_CONFIG.AUTO_CLOSE_DISCARDED).toBe(true);
+    expect(DEFAULT_ARCHIVE_CONFIG.MAX_ARCHIVED_TABS).toBe(100);
+    expect(DEFAULT_ARCHIVE_CONFIG.RETENTION_DAYS).toBe(7);
   });
 });

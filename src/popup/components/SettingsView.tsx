@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getCustomBangs, saveCustomBangs } from "@/lib/bangs-storage";
 import { isFirefoxBrowser } from "@/lib/favicon";
+import { DEFAULT_ARCHIVE_CONFIG } from "@/constants";
 import {
   DEFAULT_STYLE_PREFERENCES,
   getSpotlightPreferences,
@@ -11,6 +12,7 @@ import { AppearanceCard } from "./settings/AppearanceCard";
 import { BackupRestoreCard } from "./settings/BackupRestoreCard";
 import { ShortcutsCard } from "./settings/ShortcutsCard";
 import { StylesCard } from "./settings/StylesCard";
+import { TabArchiveCard } from "./settings/TabArchiveCard";
 
 export type SettingsViewProps = {
   preferences: SpotlightPreferences;
@@ -188,6 +190,28 @@ export const SettingsView = ({
         shortcuts={shortcuts}
         isFirefox={isFirefox}
         onOpenShortcuts={handleOpenShortcuts}
+      />
+
+      <TabArchiveCard
+        autoCloseDiscardedTabs={
+          preferences.autoCloseDiscardedTabs ??
+          DEFAULT_ARCHIVE_CONFIG.AUTO_CLOSE_DISCARDED
+        }
+        maxArchivedTabs={
+          preferences.maxArchivedTabs ??
+          DEFAULT_ARCHIVE_CONFIG.MAX_ARCHIVED_TABS
+        }
+        archiveRetentionDays={
+          preferences.archiveRetentionDays ??
+          DEFAULT_ARCHIVE_CONFIG.RETENTION_DAYS
+        }
+        onToggleAutoClose={(enabled) =>
+          onPreferenceChange("autoCloseDiscardedTabs", enabled)
+        }
+        onChangeMaxTabs={(max) => onPreferenceChange("maxArchivedTabs", max)}
+        onChangeRetentionDays={(days) =>
+          onPreferenceChange("archiveRetentionDays", days)
+        }
       />
 
       <BackupRestoreCard
