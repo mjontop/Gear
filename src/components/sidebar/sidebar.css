@@ -11,59 +11,81 @@
 }
 
 dialog.sidebar_drawer_overlay,
+dialog.sidebar_drawer_overlay:modal,
 .sidebar_drawer_overlay {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  max-width: 100vw;
-  max-height: 100vh;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  z-index: 2147483646;
-  pointer-events: auto;
-  display: flex;
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  z-index: 2147483646 !important;
+  pointer-events: auto !important;
+  display: flex !important;
 }
 
-dialog.sidebar_drawer_overlay::backdrop {
-  background: transparent;
+dialog.sidebar_drawer_overlay::backdrop,
+dialog.sidebar_drawer_overlay:modal::backdrop {
+  background: transparent !important;
 }
 
 .sidebar_backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--color-spotlight-backdrop, rgba(0, 0, 0, 0.35));
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: default;
-  outline: none;
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: var(--color-spotlight-backdrop, rgba(0, 0, 0, 0.45)) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  cursor: default !important;
+  outline: none !important;
+  z-index: 1 !important;
 }
 
 .sidebar_drawer_panel {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 340px;
-  max-width: 90vw;
-  background: var(--color-spotlight-bg, #121212);
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 360px !important;
+  max-width: 85vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background: var(--color-spotlight-bg, #0f1013) !important;
   border-right: 1px solid
-    var(--color-spotlight-border, rgba(255, 255, 255, 0.12));
-  box-shadow: 6px 0 28px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  z-index: 1;
-  animation: slideInLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  font-family: var(--spotlight-font-family, inherit);
-  color: var(--color-spotlight-input-text, #ffffff);
+    var(--color-spotlight-border, rgba(255, 255, 255, 0.12)) !important;
+  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.6) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  z-index: 2 !important;
+  animation: sidebarSlideInLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  font-family: var(--spotlight-font-family, Roboto, sans-serif) !important;
+  color: var(--color-spotlight-input-text, #ffffff) !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
-@keyframes slideInLeft {
+@keyframes sidebarSlideInLeft {
   from {
     transform: translateX(-100%);
   }
@@ -73,134 +95,145 @@ dialog.sidebar_drawer_overlay::backdrop {
 }
 
 .sidebar_view_container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 14px 16px !important;
   border-bottom: 1px solid
-    var(--color-spotlight-header-border, rgba(255, 255, 255, 0.08));
-  flex-shrink: 0;
+    var(--color-spotlight-header-border, rgba(255, 255, 255, 0.08)) !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-spotlight-input-text);
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: var(--color-spotlight-input-text, #ffffff) !important;
+  letter-spacing: -0.01em !important;
 }
 
 .sidebar_icon_btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--color-spotlight-icon);
-  padding: 6px;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: var(--color-spotlight-icon, rgba(255, 255, 255, 0.6)) !important;
+  padding: 6px !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_icon_btn:hover {
-  background: var(--color-item-hover-bg, rgba(255, 255, 255, 0.12));
-  color: var(--color-spotlight-input-text);
+  background: var(--color-item-hover-bg, rgba(255, 255, 255, 0.12)) !important;
+  color: var(--color-spotlight-input-text, #ffffff) !important;
 }
 
 .sidebar_content_scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex: 1 1 0% !important;
+  overflow-y: auto !important;
+  padding: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_section {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_accordion {
-  border-radius: 8px;
-  transition: border-color 0.15s ease;
+  border-radius: 8px !important;
+  transition: border-color 0.15s ease !important;
 }
 
 .sidebar_accordion_open {
-  border: 1px solid var(--spotlight-accent-color, rgba(56, 189, 248, 0.5));
-  padding: 6px;
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--spotlight-accent-color, rgba(56, 189, 248, 0.5)) !important;
+  padding: 6px !important;
+  background: rgba(255, 255, 255, 0.02) !important;
 }
 
 .sidebar_section_header_btn,
 .sidebar_section_header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 8px 10px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--color-item-text);
-  font-weight: 600;
-  font-size: 0.85rem;
-  border-radius: 6px;
-  text-align: left;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  padding: 8px 10px !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: var(--color-item-text, rgba(255, 255, 255, 0.9)) !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  border-radius: 6px !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_section_title_row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
 }
 
 .sidebar_section_icon {
-  color: var(--spotlight-accent-color, #38bdf8);
+  color: var(--spotlight-accent-color, #38bdf8) !important;
+  flex-shrink: 0 !important;
 }
 
 .sidebar_badge {
-  font-size: 0.72rem;
-  padding: 2px 7px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  color: var(--color-item-action-text);
-  margin-left: 4px;
+  font-size: 0.72rem !important;
+  padding: 2px 7px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+  color: var(--color-item-action-text, rgba(255, 255, 255, 0.8)) !important;
+  margin-left: 6px !important;
 }
 
 .sidebar_items_list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_list_item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 7px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--color-item-text);
-  text-align: left;
-  cursor: pointer;
-  font-size: 0.82rem;
-  transition: all 0.15s ease;
-  width: 100%;
-  box-sizing: border-box;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 8px 10px !important;
+  border-radius: 7px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: var(--color-item-text, rgba(255, 255, 255, 0.92)) !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  font-size: 0.82rem !important;
+  transition: all 0.15s ease !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_list_item:hover {
-  background: var(--color-item-hover-bg, rgba(255, 255, 255, 0.12));
+  background: var(--color-item-hover-bg, rgba(255, 255, 255, 0.12)) !important;
 }
 
 .sidebar_list_item_current {
@@ -212,156 +245,172 @@ dialog.sidebar_drawer_overlay::backdrop {
 }
 
 .sidebar_current_badge {
-  font-size: 0.68rem;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--spotlight-accent-color, #0284c7);
-  color: #ffffff;
-  margin-left: auto;
+  font-size: 0.68rem !important;
+  font-weight: 600 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  background: var(--spotlight-accent-color, #0284c7) !important;
+  color: #ffffff !important;
+  margin-left: auto !important;
+  flex-shrink: 0 !important;
 }
 
 .sidebar_bookmark_tag_icon {
-  color: #eab308;
-  margin-left: auto;
-  flex-shrink: 0;
+  color: #eab308 !important;
+  margin-left: auto !important;
+  flex-shrink: 0 !important;
 }
 
 .sidebar_favicon_box {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
-  flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 2px;
-  box-sizing: border-box;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  border-radius: 5px !important;
+  flex-shrink: 0 !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  padding: 2px !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_favicon_img {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
+  width: 18px !important;
+  height: 18px !important;
+  object-fit: contain !important;
+  display: block !important;
 }
 
 .sidebar_fallback_icon {
-  color: var(--color-spotlight-icon);
+  color: var(--color-spotlight-icon, #aaaaaa) !important;
 }
 
 .sidebar_item_info {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex: 1;
-  min-width: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
 }
 
 .sidebar_item_title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 500;
-  font-size: 0.82rem;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-weight: 500 !important;
+  font-size: 0.82rem !important;
 }
 
 .sidebar_item_domain {
-  font-size: 0.72rem;
-  color: var(--color-spotlight-placeholder);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 0.72rem !important;
+  color: var(
+    --color-spotlight-placeholder,
+    rgba(255, 255, 255, 0.42)
+  ) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 
 .sidebar_footer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 12px 14px !important;
   border-top: 1px solid
-    var(--color-spotlight-header-border, rgba(255, 255, 255, 0.08));
-  flex-shrink: 0;
-  background: rgba(0, 0, 0, 0.15);
+    var(--color-spotlight-header-border, rgba(255, 255, 255, 0.08)) !important;
+  flex-shrink: 0 !important;
+  background: rgba(0, 0, 0, 0.25) !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_action_btn {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 10px;
-  border-radius: 7px;
-  border: 1px solid var(--color-spotlight-border, rgba(255, 255, 255, 0.1));
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--color-item-text);
-  font-size: 0.78rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  flex: 1 1 0% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 8px 10px !important;
+  border-radius: 7px !important;
+  border: 1px solid var(--color-spotlight-border, rgba(255, 255, 255, 0.1)) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--color-item-text, rgba(255, 255, 255, 0.9)) !important;
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_action_btn:hover {
-  background: var(--color-item-hover-bg, rgba(255, 255, 255, 0.15));
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--color-item-hover-bg, rgba(255, 255, 255, 0.15)) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .sidebar_search_row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 14px !important;
   border-bottom: 1px solid
-    var(--color-spotlight-header-border, rgba(255, 255, 255, 0.06));
+    var(--color-spotlight-header-border, rgba(255, 255, 255, 0.06)) !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_search_wrap {
-  flex: 1;
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--color-spotlight-border, rgba(255, 255, 255, 0.1));
-  border-radius: 7px;
-  padding: 0 8px;
+  flex: 1 1 auto !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid var(--color-spotlight-border, rgba(255, 255, 255, 0.1)) !important;
+  border-radius: 7px !important;
+  padding: 0 8px !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_search_icon {
-  color: var(--color-spotlight-icon);
-  flex-shrink: 0;
+  color: var(--color-spotlight-icon, rgba(255, 255, 255, 0.6)) !important;
+  flex-shrink: 0 !important;
 }
 
 .sidebar_search_input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  padding: 7px 6px;
-  font-size: 0.82rem;
-  color: var(--color-spotlight-input-text);
-  font-family: inherit;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  padding: 7px 6px !important;
+  font-size: 0.82rem !important;
+  color: var(--color-spotlight-input-text, #ffffff) !important;
+  font-family: inherit !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_clear_btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--color-spotlight-icon);
-  padding: 4px;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: var(--color-spotlight-icon, rgba(255, 255, 255, 0.6)) !important;
+  padding: 4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .sidebar_filter_toggle_btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--color-spotlight-border, rgba(255, 255, 255, 0.1));
-  border-radius: 7px;
-  padding: 7px 9px;
-  cursor: pointer;
-  color: var(--color-item-text);
-  transition: all 0.15s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid var(--color-spotlight-border, rgba(255, 255, 255, 0.1)) !important;
+  border-radius: 7px !important;
+  padding: 7px 9px !important;
+  cursor: pointer !important;
+  color: var(--color-item-text, rgba(255, 255, 255, 0.9)) !important;
+  transition: all 0.15s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_filter_btn_active {
@@ -370,54 +419,66 @@ dialog.sidebar_drawer_overlay::backdrop {
 }
 
 .sidebar_filter_chips_row {
-  display: flex;
-  gap: 8px;
-  padding: 8px 14px 4px;
+  display: flex !important;
+  gap: 8px !important;
+  padding: 8px 14px 4px !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_chip_btn {
-  flex: 1;
-  padding: 6px 8px;
-  font-size: 0.75rem;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--color-item-text);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: center;
+  flex: 1 1 0% !important;
+  padding: 6px 8px !important;
+  font-size: 0.75rem !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: var(--color-item-text, rgba(255, 255, 255, 0.9)) !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_chip_btn_active {
-  background: rgba(56, 189, 248, 0.2);
-  border-color: var(--spotlight-accent-color, #38bdf8);
-  color: #ffffff;
-  font-weight: 600;
+  background: rgba(56, 189, 248, 0.2) !important;
+  border-color: var(--spotlight-accent-color, #38bdf8) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
 }
 
 .sidebar_bucket_section {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 8px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  margin-bottom: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .sidebar_bucket_label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-spotlight-placeholder);
-  padding: 4px 6px;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(
+    --color-spotlight-placeholder,
+    rgba(255, 255, 255, 0.42)
+  ) !important;
+  padding: 4px 6px !important;
 }
 
 .sidebar_empty_state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 16px;
-  text-align: center;
-  color: var(--color-spotlight-placeholder);
-  font-size: 0.82rem;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 32px 16px !important;
+  text-align: center !important;
+  color: var(
+    --color-spotlight-placeholder,
+    rgba(255, 255, 255, 0.42)
+  ) !important;
+  font-size: 0.82rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
