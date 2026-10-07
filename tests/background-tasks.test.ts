@@ -89,6 +89,33 @@ describe("background-tasks", () => {
       expect(tabs[1].id).toBe(10);
     });
 
+    it("includes current tab and marks it active and current when not excluded", async () => {
+      (globalThis as any).chrome.tabs.query = vi.fn().mockResolvedValue([
+        {
+          id: 10,
+          windowId: 1,
+          title: "Background Tab",
+          url: "https://tab1.com",
+          active: false,
+          index: 1,
+        },
+        {
+          id: 99,
+          windowId: 1,
+          title: "Current Tab",
+          url: "https://current.com",
+          active: true,
+          index: 0,
+        },
+      ]);
+
+      const tabs = await getOpenTabs(undefined, 99);
+      expect(tabs).toHaveLength(2);
+      expect(tabs[0].id).toBe(99);
+      expect(tabs[0].current).toBe(true);
+      expect(tabs[0].active).toBe(true);
+    });
+
     it("handles active tab already first in sorting", async () => {
       (globalThis as any).chrome.tabs.query = vi.fn().mockResolvedValue([
         { id: 1, windowId: 1, active: true, index: 1, title: "Active" },

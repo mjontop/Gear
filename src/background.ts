@@ -97,8 +97,11 @@ chrome.runtime.onMessage.addListener(
   (message: RuntimeMessage, sender, sendResponse) => {
     if (message.type === MESSAGE_TYPES.GET_OPEN_TABS) {
       const currentTabId = sender.tab?.id;
+      const excludedTabId = message.includeCurrentTab
+        ? undefined
+        : currentTabId;
 
-      getOpenTabs(currentTabId)
+      getOpenTabs(excludedTabId, currentTabId)
         .then((tabs) => {
           sendResponse({ tabs });
         })

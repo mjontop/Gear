@@ -2,6 +2,7 @@ import type { OpenTab } from "./types";
 
 export const getOpenTabs = async (
   currentTabId?: number,
+  activeTabId?: number,
 ): Promise<OpenTab[]> => {
   const tabs = await chrome.tabs.query({});
 
@@ -10,8 +11,13 @@ export const getOpenTabs = async (
       return typeof tab.id === "number" && tab.id !== currentTabId;
     })
     .sort((firstTab, secondTab) => {
-      if (firstTab.active !== secondTab.active) {
-        return firstTab.active ? -1 : 1;
+      const isFirstActive =
+        firstTab.id === activeTabId || Boolean(firstTab.active);
+      const isSecondActive =
+        secondTab.id === activeTabId || Boolean(secondTab.active);
+
+      if (isFirstActive !== isSecondActive) {
+        return isFirstActive ? -1 : 1;
       }
 
       if (firstTab.windowId !== secondTab.windowId) {
@@ -26,7 +32,8 @@ export const getOpenTabs = async (
       title: tab.title || tab.url || "Untitled",
       url: tab.url || "",
       favIconUrl: tab.favIconUrl,
-      active: Boolean(tab.active),
+      active: tab.id === activeTabId || Boolean(tab.active),
+      current: tab.id === activeTabId,
       audible: Boolean(tab.audible),
       muted: Boolean(tab.mutedInfo?.muted),
     }));

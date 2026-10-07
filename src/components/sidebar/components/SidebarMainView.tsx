@@ -40,7 +40,7 @@ export const SidebarMainView = ({
       );
 
       chrome.runtime.sendMessage(
-        { type: MESSAGE_TYPES.GET_OPEN_TABS },
+        { type: MESSAGE_TYPES.GET_OPEN_TABS, includeCurrentTab: true },
         (res) => {
           if (isCurrent && res?.tabs) {
             setOpenTabs(res.tabs);
@@ -120,7 +120,14 @@ export const SidebarMainView = ({
                     onClick={() => handleOpenUrl(b.url)}
                   >
                     <FaviconImage favIconUrl={b.favIconUrl} />
-                    <span className="sidebar_item_title">{b.title}</span>
+                    <div className="sidebar_item_info">
+                      <span className="sidebar_item_title">{b.title}</span>
+                      {b.url && (
+                        <span className="sidebar_item_domain">
+                          {b.url.replace(/^https?:\/\//i, "").split("/")[0]}
+                        </span>
+                      )}
+                    </div>
                   </button>
                 ))
               )}
@@ -138,21 +145,29 @@ export const SidebarMainView = ({
           <div className="sidebar_items_list">
             {openTabs.map((tab) => {
               const isBookmarked = bookmarkedUrls.has(tab.url);
+              const isCurrent = Boolean(tab.current ?? tab.active);
               return (
                 <button
                   key={tab.id}
                   type="button"
                   className={`sidebar_list_item ${
-                    tab.active ? "sidebar_list_item_current" : ""
+                    isCurrent ? "sidebar_list_item_current" : ""
                   } ${isBookmarked ? "sidebar_item_bookmarked" : ""}`}
                   onClick={() => handleSwitchTab(tab)}
                 >
                   <FaviconImage favIconUrl={tab.favIconUrl} />
-                  <span className="sidebar_item_title">{tab.title}</span>
-                  {tab.active && (
+                  <div className="sidebar_item_info">
+                    <span className="sidebar_item_title">{tab.title}</span>
+                    {tab.url && (
+                      <span className="sidebar_item_domain">
+                        {tab.url.replace(/^https?:\/\//i, "").split("/")[0]}
+                      </span>
+                    )}
+                  </div>
+                  {isCurrent && (
                     <span className="sidebar_current_badge">Current</span>
                   )}
-                  {isBookmarked && !tab.active && (
+                  {isBookmarked && !isCurrent && (
                     <BookmarkIcon
                       size={12}
                       className="sidebar_bookmark_tag_icon"

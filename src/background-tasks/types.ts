@@ -5,6 +5,7 @@ export type OpenTab = {
   url: string;
   favIconUrl?: string;
   active: boolean;
+  current?: boolean;
   audible?: boolean;
   muted?: boolean;
 };
@@ -54,7 +55,7 @@ export type RecentlyClosedTab = {
 };
 
 export type RuntimeMessage =
-  | { type: "GET_OPEN_TABS" }
+  | { type: "GET_OPEN_TABS"; includeCurrentTab?: boolean }
   | { type: "SWITCH_TO_TAB"; tabId: number; windowId: number }
   | { type: "OPEN_URL"; url: string }
   | {

@@ -132,4 +132,32 @@ describe("background script - sidebar handlers", () => {
     await new Promise((r) => setTimeout(r, 20));
     expect(sendResponse).toHaveBeenCalledWith({ success: true });
   });
+
+  it("handles runtime message: GET_OPEN_TABS with includeCurrentTab", async () => {
+    (globalThis as any).chrome.tabs.query = vi.fn().mockResolvedValue([
+      {
+        id: 77,
+        title: "Current Tab",
+        url: "https://current.com",
+        active: true,
+        index: 0,
+        windowId: 1,
+      },
+    ]);
+
+    const sendResponse = vi.fn();
+    const willRespond = messageListener(
+      { type: MESSAGE_TYPES.GET_OPEN_TABS, includeCurrentTab: true },
+      { tab: { id: 77 } },
+      sendResponse,
+    );
+
+    expect(willRespond).toBe(true);
+    await new Promise((r) => setTimeout(r, 20));
+    expect(sendResponse).toHaveBeenCalledWith({
+      tabs: expect.arrayContaining([
+        expect.objectContaining({ id: 77, current: true }),
+      ]),
+    });
+  });
 });
