@@ -93,7 +93,7 @@ export const SidebarMainView = ({
     <div className="sidebar_view_container">
       <SidebarHeader title="Tabs" />
 
-      <div className="sidebar_content_scroll">
+      <div className="sidebar_main_body">
         {/* Bookmarks Accordion Section */}
         <div
           className={`sidebar_section sidebar_accordion ${
@@ -119,7 +119,7 @@ export const SidebarMainView = ({
           </button>
 
           {isAccordionOpen && (
-            <div className="sidebar_items_list">
+            <div className="sidebar_items_list sidebar_bookmarks_scroll">
               {bookmarks.length === 0 ? (
                 <div className="sidebar_empty_state">No bookmarks found</div>
               ) : (
@@ -147,13 +147,13 @@ export const SidebarMainView = ({
         </div>
 
         {/* Open Tabs Section */}
-        <div className="sidebar_section">
+        <div className="sidebar_section sidebar_tabs_section">
           <div className="sidebar_section_header">
             <span>Open Tabs</span>
             <span className="sidebar_badge">{openTabs.length}</span>
           </div>
 
-          <div className="sidebar_items_list">
+          <div className="sidebar_items_list sidebar_tabs_scroll">
             {openTabs.map((tab) => {
               const isBookmarked = bookmarkedUrls.has(tab.url);
               const isCurrent = Boolean(tab.current ?? tab.active);

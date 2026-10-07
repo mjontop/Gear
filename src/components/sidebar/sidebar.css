@@ -145,13 +145,40 @@ dialog.sidebar_drawer_overlay:modal::backdrop {
   color: var(--color-spotlight-input-text, #ffffff) !important;
 }
 
+.sidebar_drawer_panel,
+.sidebar_drawer_panel * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.sidebar_drawer_panel::-webkit-scrollbar,
+.sidebar_drawer_panel *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 .sidebar_content_scroll {
   flex: 1 1 0% !important;
+  min-height: 0 !important;
   overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
   padding: 12px !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 14px !important;
+  box-sizing: border-box !important;
+}
+
+.sidebar_main_body {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 12px !important;
+  gap: 12px !important;
+  overflow: hidden !important;
   box-sizing: border-box !important;
 }
 
@@ -166,12 +193,39 @@ dialog.sidebar_drawer_overlay:modal::backdrop {
 .sidebar_accordion {
   border-radius: 8px !important;
   transition: border-color 0.15s ease !important;
+  flex-shrink: 0 !important;
 }
 
 .sidebar_accordion_open {
   border: 1px solid var(--spotlight-accent-color, rgba(56, 189, 248, 0.5)) !important;
   padding: 6px !important;
   background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.sidebar_bookmarks_scroll {
+  max-height: 220px !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  padding-right: 2px !important;
+}
+
+.sidebar_tabs_section {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  gap: 6px !important;
+}
+
+.sidebar_tabs_scroll {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  padding-right: 2px !important;
 }
 
 .sidebar_section_header_btn,
