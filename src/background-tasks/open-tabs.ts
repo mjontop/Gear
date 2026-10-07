@@ -11,15 +11,6 @@ export const getOpenTabs = async (
       return typeof tab.id === "number" && tab.id !== currentTabId;
     })
     .sort((firstTab, secondTab) => {
-      const isFirstActive =
-        firstTab.id === activeTabId || Boolean(firstTab.active);
-      const isSecondActive =
-        secondTab.id === activeTabId || Boolean(secondTab.active);
-
-      if (isFirstActive !== isSecondActive) {
-        return isFirstActive ? -1 : 1;
-      }
-
       if (firstTab.windowId !== secondTab.windowId) {
         return firstTab.windowId - secondTab.windowId;
       }

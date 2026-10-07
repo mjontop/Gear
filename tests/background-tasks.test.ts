@@ -85,19 +85,19 @@ describe("background-tasks", () => {
 
       const tabs = await getOpenTabs(99);
       expect(tabs).toHaveLength(2);
-      expect(tabs[0].id).toBe(11);
-      expect(tabs[1].id).toBe(10);
+      expect(tabs[0].id).toBe(10);
+      expect(tabs[1].id).toBe(11);
     });
 
-    it("includes current tab and marks it active and current when not excluded", async () => {
+    it("includes current tab and preserves its natural place based on index", async () => {
       (globalThis as any).chrome.tabs.query = vi.fn().mockResolvedValue([
         {
           id: 10,
           windowId: 1,
-          title: "Background Tab",
+          title: "First Tab",
           url: "https://tab1.com",
           active: false,
-          index: 1,
+          index: 0,
         },
         {
           id: 99,
@@ -105,25 +105,27 @@ describe("background-tasks", () => {
           title: "Current Tab",
           url: "https://current.com",
           active: true,
-          index: 0,
+          index: 1,
         },
       ]);
 
       const tabs = await getOpenTabs(undefined, 99);
       expect(tabs).toHaveLength(2);
-      expect(tabs[0].id).toBe(99);
-      expect(tabs[0].current).toBe(true);
-      expect(tabs[0].active).toBe(true);
+      expect(tabs[0].id).toBe(10);
+      expect(tabs[1].id).toBe(99);
+      expect(tabs[1].current).toBe(true);
+      expect(tabs[1].active).toBe(true);
     });
 
-    it("handles active tab already first in sorting", async () => {
+    it("preserves index order regardless of active state", async () => {
       (globalThis as any).chrome.tabs.query = vi.fn().mockResolvedValue([
-        { id: 1, windowId: 1, active: true, index: 1, title: "Active" },
-        { id: 2, windowId: 1, active: false, index: 2, title: "Inactive" },
+        { id: 1, windowId: 1, active: false, index: 1, title: "Inactive" },
+        { id: 2, windowId: 1, active: true, index: 2, title: "Active" },
       ]);
 
       const tabs = await getOpenTabs();
       expect(tabs[0].id).toBe(1);
+      expect(tabs[1].id).toBe(2);
     });
 
     it("sorts by windowId and index, and handles title fallbacks and audio states", async () => {
