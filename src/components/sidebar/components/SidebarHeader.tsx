@@ -3,7 +3,7 @@ import { ArrowLeftIcon, XIcon } from "lucide-react";
 export type SidebarHeaderProps = {
   title: string;
   onBack?: () => void;
-  onClose: () => void;
+  onClose?: () => void;
 };
 
 export const SidebarHeader = ({
@@ -24,14 +24,16 @@ export const SidebarHeader = ({
         </button>
       )}
       <span className="sidebar_title">{title}</span>
-      <button
-        type="button"
-        aria-label="Close sidebar"
-        className="sidebar_icon_btn"
-        onClick={onClose}
-      >
-        <XIcon size={18} />
-      </button>
+      {onClose && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          className="sidebar_icon_btn"
+          onClick={onClose}
+        >
+          <XIcon size={18} />
+        </button>
+      )}
     </div>
   );
 };

@@ -29,7 +29,7 @@ describe("Sidebar Components", () => {
       });
 
       expect(screen.getByRole("dialog")).toBeInTheDocument();
-      expect(screen.getByText("Tabs & Bookmarks")).toBeInTheDocument();
+      expect(screen.getByText("Tabs")).toBeInTheDocument();
 
       // Close on Escape
       act(() => {
@@ -63,7 +63,7 @@ describe("Sidebar Components", () => {
   });
 
   describe("SidebarMainView", () => {
-    it("renders bookmarks accordion and open tabs list", async () => {
+    it("renders bookmarks accordion and open tabs list with close buttons", async () => {
       vi.spyOn(chrome.runtime, "sendMessage").mockImplementation(
         (msg: any, cb: any) => {
           if (msg.type === MESSAGE_TYPES.GET_BOOKMARKS && cb) {
@@ -101,8 +101,13 @@ describe("Sidebar Components", () => {
         />,
       );
 
+      expect(screen.getByText("Tabs")).toBeInTheDocument();
       expect(screen.getByText("Bookmarks")).toBeInTheDocument();
       expect(screen.getByText("Open Tabs")).toBeInTheDocument();
+
+      // Heading has no close button
+      const header = document.querySelector(".sidebar_header");
+      expect(header?.querySelector("button")).toBeNull();
 
       // Accordion toggle
       const accordionBtn = screen.getByRole("button", { name: /Bookmarks/i });
@@ -110,7 +115,8 @@ describe("Sidebar Components", () => {
       expect(screen.getAllByText("GitHub").length).toBeGreaterThan(0);
 
       // Open tab click
-      const tabBtn = screen.getByRole("button", { name: /Active Tab/i });
+      const tabBtn = screen.getByRole("button", { name: /^Active Tab/i });
+      expect(tabBtn).toBeInTheDocument();
       fireEvent.click(tabBtn);
       expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
         type: MESSAGE_TYPES.SWITCH_TO_TAB,
@@ -119,9 +125,20 @@ describe("Sidebar Components", () => {
       });
       expect(onClose).toHaveBeenCalled();
 
+      // Open tab close button
+      const closeTabBtn = screen.getByRole("button", {
+        name: "Close tab Active Tab",
+      });
+      fireEvent.click(closeTabBtn);
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        type: MESSAGE_TYPES.CLOSE_TAB,
+        tabId: 1,
+      });
+      expect(screen.queryByText("Active Tab")).not.toBeInTheDocument();
+
       // View Archive button
       const archiveBtn = screen.getByRole("button", {
-        name: /View Archive tabs/i,
+        name: /Archive tabs/i,
       });
       fireEvent.click(archiveBtn);
       expect(onOpenArchive).toHaveBeenCalled();

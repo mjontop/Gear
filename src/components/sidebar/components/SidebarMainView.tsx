@@ -4,6 +4,7 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   DownloadIcon,
+  XIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { MESSAGE_TYPES } from "@/constants";
@@ -65,6 +66,16 @@ export const SidebarMainView = ({
     }
   };
 
+  const handleCloseTab = (tabId: number) => {
+    setOpenTabs((prev) => prev.filter((t) => t.id !== tabId));
+    if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
+      chrome.runtime.sendMessage({
+        type: MESSAGE_TYPES.CLOSE_TAB,
+        tabId,
+      });
+    }
+  };
+
   const handleOpenUrl = (url: string) => {
     if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
       chrome.runtime.sendMessage({
@@ -80,7 +91,7 @@ export const SidebarMainView = ({
 
   return (
     <div className="sidebar_view_container">
-      <SidebarHeader title="Tabs & Bookmarks" onClose={onClose} />
+      <SidebarHeader title="Tabs" />
 
       <div className="sidebar_content_scroll">
         {/* Bookmarks Accordion Section */}
@@ -147,33 +158,43 @@ export const SidebarMainView = ({
               const isBookmarked = bookmarkedUrls.has(tab.url);
               const isCurrent = Boolean(tab.current ?? tab.active);
               return (
-                <button
+                <div
                   key={tab.id}
-                  type="button"
                   className={`sidebar_list_item ${
                     isCurrent ? "sidebar_list_item_current" : ""
                   } ${isBookmarked ? "sidebar_item_bookmarked" : ""}`}
-                  onClick={() => handleSwitchTab(tab)}
                 >
-                  <FaviconImage favIconUrl={tab.favIconUrl} />
-                  <div className="sidebar_item_info">
-                    <span className="sidebar_item_title">{tab.title}</span>
-                    {tab.url && (
-                      <span className="sidebar_item_domain">
-                        {tab.url.replace(/^https?:\/\//i, "").split("/")[0]}
-                      </span>
+                  <button
+                    type="button"
+                    className="sidebar_tab_main_btn"
+                    onClick={() => handleSwitchTab(tab)}
+                  >
+                    <FaviconImage favIconUrl={tab.favIconUrl} />
+                    <div className="sidebar_item_info">
+                      <span className="sidebar_item_title">{tab.title}</span>
+                      {tab.url && (
+                        <span className="sidebar_item_domain">
+                          {tab.url.replace(/^https?:\/\//i, "").split("/")[0]}
+                        </span>
+                      )}
+                    </div>
+                    {isBookmarked && (
+                      <BookmarkIcon
+                        size={12}
+                        className="sidebar_bookmark_tag_icon"
+                      />
                     )}
-                  </div>
-                  {isCurrent && (
-                    <span className="sidebar_current_badge">Current</span>
-                  )}
-                  {isBookmarked && !isCurrent && (
-                    <BookmarkIcon
-                      size={12}
-                      className="sidebar_bookmark_tag_icon"
-                    />
-                  )}
-                </button>
+                  </button>
+                  <button
+                    type="button"
+                    className="sidebar_tab_close_btn"
+                    aria-label={`Close tab ${tab.title}`}
+                    title="Close tab"
+                    onClick={() => handleCloseTab(tab.id)}
+                  >
+                    <XIcon size={14} />
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -184,20 +205,22 @@ export const SidebarMainView = ({
       <div className="sidebar_footer">
         <button
           type="button"
-          className="sidebar_action_btn"
+          className="sidebar_action_icon_btn"
+          title="Archive tabs"
+          aria-label="Archive tabs"
           onClick={onOpenArchive}
         >
-          <ArchiveIcon size={16} />
-          <span>View Archive tabs</span>
+          <ArchiveIcon size={18} />
         </button>
 
         <button
           type="button"
-          className="sidebar_action_btn"
+          className="sidebar_action_icon_btn"
+          title="Downloads"
+          aria-label="Downloads"
           onClick={onOpenDownloads}
         >
-          <DownloadIcon size={16} />
-          <span>Downloads</span>
+          <DownloadIcon size={18} />
         </button>
       </div>
     </div>

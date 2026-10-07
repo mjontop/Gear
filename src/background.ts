@@ -221,6 +221,19 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
+    if (message.type === MESSAGE_TYPES.CLOSE_TAB) {
+      chrome.tabs
+        .remove(message.tabId)
+        .then(() => {
+          sendResponse({ success: true });
+        })
+        .catch(() => {
+          sendResponse({ success: false });
+        });
+
+      return true;
+    }
+
     return false;
   },
 );

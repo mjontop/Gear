@@ -221,20 +221,24 @@ dialog.sidebar_drawer_overlay:modal::backdrop {
 }
 
 .sidebar_list_item {
+  position: relative !important;
   display: flex !important;
   align-items: center !important;
-  gap: 10px !important;
-  padding: 8px 10px !important;
   border-radius: 7px !important;
   border: 1px solid transparent !important;
   background: transparent !important;
   color: var(--color-item-text, rgba(255, 255, 255, 0.92)) !important;
   text-align: left !important;
-  cursor: pointer !important;
   font-size: 0.82rem !important;
   transition: all 0.15s ease !important;
   width: 100% !important;
   box-sizing: border-box !important;
+}
+
+button.sidebar_list_item {
+  gap: 10px !important;
+  padding: 8px 10px !important;
+  cursor: pointer !important;
 }
 
 .sidebar_list_item:hover {
@@ -249,15 +253,53 @@ dialog.sidebar_drawer_overlay:modal::backdrop {
   ) !important;
 }
 
-.sidebar_current_badge {
-  font-size: 0.68rem !important;
-  font-weight: 600 !important;
-  padding: 2px 6px !important;
+.sidebar_tab_main_btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 8px 10px !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  font-size: 0.82rem !important;
+  box-sizing: border-box !important;
+}
+
+.sidebar_tab_close_btn {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: var(--color-spotlight-icon, rgba(255, 255, 255, 0.5)) !important;
+  padding: 4px !important;
+  margin-right: 6px !important;
   border-radius: 4px !important;
-  background: var(--spotlight-accent-color, #0284c7) !important;
-  color: #ffffff !important;
-  margin-left: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   flex-shrink: 0 !important;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease !important;
+}
+
+.sidebar_list_item:hover .sidebar_tab_close_btn,
+.sidebar_list_item:focus-within .sidebar_tab_close_btn,
+.sidebar_tab_close_btn:focus-visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.sidebar_tab_close_btn:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: var(--color-spotlight-input-text, #ffffff) !important;
 }
 
 .sidebar_bookmark_tag_icon {
@@ -322,8 +364,8 @@ dialog.sidebar_drawer_overlay:modal::backdrop {
 .sidebar_footer {
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  padding: 12px 14px !important;
+  justify-content: space-between !important;
+  padding: 12px 16px !important;
   border-top: 1px solid
     var(--color-spotlight-header-border, rgba(255, 255, 255, 0.08)) !important;
   flex-shrink: 0 !important;
@@ -331,27 +373,26 @@ dialog.sidebar_drawer_overlay:modal::backdrop {
   box-sizing: border-box !important;
 }
 
-.sidebar_action_btn {
-  flex: 1 1 0% !important;
+.sidebar_action_icon_btn {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 6px !important;
-  padding: 8px 10px !important;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
   border-radius: 7px !important;
   border: 1px solid var(--color-spotlight-border, rgba(255, 255, 255, 0.1)) !important;
   background: rgba(255, 255, 255, 0.05) !important;
-  color: var(--color-item-text, rgba(255, 255, 255, 0.9)) !important;
-  font-size: 0.78rem !important;
-  font-weight: 500 !important;
+  color: var(--color-item-text, rgba(255, 255, 255, 0.85)) !important;
   cursor: pointer !important;
   transition: all 0.15s ease !important;
   box-sizing: border-box !important;
 }
 
-.sidebar_action_btn:hover {
+.sidebar_action_icon_btn:hover {
   background: var(--color-item-hover-bg, rgba(255, 255, 255, 0.15)) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: var(--color-spotlight-input-text, #ffffff) !important;
 }
 
 .sidebar_search_row {

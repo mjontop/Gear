@@ -72,4 +72,5 @@ export type RuntimeMessage =
   | { type: "GET_ARCHIVED_TABS" }
   | { type: "GET_RECENTLY_CLOSED_TABS" }
   | { type: "GET_DOWNLOADS"; query?: string }
-  | { type: "OPEN_DOWNLOAD"; downloadId: number };
+  | { type: "OPEN_DOWNLOAD"; downloadId: number }
+  | { type: "CLOSE_TAB"; tabId: number };

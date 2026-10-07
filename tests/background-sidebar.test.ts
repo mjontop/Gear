@@ -160,4 +160,22 @@ describe("background script - sidebar handlers", () => {
       ]),
     });
   });
+
+  it("handles runtime message: CLOSE_TAB", async () => {
+    (globalThis as any).chrome.tabs.remove = vi
+      .fn()
+      .mockResolvedValue(undefined);
+
+    const sendResponse = vi.fn();
+    const willRespond = messageListener(
+      { type: MESSAGE_TYPES.CLOSE_TAB, tabId: 42 },
+      {},
+      sendResponse,
+    );
+
+    expect(willRespond).toBe(true);
+    await new Promise((r) => setTimeout(r, 20));
+    expect((globalThis as any).chrome.tabs.remove).toHaveBeenCalledWith(42);
+    expect(sendResponse).toHaveBeenCalledWith({ success: true });
+  });
 });
