@@ -32,11 +32,15 @@ describe("Sidebar Components", () => {
       expect(screen.getByText("Tabs & Bookmarks")).toBeInTheDocument();
 
       // Close on Escape
-      fireEvent.keyDown(window, { key: "Escape" });
+      act(() => {
+        fireEvent.keyDown(window, { key: "Escape" });
+      });
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
       // Toggle open via Alt+S
-      fireEvent.keyDown(window, { key: "s", altKey: true });
+      act(() => {
+        fireEvent.keyDown(window, { key: "s", altKey: true });
+      });
       expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
 
@@ -45,8 +49,16 @@ describe("Sidebar Components", () => {
       const backdrop = document.querySelector(".sidebar_backdrop");
       expect(backdrop).toBeInTheDocument();
 
-      fireEvent.click(backdrop!);
+      act(() => {
+        fireEvent.click(backdrop!);
+      });
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    it("disables backdrop blur when enableBackgroundBlur is false", () => {
+      render(<Sidebar defaultOpen={true} enableBackgroundBlur={false} />);
+      const backdrop = document.querySelector(".sidebar_backdrop");
+      expect(backdrop).toHaveClass("sidebar_backdrop_no_blur");
     });
   });
 

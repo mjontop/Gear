@@ -1,19 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import { MESSAGE_TYPES } from "@/constants";
+import { useSpotlightPreferences } from "@/lib/preferences";
 import { SidebarMainView } from "./components/SidebarMainView";
 import { SidebarArchiveView } from "./components/SidebarArchiveView";
 import { SidebarDownloadsView } from "./components/SidebarDownloadsView";
 
 export type SidebarProps = {
   defaultOpen?: boolean;
+  enableBackgroundBlur?: boolean;
 };
 
-export const Sidebar = ({ defaultOpen = false }: SidebarProps) => {
+export const Sidebar = ({
+  defaultOpen = false,
+  enableBackgroundBlur,
+}: SidebarProps) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [activeView, setActiveView] = useState<
     "main" | "archive" | "downloads"
   >("main");
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const { preferences } = useSpotlightPreferences();
+
+  const shouldBlur = enableBackgroundBlur ?? preferences.enableBackgroundBlur;
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -90,7 +98,7 @@ export const Sidebar = ({ defaultOpen = false }: SidebarProps) => {
       {/* Backdrop */}
       <button
         type="button"
-        className="sidebar_backdrop"
+        className={`sidebar_backdrop ${!shouldBlur ? "sidebar_backdrop_no_blur" : ""}`}
         onClick={handleClose}
         aria-label="Close sidebar backdrop"
       />

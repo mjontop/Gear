@@ -40,7 +40,7 @@ function App() {
     >
       <Spotlight />
       <CopyUrlToast />
-      <Sidebar />
+      <Sidebar enableBackgroundBlur={preferences.enableBackgroundBlur} />
     </div>
   );
 }
