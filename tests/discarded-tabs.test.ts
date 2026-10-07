@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { handleTabDiscarded } from "@/background-tasks/discarded-tabs";
+import {
+  handleTabDiscarded,
+  closeExistingDiscardedTabs,
+} from "@/background-tasks/discarded-tabs";
 import { getArchivedTabs } from "@/lib/archived-tabs-storage";
 import {
   saveSpotlightPreferences,
@@ -89,5 +92,86 @@ describe("handleTabDiscarded", () => {
     const archived = await getArchivedTabs();
     expect(archived).toHaveLength(1);
     expect(archived[0].url).toBe("https://example.com/error-tab");
+  });
+});
+
+describe("closeExistingDiscardedTabs", () => {
+  beforeEach(async () => {
+    vi.restoreAllMocks();
+    await saveSpotlightPreferences({
+      ...DEFAULT_SPOTLIGHT_PREFERENCES,
+      autoCloseDiscardedTabs: true,
+      maxArchivedTabs: 100,
+      archiveRetentionDays: 7,
+    });
+  });
+
+  it("queries existing tabs and closes inactive discarded tabs", async () => {
+    const removeSpy = vi
+      .spyOn(chrome.tabs, "remove")
+      .mockResolvedValue(undefined as any);
+
+    vi.spyOn(chrome.tabs, "query").mockResolvedValue([
+      {
+        id: 101,
+        url: "https://active.com",
+        title: "Active Tab",
+        active: true,
+        discarded: true, // Active should never be closed
+      },
+      {
+        id: 102,
+        url: "https://inactive-discarded.com",
+        title: "Inactive Discarded",
+        active: false,
+        discarded: true,
+      },
+      {
+        id: 103,
+        url: "https://unloaded.com",
+        title: "Unloaded Tab",
+        active: false,
+        status: "unloaded",
+      },
+      {
+        id: 104,
+        url: "https://normal.com",
+        title: "Normal Active Tab",
+        active: false,
+        discarded: false,
+      },
+    ] as any);
+
+    const count = await closeExistingDiscardedTabs();
+
+    expect(count).toBe(2);
+    expect(removeSpy).toHaveBeenCalledWith(102);
+    expect(removeSpy).toHaveBeenCalledWith(103);
+    expect(removeSpy).not.toHaveBeenCalledWith(101);
+    expect(removeSpy).not.toHaveBeenCalledWith(104);
+
+    const archived = await getArchivedTabs();
+    expect(archived).toHaveLength(2);
+  });
+
+  it("does not close tabs when autoCloseDiscardedTabs is false", async () => {
+    await saveSpotlightPreferences({
+      ...DEFAULT_SPOTLIGHT_PREFERENCES,
+      autoCloseDiscardedTabs: false,
+    });
+
+    const removeSpy = vi.spyOn(chrome.tabs, "remove");
+    vi.spyOn(chrome.tabs, "query").mockResolvedValue([
+      {
+        id: 102,
+        url: "https://inactive-discarded.com",
+        active: false,
+        discarded: true,
+      },
+    ] as any);
+
+    const count = await closeExistingDiscardedTabs();
+    expect(count).toBe(0);
+    expect(removeSpy).not.toHaveBeenCalled();
   });
 });

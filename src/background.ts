@@ -1,10 +1,18 @@
-import { COMMAND_NAMES, MESSAGE_TYPES, isRestrictedUrl } from "@/constants";
+import {
+  COMMAND_NAMES,
+  MESSAGE_TYPES,
+  SPOTLIGHT_PREFERENCES_STORAGE_KEY,
+  isRestrictedUrl,
+} from "@/constants";
 import { getBookmarks } from "./background-tasks/bookmarks";
 import { getHistory } from "./background-tasks/history";
 import { getOpenTabs } from "./background-tasks/open-tabs";
 import { getSearchSuggestions } from "./background-tasks/search-suggestions";
 import { switchToTab } from "./background-tasks/switch-tab";
-import { handleTabDiscarded } from "./background-tasks/discarded-tabs";
+import {
+  handleTabDiscarded,
+  closeExistingDiscardedTabs,
+} from "./background-tasks/discarded-tabs";
 import { getRecentlyClosedTabs } from "./background-tasks/recently-closed";
 import { getDownloads, openDownload } from "./background-tasks/downloads";
 import {
@@ -18,10 +26,55 @@ getSpotlightPreferences()
   .then((prefs) =>
     pruneExpiredArchivedTabs(prefs.maxArchivedTabs, prefs.archiveRetentionDays),
   )
+  .then(() => closeExistingDiscardedTabs())
   .catch(() => {});
 
+const DISCARDED_CHECK_ALARM = "gear_check_discarded_tabs";
+
+if (typeof chrome !== "undefined" && chrome.alarms) {
+  chrome.alarms.get(DISCARDED_CHECK_ALARM, (alarm) => {
+    if (!alarm) {
+      chrome.alarms.create(DISCARDED_CHECK_ALARM, {
+        periodInMinutes: 1,
+      });
+    }
+  });
+
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === DISCARDED_CHECK_ALARM) {
+      closeExistingDiscardedTabs().catch(() => {});
+    }
+  });
+}
+
+if (typeof chrome !== "undefined" && chrome.runtime?.onStartup) {
+  chrome.runtime.onStartup.addListener(() => {
+    closeExistingDiscardedTabs().catch(() => {});
+  });
+}
+
+if (typeof chrome !== "undefined" && chrome.runtime?.onInstalled) {
+  chrome.runtime.onInstalled.addListener(() => {
+    closeExistingDiscardedTabs().catch(() => {});
+  });
+}
+
+if (typeof chrome !== "undefined" && chrome.tabs?.onActivated) {
+  chrome.tabs.onActivated.addListener(() => {
+    closeExistingDiscardedTabs().catch(() => {});
+  });
+}
+
+if (typeof chrome !== "undefined" && chrome.storage?.onChanged) {
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === "sync" && changes[SPOTLIGHT_PREFERENCES_STORAGE_KEY]) {
+      closeExistingDiscardedTabs().catch(() => {});
+    }
+  });
+}
+
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.discarded) {
+  if (changeInfo.discarded || tab.discarded) {
     handleTabDiscarded(tabId, changeInfo, tab).catch(() => {});
   }
 });
@@ -101,7 +154,8 @@ chrome.runtime.onMessage.addListener(
         ? undefined
         : currentTabId;
 
-      getOpenTabs(excludedTabId, currentTabId)
+      closeExistingDiscardedTabs()
+        .then(() => getOpenTabs(excludedTabId, currentTabId))
         .then((tabs) => {
           sendResponse({ tabs });
         })

@@ -54,6 +54,53 @@ export async function saveArchivedTabs(tabs: ArchivedTab[]): Promise<void> {
   }
 }
 
+export async function archiveMultipleTabs(
+  tabs: Array<{
+    id?: number;
+    windowId?: number;
+    title?: string;
+    url?: string;
+    favIconUrl?: string;
+  }>,
+  maxTabs: number = DEFAULT_ARCHIVE_CONFIG.MAX_ARCHIVED_TABS,
+  retentionDays: number = DEFAULT_ARCHIVE_CONFIG.RETENTION_DAYS,
+): Promise<ArchivedTab[]> {
+  const validTabs = tabs.filter(
+    (tab) => tab.url && tab.url.trim() !== "" && tab.url !== "about:blank",
+  );
+  if (validTabs.length === 0) {
+    return [];
+  }
+
+  const now = Date.now();
+  const newArchived: ArchivedTab[] = validTabs.map((tab, idx) => {
+    const id =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `tab_${now}_${idx}_${Math.random().toString(36).slice(2, 9)}`;
+
+    return {
+      id,
+      originalTabId: tab.id,
+      windowId: tab.windowId,
+      title: tab.title || tab.url!,
+      url: tab.url!,
+      favIconUrl: tab.favIconUrl,
+      discardedAt: now,
+    };
+  });
+
+  const existing = await getArchivedTabs();
+  const pruned = pruneArchivedTabs(
+    [...newArchived, ...existing],
+    maxTabs,
+    retentionDays,
+  );
+  await saveArchivedTabs(pruned);
+
+  return newArchived;
+}
+
 export async function archiveTab(
   tab: {
     id?: number;
@@ -65,34 +112,8 @@ export async function archiveTab(
   maxTabs: number = DEFAULT_ARCHIVE_CONFIG.MAX_ARCHIVED_TABS,
   retentionDays: number = DEFAULT_ARCHIVE_CONFIG.RETENTION_DAYS,
 ): Promise<ArchivedTab | null> {
-  if (!tab.url || tab.url.trim() === "" || tab.url === "about:blank") {
-    return null;
-  }
-
-  const id =
-    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-      ? crypto.randomUUID()
-      : `tab_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-
-  const archivedTab: ArchivedTab = {
-    id,
-    originalTabId: tab.id,
-    windowId: tab.windowId,
-    title: tab.title || tab.url,
-    url: tab.url,
-    favIconUrl: tab.favIconUrl,
-    discardedAt: Date.now(),
-  };
-
-  const existing = await getArchivedTabs();
-  const pruned = pruneArchivedTabs(
-    [archivedTab, ...existing],
-    maxTabs,
-    retentionDays,
-  );
-  await saveArchivedTabs(pruned);
-
-  return archivedTab;
+  const [archived] = await archiveMultipleTabs([tab], maxTabs, retentionDays);
+  return archived || null;
 }
 
 export async function clearArchivedTabs(): Promise<void> {

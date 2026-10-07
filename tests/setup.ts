@@ -115,6 +115,11 @@ export const createChromeMock = () => {
     },
     tabs: {
       query: vi.fn(async () => []),
+      get: vi.fn(async (id: number) => ({
+        id,
+        url: "https://example.com",
+        title: "Example",
+      })),
       sendMessage: vi.fn(async () => {}),
       create: vi.fn(async (props: any) => ({ id: 999, ...props })),
       update: vi.fn(async (tabId: number, props: any) => ({
@@ -123,6 +128,20 @@ export const createChromeMock = () => {
       })),
       remove: vi.fn(async () => {}),
       onUpdated: {
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+      },
+      onActivated: {
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+      },
+    },
+    alarms: {
+      create: vi.fn(),
+      get: vi.fn((_name: string, cb?: (alarm?: any) => void) => {
+        if (cb) cb(undefined);
+      }),
+      onAlarm: {
         addListener: vi.fn(),
         removeListener: vi.fn(),
       },

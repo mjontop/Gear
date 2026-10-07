@@ -76,6 +76,7 @@ export default defineManifest((env) => {
       "clipboardWrite",
       "sessions",
       "downloads",
+      "alarms",
       ...(isFirefox ? [] : ["favicon"]),
     ],
     ...(isFirefox
