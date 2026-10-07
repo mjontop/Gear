@@ -143,12 +143,21 @@ export const createChromeMock = () => {
     history: {
       search: vi.fn(async () => []),
     },
+    sessions: {
+      getRecentlyClosed: vi.fn(async () => []),
+    },
+    downloads: {
+      search: vi.fn(async () => []),
+      open: vi.fn(async () => {}),
+      show: vi.fn(async () => {}),
+    },
     commands: {
       getAll: vi.fn(async (cb?: (commands: any[]) => void) => {
         const cmds = [
           { name: "toggle-spotlight", shortcut: "Alt+M" },
           { name: "copy-current-url", shortcut: "Alt+Shift+L" },
           { name: "open-spotlight-with-url", shortcut: "Alt+L" },
+          { name: "toggle-sidebar", shortcut: "Alt+S" },
         ];
         if (cb) cb(cmds);
         return cmds;

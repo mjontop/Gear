@@ -216,6 +216,9 @@ describe("background script", () => {
       commandListener(COMMAND_NAMES.TOGGLE_SPOTLIGHT),
     ).resolves.not.toThrow();
     await expect(
+      commandListener(COMMAND_NAMES.TOGGLE_SIDEBAR),
+    ).resolves.not.toThrow();
+    await expect(
       commandListener(COMMAND_NAMES.COPY_CURRENT_URL),
     ).resolves.not.toThrow();
     await expect(
@@ -227,6 +230,7 @@ describe("background script", () => {
     (globalThis as any).chrome.tabs.query = vi.fn().mockResolvedValue([]);
 
     await commandListener(COMMAND_NAMES.TOGGLE_SPOTLIGHT);
+    await commandListener(COMMAND_NAMES.TOGGLE_SIDEBAR);
     await commandListener(COMMAND_NAMES.COPY_CURRENT_URL);
     await commandListener(COMMAND_NAMES.OPEN_SPOTLIGHT_WITH_URL);
 

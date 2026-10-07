@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Sidebar } from "@/components/sidebar";
 import { Spotlight } from "@/components/spotlight";
 import { CopyUrlToast } from "../components/CopyUrlToast";
 import {
@@ -39,6 +40,7 @@ function App() {
     >
       <Spotlight />
       <CopyUrlToast />
+      <Sidebar />
     </div>
   );
 }

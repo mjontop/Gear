@@ -33,6 +33,26 @@ export type HistoryItem = {
   favIconUrl?: string;
 };
 
+export type DownloadItem = {
+  id: number;
+  filename: string;
+  url: string;
+  fileSize: number;
+  startTime: number;
+  state: string;
+  danger?: string;
+  mime?: string;
+};
+
+export type RecentlyClosedTab = {
+  id: string;
+  title: string;
+  url: string;
+  favIconUrl?: string;
+  closedAt: number;
+  sessionId?: string;
+};
+
 export type RuntimeMessage =
   | { type: "GET_OPEN_TABS" }
   | { type: "SWITCH_TO_TAB"; tabId: number; windowId: number }
@@ -46,4 +66,9 @@ export type RuntimeMessage =
   | { type: "GET_HISTORY"; query: string }
   | { type: "COPY_CURRENT_URL"; url: string }
   | { type: "TOGGLE_SPOTLIGHT" }
-  | { type: "OPEN_SPOTLIGHT_WITH_URL"; url?: string };
+  | { type: "OPEN_SPOTLIGHT_WITH_URL"; url?: string }
+  | { type: "TOGGLE_SIDEBAR" }
+  | { type: "GET_ARCHIVED_TABS" }
+  | { type: "GET_RECENTLY_CLOSED_TABS" }
+  | { type: "GET_DOWNLOADS"; query?: string }
+  | { type: "OPEN_DOWNLOAD"; downloadId: number };

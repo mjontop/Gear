@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+@import "../components/sidebar/sidebar.css";
 
 :host {
   all: initial;

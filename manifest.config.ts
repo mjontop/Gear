@@ -51,6 +51,13 @@ export default defineManifest((env) => {
         },
         description: "Open Spotlight with current URL prefilled and selected",
       },
+      "toggle-sidebar": {
+        suggested_key: {
+          default: "Alt+S",
+          mac: "Alt+S",
+        },
+        description: "Toggle sidebar navigation overlay",
+      },
     },
     background: isFirefox
       ? {
@@ -67,6 +74,8 @@ export default defineManifest((env) => {
       "history",
       "storage",
       "clipboardWrite",
+      "sessions",
+      "downloads",
       ...(isFirefox ? [] : ["favicon"]),
     ],
     ...(isFirefox

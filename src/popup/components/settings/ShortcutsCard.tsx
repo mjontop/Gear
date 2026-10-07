@@ -5,6 +5,7 @@ export type ShortcutsCardProps = {
     toggle: string[];
     copyUrl: string[];
     openWithUrl: string[];
+    toggleSidebar?: string[];
   };
   isFirefox: boolean;
   onOpenShortcuts: () => void;
@@ -73,6 +74,28 @@ export const ShortcutsCard = ({
         ))}
       </div>
     </div>
+
+    {shortcuts.toggleSidebar && (
+      <div className="shortcut_setting_row" style={{ marginTop: "8px" }}>
+        <div className="shortcut_info">
+          <span className="shortcut_name">Toggle Sidebar</span>
+          <span className="shortcut_desc">
+            Open the sidebar drawer on the left side of the screen.
+          </span>
+        </div>
+        <div className="shortcut_keys">
+          {shortcuts.toggleSidebar.map((k, idx) => (
+            <span
+              key={`toggleSidebar-${k}-${idx}`}
+              className="shortcut_key_piece"
+            >
+              {idx > 0 && <span className="shortcut_plus">+</span>}
+              <kbd>{k}</kbd>
+            </span>
+          ))}
+        </div>
+      </div>
+    )}
 
     {isFirefox ? (
       <p className="shortcut_tip_text">

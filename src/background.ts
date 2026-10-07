@@ -5,7 +5,12 @@ import { getOpenTabs } from "./background-tasks/open-tabs";
 import { getSearchSuggestions } from "./background-tasks/search-suggestions";
 import { switchToTab } from "./background-tasks/switch-tab";
 import { handleTabDiscarded } from "./background-tasks/discarded-tabs";
-import { pruneExpiredArchivedTabs } from "./lib/archived-tabs-storage";
+import { getRecentlyClosedTabs } from "./background-tasks/recently-closed";
+import { getDownloads, openDownload } from "./background-tasks/downloads";
+import {
+  getArchivedTabs,
+  pruneExpiredArchivedTabs,
+} from "./lib/archived-tabs-storage";
 import { getSpotlightPreferences } from "./lib/preferences";
 import type { RuntimeMessage } from "./background-tasks/types";
 
@@ -67,6 +72,22 @@ chrome.commands.onCommand.addListener(async (command) => {
       .sendMessage(tab.id, {
         type: MESSAGE_TYPES.OPEN_SPOTLIGHT_WITH_URL,
         url: tab.url,
+      })
+      .catch(() => {});
+    return;
+  }
+
+  if (command === COMMAND_NAMES.TOGGLE_SIDEBAR) {
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+
+    if (!tab?.id || isRestrictedUrl(tab.url)) return;
+
+    chrome.tabs
+      .sendMessage(tab.id, {
+        type: MESSAGE_TYPES.TOGGLE_SIDEBAR,
       })
       .catch(() => {});
   }
@@ -144,6 +165,54 @@ chrome.runtime.onMessage.addListener(
         })
         .catch(() => {
           sendResponse({ history: [] });
+        });
+
+      return true;
+    }
+
+    if (message.type === MESSAGE_TYPES.GET_ARCHIVED_TABS) {
+      getArchivedTabs()
+        .then((tabs) => {
+          sendResponse({ tabs });
+        })
+        .catch(() => {
+          sendResponse({ tabs: [] });
+        });
+
+      return true;
+    }
+
+    if (message.type === MESSAGE_TYPES.GET_RECENTLY_CLOSED_TABS) {
+      getRecentlyClosedTabs()
+        .then((tabs) => {
+          sendResponse({ tabs });
+        })
+        .catch(() => {
+          sendResponse({ tabs: [] });
+        });
+
+      return true;
+    }
+
+    if (message.type === MESSAGE_TYPES.GET_DOWNLOADS) {
+      getDownloads(message.query)
+        .then((downloads) => {
+          sendResponse({ downloads });
+        })
+        .catch(() => {
+          sendResponse({ downloads: [] });
+        });
+
+      return true;
+    }
+
+    if (message.type === MESSAGE_TYPES.OPEN_DOWNLOAD) {
+      openDownload(message.downloadId)
+        .then((success) => {
+          sendResponse({ success });
+        })
+        .catch(() => {
+          sendResponse({ success: false });
         });
 
       return true;

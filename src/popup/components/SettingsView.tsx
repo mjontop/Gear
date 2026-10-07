@@ -40,6 +40,7 @@ export const SettingsView = ({
     toggle: ["Alt", "M"],
     copyUrl: ["Alt", "Shift", "L"],
     openWithUrl: ["Alt", "L"],
+    toggleSidebar: ["Alt", "S"],
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -63,6 +64,12 @@ export const SettingsView = ({
             setShortcuts((prev) => ({
               ...prev,
               openWithUrl: cmd.shortcut!.split("+").map((s) => s.trim()),
+            }));
+          }
+          if (cmd.name === "toggle-sidebar" && cmd.shortcut) {
+            setShortcuts((prev) => ({
+              ...prev,
+              toggleSidebar: cmd.shortcut!.split("+").map((s) => s.trim()),
             }));
           }
         }
