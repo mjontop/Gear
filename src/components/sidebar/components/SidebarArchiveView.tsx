@@ -1,8 +1,15 @@
-import { FilterIcon, SearchIcon, XIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import {
+  CheckIcon,
+  CopyIcon,
+  FilterIcon,
+  SearchIcon,
+  XIcon,
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MESSAGE_TYPES } from "@/constants";
 import type { ArchivedTab } from "@/lib/archived-tabs-storage";
 import type { RecentlyClosedTab } from "@/background-tasks/types";
+import { copyTextToClipboard } from "../utils/clipboard";
 import { groupByTimeBuckets } from "../utils/time-buckets";
 import { FaviconImage } from "./FaviconImage";
 import { SidebarHeader } from "./SidebarHeader";
@@ -29,6 +36,33 @@ export const SidebarArchiveView = ({
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   const [autoTabs, setAutoTabs] = useState<ArchivedTab[]>([]);
   const [manualTabs, setManualTabs] = useState<RecentlyClosedTab[]>([]);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const copyTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        window.clearTimeout(copyTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleCopyUrl = async (
+    e: React.MouseEvent,
+    url: string,
+    id: string,
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+    await copyTextToClipboard(url);
+    setCopiedId(id);
+    if (copyTimeoutRef.current) {
+      window.clearTimeout(copyTimeoutRef.current);
+    }
+    copyTimeoutRef.current = window.setTimeout(() => {
+      setCopiedId((curr) => (curr === id ? null : curr));
+    }, 1500);
+  };
 
   useEffect(() => {
     let isCurrent = true;
@@ -190,20 +224,40 @@ export const SidebarArchiveView = ({
               <div className="sidebar_bucket_label">{bucket.label}</div>
               <div className="sidebar_items_list">
                 {bucket.items.map((item) => (
-                  <button
+                  <div
                     key={item.id}
-                    type="button"
-                    className="sidebar_list_item"
-                    onClick={() => handleOpenUrl(item.url)}
+                    className="sidebar_list_item sidebar_archive_item"
                   >
-                    <FaviconImage favIconUrl={item.favIconUrl} />
-                    <div className="sidebar_item_info">
-                      <span className="sidebar_item_title">{item.title}</span>
-                      <span className="sidebar_item_domain">
-                        {item.url.replace(/^https?:\/\//i, "").split("/")[0]}
-                      </span>
-                    </div>
-                  </button>
+                    <button
+                      type="button"
+                      className="sidebar_tab_main_btn"
+                      onClick={() => handleOpenUrl(item.url)}
+                      title={item.title}
+                    >
+                      <FaviconImage favIconUrl={item.favIconUrl} />
+                      <div className="sidebar_item_info">
+                        <span className="sidebar_item_title">{item.title}</span>
+                        <span className="sidebar_item_domain sidebar_item_url">
+                          {item.url.replace(/^https?:\/\//i, "")}
+                        </span>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      className={`sidebar_copy_btn ${
+                        copiedId === item.id ? "sidebar_copy_btn_active" : ""
+                      }`}
+                      aria-label="Copy URL"
+                      title={copiedId === item.id ? "Copied!" : "Copy URL"}
+                      onClick={(e) => handleCopyUrl(e, item.url, item.id)}
+                    >
+                      {copiedId === item.id ? (
+                        <CheckIcon size={14} className="sidebar_copied_icon" />
+                      ) : (
+                        <CopyIcon size={14} />
+                      )}
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>

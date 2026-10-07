@@ -380,6 +380,66 @@ button.sidebar_list_item {
   color: var(--color-spotlight-input-text, #ffffff) !important;
 }
 
+.sidebar_copy_btn {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: var(--color-spotlight-icon, rgba(255, 255, 255, 0.5)) !important;
+  padding: 4px !important;
+  margin-right: 6px !important;
+  border-radius: 4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease !important;
+}
+
+.sidebar_list_item:hover .sidebar_copy_btn,
+.sidebar_list_item:focus-within .sidebar_copy_btn,
+.sidebar_copy_btn:focus-visible,
+.sidebar_copy_btn_active {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.sidebar_copy_btn:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: var(--color-spotlight-input-text, #ffffff) !important;
+}
+
+.sidebar_copied_icon {
+  color: #22c55e !important;
+}
+
+.sidebar_item_url {
+  font-size: 0.72rem !important;
+  color: var(
+    --color-spotlight-placeholder,
+    rgba(255, 255, 255, 0.42)
+  ) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.sidebar_archive_item .sidebar_item_url,
+.sidebar_archive_item .sidebar_item_domain {
+  display: none !important;
+}
+
+.sidebar_archive_item:hover .sidebar_item_url,
+.sidebar_archive_item:hover .sidebar_item_domain,
+.sidebar_archive_item:focus-within .sidebar_item_url,
+.sidebar_archive_item:focus-within .sidebar_item_domain {
+  display: block !important;
+}
+
 .sidebar_bookmark_tag_icon {
   color: #eab308 !important;
   margin-left: auto !important;
