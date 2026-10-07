@@ -83,6 +83,13 @@ describe("Sidebar Components", () => {
                   url: "https://github.com",
                   active: true,
                 },
+                {
+                  id: 2,
+                  windowId: 1,
+                  title: "Normal Tab",
+                  url: "https://unbookmarked.com",
+                  active: false,
+                },
               ],
             });
           }
@@ -109,32 +116,40 @@ describe("Sidebar Components", () => {
       const header = document.querySelector(".sidebar_header");
       expect(header?.querySelector("button")).toBeNull();
 
+      // Even when collapsed, opened bookmark appears in bookmarks section
+      expect(screen.getByText("Active Tab")).toBeInTheDocument();
+
+      // Open tabs should have Normal Tab, and not repeat Active Tab
+      const openTabsSection = document.querySelector(".sidebar_tabs_section");
+      expect(openTabsSection).toHaveTextContent("Normal Tab");
+      expect(openTabsSection).not.toHaveTextContent("Active Tab");
+
       // Accordion toggle
       const accordionBtn = screen.getByRole("button", { name: /Bookmarks/i });
       fireEvent.click(accordionBtn);
-      expect(screen.getAllByText("GitHub").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Active Tab").length).toBeGreaterThan(0);
 
       // Open tab click
-      const tabBtn = screen.getByRole("button", { name: /^Active Tab/i });
-      expect(tabBtn).toBeInTheDocument();
-      fireEvent.click(tabBtn);
+      const normalTabBtn = screen.getByRole("button", { name: /^Normal Tab/i });
+      expect(normalTabBtn).toBeInTheDocument();
+      fireEvent.click(normalTabBtn);
       expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
         type: MESSAGE_TYPES.SWITCH_TO_TAB,
-        tabId: 1,
+        tabId: 2,
         windowId: 1,
       });
       expect(onClose).toHaveBeenCalled();
 
       // Open tab close button
-      const closeTabBtn = screen.getByRole("button", {
-        name: "Close tab Active Tab",
+      const closeNormalTabBtn = screen.getByRole("button", {
+        name: "Close tab Normal Tab",
       });
-      fireEvent.click(closeTabBtn);
+      fireEvent.click(closeNormalTabBtn);
       expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
         type: MESSAGE_TYPES.CLOSE_TAB,
-        tabId: 1,
+        tabId: 2,
       });
-      expect(screen.queryByText("Active Tab")).not.toBeInTheDocument();
+      expect(screen.queryByText("Normal Tab")).not.toBeInTheDocument();
 
       // View Archive button
       const archiveBtn = screen.getByRole("button", {

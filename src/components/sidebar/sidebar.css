@@ -307,6 +307,30 @@ button.sidebar_list_item {
   ) !important;
 }
 
+.sidebar_bookmark_opened {
+  border: 1px solid var(--color-spotlight-border, rgba(255, 255, 255, 0.16)) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.sidebar_bookmark_opened:hover {
+  background: var(--color-item-hover-bg, rgba(255, 255, 255, 0.12)) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+.sidebar_bookmark_opened.sidebar_list_item_current {
+  background: rgba(56, 189, 248, 0.15) !important;
+  border-color: var(
+    --spotlight-accent-color,
+    rgba(56, 189, 248, 0.5)
+  ) !important;
+}
+
+.sidebar_opened_bookmarks_collapsed {
+  margin-top: 6px !important;
+  max-height: 180px !important;
+  overflow-y: auto !important;
+}
+
 .sidebar_tab_main_btn {
   display: flex !important;
   align-items: center !important;
