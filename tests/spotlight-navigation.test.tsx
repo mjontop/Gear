@@ -139,6 +139,7 @@ describe("Spotlight Navigation & Toggle", () => {
 
     // Reopen and test backdrop close
     await act(async () => {
+      window.dispatchEvent(new KeyboardEvent("keyup"));
       messageListener({ type: MESSAGE_TYPES.TOGGLE_SPOTLIGHT });
     });
     const backdrop = screen.getByLabelText("Close Spotlight search");
@@ -193,6 +194,7 @@ describe("Spotlight Navigation & Toggle", () => {
 
     // Test selecting direct-url
     await act(async () => {
+      window.dispatchEvent(new KeyboardEvent("keyup"));
       messageListener({ type: MESSAGE_TYPES.TOGGLE_SPOTLIGHT });
     });
 

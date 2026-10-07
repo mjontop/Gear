@@ -21,7 +21,51 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
+const commandLatches = new Map<
+  string,
+  { isHeld: boolean; timer: ReturnType<typeof setTimeout> | null }
+>();
+
+export function canTriggerCommand(command: string, timeoutMs = 350): boolean {
+  let state = commandLatches.get(command);
+  if (!state) {
+    state = { isHeld: false, timer: null };
+    commandLatches.set(command, state);
+  }
+
+  if (state.isHeld) {
+    if (state.timer !== null) {
+      clearTimeout(state.timer);
+    }
+    state.timer = setTimeout(() => {
+      state.isHeld = false;
+    }, timeoutMs);
+    return false;
+  }
+
+  state.isHeld = true;
+  if (state.timer !== null) {
+    clearTimeout(state.timer);
+  }
+  state.timer = setTimeout(() => {
+    state.isHeld = false;
+  }, timeoutMs);
+  return true;
+}
+
+export function resetCommandLatches(): void {
+  for (const state of commandLatches.values()) {
+    state.isHeld = false;
+    if (state.timer !== null) {
+      clearTimeout(state.timer);
+      state.timer = null;
+    }
+  }
+}
+
 chrome.commands.onCommand.addListener(async (command) => {
+  if (!canTriggerCommand(command)) return;
+
   if (command === COMMAND_NAMES.TOGGLE_SPOTLIGHT) {
     const [tab] = await chrome.tabs.query({
       active: true,
@@ -74,6 +118,12 @@ chrome.commands.onCommand.addListener(async (command) => {
 
 chrome.runtime.onMessage.addListener(
   (message: RuntimeMessage, sender, sendResponse) => {
+    if (message.type === MESSAGE_TYPES.SHORTCUT_KEY_UP) {
+      resetCommandLatches();
+      sendResponse({ success: true });
+      return true;
+    }
+
     if (message.type === MESSAGE_TYPES.GET_OPEN_TABS) {
       const currentTabId = sender.tab?.id;
 

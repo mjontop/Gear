@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { CheckIcon } from "lucide-react";
 import { MESSAGE_TYPES } from "@/constants";
 
+import { createShortcutLatch, type ShortcutLatch } from "@/lib/shortcut-latch";
+
 async function copyTextToClipboard(text: string): Promise<boolean> {
   if (navigator.clipboard && window.isSecureContext) {
     try {
@@ -37,29 +39,71 @@ async function copyTextToClipboard(text: string): Promise<boolean> {
 export const CopyUrlToast = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
+  const toastMessageRef = useRef<string | null>(null);
+
+  const copyLatchRef = useRef<ShortcutLatch | null>(null);
+  if (!copyLatchRef.current) {
+    copyLatchRef.current = createShortcutLatch();
+  }
 
   useEffect(() => {
-    const handleMessage = async (message: { type?: string; url?: string }) => {
+    toastMessageRef.current = toastMessage;
+  }, [toastMessage]);
+
+  useEffect(() => {
+    const handleMessage = (message: { type?: string; url?: string }) => {
       if (message.type === MESSAGE_TYPES.COPY_CURRENT_URL) {
-        const urlToCopy = message.url || window.location.href;
-        await copyTextToClipboard(urlToCopy);
+        copyLatchRef.current?.handleTrigger(async () => {
+          if (toastMessageRef.current) {
+            if (timerRef.current) {
+              window.clearTimeout(timerRef.current);
+              timerRef.current = null;
+            }
+            setToastMessage(null);
+            return;
+          }
 
-        setToastMessage("Copied Current URL");
+          const urlToCopy = message.url || window.location.href;
+          await copyTextToClipboard(urlToCopy);
 
-        if (timerRef.current) {
-          window.clearTimeout(timerRef.current);
-        }
+          setToastMessage("Copied Current URL");
 
-        timerRef.current = window.setTimeout(() => {
-          setToastMessage(null);
-        }, 2500);
+          if (timerRef.current) {
+            window.clearTimeout(timerRef.current);
+          }
+
+          timerRef.current = window.setTimeout(() => {
+            setToastMessage(null);
+          }, 2500);
+        });
       }
     };
 
-    chrome.runtime.onMessage.addListener(handleMessage);
+    const handleKeyup = () => {
+      copyLatchRef.current?.handleRelease();
+      if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
+        try {
+          const res = chrome.runtime.sendMessage({
+            type: MESSAGE_TYPES.SHORTCUT_KEY_UP,
+          });
+          if (res && typeof res.catch === "function") {
+            res.catch(() => {});
+          }
+        } catch {}
+      }
+    };
+
+    if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
+      chrome.runtime.onMessage.addListener(handleMessage);
+    }
+    window.addEventListener("keyup", handleKeyup, { capture: true });
 
     return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage);
+      if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
+        chrome.runtime.onMessage.removeListener(handleMessage);
+      }
+      window.removeEventListener("keyup", handleKeyup, { capture: true });
+      copyLatchRef.current?.reset();
       if (timerRef.current) {
         window.clearTimeout(timerRef.current);
       }

@@ -1,4 +1,4 @@
-import { useState, useRef, KeyboardEvent } from "react";
+import { useState, useRef, useCallback, KeyboardEvent } from "react";
 import {
   DEFAULT_SEARCH_PROVIDER_ID,
   MAX_SPOTLIGHT_RESULTS,
@@ -23,33 +23,14 @@ import {
   useSpotlightScrollLock,
   useSpotlightShortcut,
 } from "./hooks";
+import {
+  formatQueryWithBang,
+  getAutocompletedText,
+  getClampedTabIndex,
+} from "./utils";
 
 type SwitchTabResponse = {
   success?: boolean;
-};
-
-const getClampedTabIndex = (index: number, tabCount: number) => {
-  if (tabCount === 0) return 0;
-
-  return Math.min(index, tabCount - 1);
-};
-
-const formatQueryWithBang = (query: string, bang: string | null): string => {
-  if (bang) {
-    return `${bang} ${query}`;
-  }
-  return query;
-};
-
-const getAutocompletedText = (
-  result: SpotlightResultData,
-  bang: string | null,
-): string => {
-  if (result.kind === "search-suggestion") {
-    return formatQueryWithBang(result.query, bang);
-  }
-
-  return result.title;
 };
 
 export const Spotlight = () => {
@@ -84,13 +65,13 @@ export const Spotlight = () => {
 
   const [shouldSelectInputText, setShouldSelectInputText] = useState(false);
 
-  const resetSpotlight = () => {
+  const resetSpotlight = useCallback(() => {
     setSearchValue("");
     setSelectedTabIndex(0);
     setShouldSelectInputText(false);
-  };
+  }, []);
 
-  const handleOpenWithUrl = (url: string) => {
+  const handleOpenWithUrl = useCallback((url: string) => {
     setSearchValue(url);
     setSelectedTabIndex(0);
     setShouldSelectInputText(true);
@@ -101,7 +82,7 @@ export const Spotlight = () => {
         inputRef.current.select();
       }
     });
-  };
+  }, []);
 
   useSpotlightShortcut({
     setIsOpen,

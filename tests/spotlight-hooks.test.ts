@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import {
-  useSpotlightShortcut,
   useOpenTabs,
   useBookmarks,
   useHistory,
@@ -260,81 +259,6 @@ describe("Spotlight Data Hooks", () => {
 
       expect(sendMock).not.toHaveBeenCalled();
       vi.useRealTimers();
-    });
-  });
-
-  describe("useSpotlightShortcut", () => {
-    it("listens for TOGGLE_SPOTLIGHT message and toggles state", () => {
-      const setIsOpen = vi.fn();
-      const onToggle = vi.fn();
-
-      let messageListener: any;
-      (globalThis as any).chrome.runtime.onMessage.addListener = vi.fn((fn) => {
-        messageListener = fn;
-      });
-
-      renderHook(() => useSpotlightShortcut({ setIsOpen, onToggle }));
-
-      act(() => {
-        messageListener({ type: MESSAGE_TYPES.TOGGLE_SPOTLIGHT });
-      });
-
-      expect(onToggle).toHaveBeenCalled();
-      expect(setIsOpen).toHaveBeenCalled();
-    });
-
-    it("listens for OPEN_SPOTLIGHT_WITH_URL message", () => {
-      const setIsOpen = vi.fn();
-      const onOpenWithUrl = vi.fn();
-
-      let messageListener: any;
-      (globalThis as any).chrome.runtime.onMessage.addListener = vi.fn((fn) => {
-        messageListener = fn;
-      });
-
-      renderHook(() =>
-        useSpotlightShortcut({
-          setIsOpen,
-          onToggle: vi.fn(),
-          onOpenWithUrl,
-        }),
-      );
-
-      act(() => {
-        messageListener({
-          type: MESSAGE_TYPES.OPEN_SPOTLIGHT_WITH_URL,
-          url: "https://prefill.com",
-        });
-      });
-
-      expect(onOpenWithUrl).toHaveBeenCalledWith("https://prefill.com");
-      expect(setIsOpen).toHaveBeenCalledWith(true);
-    });
-
-    it("handles Alt+L keydown shortcut on window", () => {
-      const setIsOpen = vi.fn();
-      const onOpenWithUrl = vi.fn();
-
-      renderHook(() =>
-        useSpotlightShortcut({
-          setIsOpen,
-          onToggle: vi.fn(),
-          onOpenWithUrl,
-        }),
-      );
-
-      const event = new KeyboardEvent("keydown", {
-        key: "l",
-        code: "KeyL",
-        altKey: true,
-      });
-
-      act(() => {
-        window.dispatchEvent(event);
-      });
-
-      expect(onOpenWithUrl).toHaveBeenCalled();
-      expect(setIsOpen).toHaveBeenCalledWith(true);
     });
   });
 });

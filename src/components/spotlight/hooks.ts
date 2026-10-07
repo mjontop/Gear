@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import {
   MESSAGE_TYPES,
   SEARCH_SUGGESTION_DEBOUNCE_MS,
   type SearchProviderId,
 } from "@/constants";
+import { createShortcutLatch, type ShortcutLatch } from "@/lib/shortcut-latch";
 import type { BookmarkItem, HistoryItem } from "@/background-tasks/types";
 import type { OpenTabData, SearchSuggestionResponseData } from "./results";
 
@@ -15,21 +16,7 @@ export {
   type UseSpotlightScrollLockParams,
 } from "./scroll-lock";
 
-type TabsResponse = {
-  tabs?: OpenTabData[];
-};
-
-type BookmarksResponse = {
-  bookmarks?: BookmarkItem[];
-};
-
-type HistoryResponse = {
-  history?: HistoryItem[];
-};
-
-type SearchSuggestionsResponse = {
-  suggestions?: SearchSuggestionResponseData[];
-};
+import type { SpotlightApiResponse } from "./utils";
 
 export type UseSpotlightShortcutParams = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -49,34 +36,80 @@ export const useSpotlightShortcut = ({
   onToggle,
   onOpenWithUrl,
 }: UseSpotlightShortcutParams) => {
+  const onToggleRef = useRef(onToggle);
+  const onOpenWithUrlRef = useRef(onOpenWithUrl);
+
+  useEffect(() => {
+    onToggleRef.current = onToggle;
+    onOpenWithUrlRef.current = onOpenWithUrl;
+  }, [onToggle, onOpenWithUrl]);
+
+  const toggleLatchRef = useRef<ShortcutLatch | null>(null);
+  const urlLatchRef = useRef<ShortcutLatch | null>(null);
+  if (!toggleLatchRef.current) toggleLatchRef.current = createShortcutLatch();
+  if (!urlLatchRef.current) urlLatchRef.current = createShortcutLatch();
+
   useEffect(() => {
     const handleMessage = (message: { type?: string; url?: string }) => {
       if (message.type === MESSAGE_TYPES.TOGGLE_SPOTLIGHT) {
-        onToggle();
-        setIsOpen((prev) => !prev);
+        toggleLatchRef.current?.handleTrigger(() => {
+          onToggleRef.current();
+          setIsOpen((prev) => !prev);
+        });
         return;
       }
 
       if (message.type === MESSAGE_TYPES.OPEN_SPOTLIGHT_WITH_URL) {
-        const targetUrl = message.url || window.location.href;
-        onOpenWithUrl?.(targetUrl);
-        setIsOpen(true);
+        urlLatchRef.current?.handleTrigger(() => {
+          setIsOpen((prev) => {
+            if (prev) {
+              onToggleRef.current();
+              return false;
+            }
+            const targetUrl = message.url || window.location.href;
+            onOpenWithUrlRef.current?.(targetUrl);
+            return true;
+          });
+        });
       }
     };
 
     const handleKeydown = (e: globalThis.KeyboardEvent) => {
-      if (
+      const isAltL =
         e.altKey &&
         !e.ctrlKey &&
         !e.metaKey &&
         !e.shiftKey &&
-        (e.key === "l" || e.key === "L" || e.code === "KeyL")
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        const targetUrl = window.location.href;
-        onOpenWithUrl?.(targetUrl);
-        setIsOpen(true);
+        (e.key === "l" || e.key === "L" || e.code === "KeyL");
+      if (!isAltL) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.repeat) return;
+
+      urlLatchRef.current?.handleTrigger(() => {
+        setIsOpen((prev) => {
+          if (prev) {
+            onToggleRef.current();
+            return false;
+          }
+          onOpenWithUrlRef.current?.(window.location.href);
+          return true;
+        });
+      });
+    };
+
+    const handleKeyup = () => {
+      toggleLatchRef.current?.handleRelease();
+      urlLatchRef.current?.handleRelease();
+      if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
+        try {
+          const res = chrome.runtime.sendMessage({
+            type: MESSAGE_TYPES.SHORTCUT_KEY_UP,
+          });
+          if (res && typeof res.catch === "function") {
+            res.catch(() => {});
+          }
+        } catch {}
       }
     };
 
@@ -84,14 +117,18 @@ export const useSpotlightShortcut = ({
       chrome.runtime.onMessage.addListener(handleMessage);
     }
     window.addEventListener("keydown", handleKeydown, { capture: true });
+    window.addEventListener("keyup", handleKeyup, { capture: true });
 
     return () => {
       if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
         chrome.runtime.onMessage.removeListener(handleMessage);
       }
       window.removeEventListener("keydown", handleKeydown, { capture: true });
+      window.removeEventListener("keyup", handleKeyup, { capture: true });
+      toggleLatchRef.current?.reset();
+      urlLatchRef.current?.reset();
     };
-  }, [onToggle, setIsOpen, onOpenWithUrl]);
+  }, [setIsOpen]);
 };
 
 export const useOpenTabs = (isOpen?: boolean) => {
@@ -102,7 +139,7 @@ export const useOpenTabs = (isOpen?: boolean) => {
 
     chrome.runtime.sendMessage(
       { type: MESSAGE_TYPES.GET_OPEN_TABS },
-      (response?: TabsResponse) => {
+      (response?: SpotlightApiResponse) => {
         setTabs(response?.tabs ?? []);
       },
     );
@@ -136,7 +173,7 @@ export const useBookmarks = ({
     const fetchBookmarks = () => {
       chrome.runtime.sendMessage(
         { type: MESSAGE_TYPES.GET_BOOKMARKS, query: queryToSearch },
-        (response?: BookmarksResponse) => {
+        (response?: SpotlightApiResponse) => {
           if (!isCurrent) return;
           setBookmarks(response?.bookmarks ?? []);
         },
@@ -186,7 +223,7 @@ export const useHistory = ({
     const fetchHistory = () => {
       chrome.runtime.sendMessage(
         { type: MESSAGE_TYPES.GET_HISTORY, query: cleanQuery },
-        (response?: HistoryResponse) => {
+        (response?: SpotlightApiResponse) => {
           if (!isCurrent) return;
           setHistory(response?.history ?? []);
         },
@@ -239,7 +276,7 @@ export const useSearchSuggestions = ({
           query: trimmedClean,
           provider,
         },
-        (response?: SearchSuggestionsResponse) => {
+        (response?: SpotlightApiResponse) => {
           if (!isCurrentSearch) return;
 
           setSearchSuggestions(response?.suggestions ?? []);

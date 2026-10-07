@@ -6,6 +6,8 @@ describe("background script", () => {
   let messageListener: (msg: any, sender: any, sendResponse: any) => boolean;
   let tabUpdatedListener: (tabId: number, changeInfo: any, tab: any) => void;
 
+  let backgroundModule: any;
+
   beforeAll(async () => {
     (globalThis as any).chrome.commands.onCommand.addListener = (fn: any) => {
       commandListener = fn;
@@ -17,11 +19,12 @@ describe("background script", () => {
       tabUpdatedListener = fn;
     };
 
-    await import("@/background");
+    backgroundModule = await import("@/background");
   });
 
   beforeEach(() => {
     vi.clearAllMocks();
+    backgroundModule?.resetCommandLatches();
   });
 
   it("handles toggle-spotlight command on unrestricted tab", async () => {
@@ -260,5 +263,31 @@ describe("background script", () => {
     );
 
     expect(removeSpy).not.toHaveBeenCalled();
+  });
+
+  it("suppresses repeated command triggers while held and resets on SHORTCUT_KEY_UP", async () => {
+    (globalThis as any).chrome.tabs.query = vi
+      .fn()
+      .mockResolvedValue([{ id: 101, url: "https://example.com" }]);
+
+    await commandListener(COMMAND_NAMES.TOGGLE_SPOTLIGHT);
+    expect((globalThis as any).chrome.tabs.sendMessage).toHaveBeenCalledTimes(
+      1,
+    );
+
+    // Repeated triggers while held
+    await commandListener(COMMAND_NAMES.TOGGLE_SPOTLIGHT);
+    expect((globalThis as any).chrome.tabs.sendMessage).toHaveBeenCalledTimes(
+      1,
+    );
+
+    // Key released
+    messageListener({ type: MESSAGE_TYPES.SHORTCUT_KEY_UP }, {}, () => {});
+
+    // Next press triggers again
+    await commandListener(COMMAND_NAMES.TOGGLE_SPOTLIGHT);
+    expect((globalThis as any).chrome.tabs.sendMessage).toHaveBeenCalledTimes(
+      2,
+    );
   });
 });
